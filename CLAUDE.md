@@ -25,7 +25,7 @@
 | skills    | npx skills                                                   |
 | openspec  | npx @fission-ai/openspec                                     |
 | codegraph | npx @colbymchenry/codegraph                                  |
-| graphify  | uvx --env-file=.env --from graphifyy --with "graphifyy[openai]" graphify ~/Documents/lbs/lbs-udf |
+| graphify  | /cluster/uv/uvx --env-file=.env --from graphifyy --with "graphifyy[openai]" graphify ~/Documents/lbs/lbs-udf |
 | claude    | npx @anthropic-ai/claude-code                                |
 | openclaw  | npx openclaw                                                 |
 
