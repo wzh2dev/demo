@@ -28,6 +28,7 @@
 | graphify  | /cluster/uv/uvx --env-file=.env --from graphifyy --with "graphifyy[openai]" graphify ~/Documents/lbs/lbs-udf |
 | claude    | npx @anthropic-ai/claude-code                                |
 | openclaw  | npx openclaw                                                 |
+| lark-cli  | npx @larksuite/cli                                           |
 
 ## 项目构建
 
@@ -38,4 +39,4 @@
 
 ## 提交代码
 
-严格按照 `.gitignore` 文件中的规则提交代码，**MUST NOT**自行判断哪些文件"RECOMMENDED‌"或"NOT RECOMMENDED‌"提交。
+严格按照 `.gitignore` 文件中的规则提交代码，**MUST NOT**自行判断哪些文件"RECOMMENDED"或"NOT RECOMMENDED"提交。
