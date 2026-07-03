@@ -11,6 +11,7 @@
     "mechatroner.rainbow-csv",
     "pomdtr.excalidraw-editor",
     "redhat.vscode-xml",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "DavidAnson.vscode-markdownlint"
   ]
 }
