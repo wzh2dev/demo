@@ -8,6 +8,7 @@
     "hediet.vscode-drawio",
     "mtxr.sqltools",
     "mtxr.sqltools-driver-mysql",
+    "mtxr.sqltools-driver-pg",
     "mechatroner.rainbow-csv",
     "pomdtr.excalidraw-editor",
     "redhat.vscode-xml",
