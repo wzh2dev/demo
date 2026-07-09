@@ -49,4 +49,4 @@
 
 ---
 
-@PERSONA
+@PERSONA.md
