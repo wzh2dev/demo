@@ -1,5 +1,13 @@
 {
   "mcpServers": {
+    "codegraph": {
+      "command": "npx",
+      "args": [
+        "@colbymchenry/codegraph",
+        "serve",
+        "--mcp"
+      ]
+    },
     "drawio": {
       "command": "npx",
       "args": [
@@ -11,6 +19,13 @@
       "args": [
         "@playwright/mcp@latest",
         "--browser=chrome"
+      ]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:postgres@xueyingying.com/demo"
       ]
     }
   }

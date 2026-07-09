@@ -36,6 +36,7 @@
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true
   },
+  "go.goroot": "/cluster/go",
   // for trae
   "workbench.colorTheme": "Light",
   "java.configuration.updateBuildConfiguration": "automatic",

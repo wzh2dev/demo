@@ -4,6 +4,7 @@
     "scala-lang.scala",
     "ms-python.python",
     "fwcd.kotlin",
+    "golang.Go",
     "EditorConfig.EditorConfig",
     "hediet.vscode-drawio",
     "mtxr.sqltools",
