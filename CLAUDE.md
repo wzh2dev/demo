@@ -1,8 +1,7 @@
 ## 目录结构
 
 - Gradle/Maven 项目根目录 **MUST** 仅包含构建配置文件及项目级文档。
-- 项目根目录 **MUST** 存在 `.codegraph` 目录，如果不存在，先执行 `codegraph init -i`。
-
+- 项目根目录 **MUST** 存在 `.codegraph` 目录，如果不存在，执行 `codegraph init -i`。
 
 ## 本地环境
 
@@ -22,7 +21,7 @@
 
 ## 项目构建
 
-- **MUST NOT** 通过 `brew install` 自动安装软件。如需要安装软件时，**MUST** 停止并提示用户自行安装，列出所需软件及版本要求。
+- **MUST NOT** 通过 `brew install` 自动安装软件。需要安装软件时，**MUST** 停止并提示用户自行安装，列出所需软件及版本要求。
 - **MUST NOT** 使用 Gradle/Maven Wrapper，使用本地环境表中的版本。
 - **MUST NOT** 在 Gradle/Maven 项目级配置文件中声明 repositories 或修改全局配置文件，**MUST** 使用已有的全局配置。
 - **MUST NOT** 通过修改环境变量、`go env -w` 等方式修改 Go 配置，**MUST** 使用已有的全局配置。
@@ -48,6 +47,7 @@
 | codegraph | npx @colbymchenry/codegraph                                  |
 | graphify  | /cluster/uv/uvx --env-file=.env --from graphifyy --with "graphifyy[openai]" graphify . |
 | claude    | npx @anthropic-ai/claude-code                                |
+| codex     | npx @openai/codex                                            |
 | openclaw  | npx openclaw                                                 |
 | lark-cli  | npx @larksuite/cli                                           |
 
