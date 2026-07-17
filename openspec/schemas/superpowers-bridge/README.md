@@ -1,7 +1,3 @@
-# superpowers-bridge Schema
-
----
-
 ## 进入与离开的判断(Entry & exit gates)
 
 本 schema 的 instruction 只在 `/opsx:*` 指令启动 artifact 时才注入 prompt。
