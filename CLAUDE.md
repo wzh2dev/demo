@@ -43,6 +43,7 @@
 
 | 工具      | 调用命令                                                     |
 | :-------- | :----------------------------------------------------------- |
+| skills    | npx skills                                                   |
 | openspec  | npx @fission-ai/openspec                                     |
 | codegraph | npx @colbymchenry/codegraph                                  |
 | graphify  | /cluster/uv/uvx --env-file=.env --from graphifyy --with "graphifyy[openai]" graphify . |

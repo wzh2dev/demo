@@ -1,6 +1,9 @@
 {
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
+  "files.exclude": {
+    "**/.git": false
+  },
   "editor.formatOnSave": true,
   "editor.formatOnPaste": false,
   "redhat.telemetry.enabled": false,

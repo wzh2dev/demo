@@ -7,11 +7,23 @@
       "skillPath": "skills/docx/SKILL.md",
       "computedHash": "6962db07127ee540a56e4677f65576d0727668a1d67f7da8bc978f10791c2bfe"
     },
+    "domain-modeling": {
+      "source": "vinvcn/mattpocock-skills-zh-cn",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/domain-modeling/SKILL.md",
+      "computedHash": "e6359b331464587c59ce6e7f38bae8cea119eab21c46895f901d8ca632252b35"
+    },
     "grill-with-docs": {
-      "source": "mattpocock/skills",
+      "source": "vinvcn/mattpocock-skills-zh-cn",
       "sourceType": "github",
       "skillPath": "skills/engineering/grill-with-docs/SKILL.md",
-      "computedHash": "e7ef25bbee50cda2eb7b3a8ef541db0a0396dad7d369f7d14fb610671dd1864b"
+      "computedHash": "3e2e767cad8818a753bc627d4fe2626cec3441e80dd390a56cfe6cb2b32ec71b"
+    },
+    "grilling": {
+      "source": "vinvcn/mattpocock-skills-zh-cn",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grilling/SKILL.md",
+      "computedHash": "6a80037ed73490cf3d3b3ab67b49ef6785ac2c4059e99f0426b5a1fc2c037e97"
     },
     "lark-base": {
       "source": "larksuite/cli",
