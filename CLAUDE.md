@@ -25,7 +25,7 @@
 - **MUST NOT** 使用 Gradle/Maven Wrapper，使用本地环境表中的版本。
 - **MUST NOT** 在 Gradle/Maven 项目级配置文件中声明 repositories 或修改全局配置文件，**MUST** 使用已有的全局配置。
 - **MUST NOT** 通过修改环境变量、`go env -w` 等方式修改 Go 配置，**MUST** 使用已有的全局配置。
-- npm 包 **MUST** 使用 `npx` 运行；
+- npm 包的一次性执行 **MUST** 使用 `npx`（如 `npx @fission-ai/openspec`）；项目依赖安装使用 `npm install`；
 - npm **MUST NOT** 指定镜像源（如 `--registry`）和修改 npm 全局配置，**MUST** 使用已有的全局配置。
 - 命令与脚本 **MUST** 使用 `bash` 语法。
 - 联网下载 **MUST** 先直连，直连失败 3 次后使用[网络代理](http://127.0.0.1:7897)；代理再失败 3 次，**MUST** 停止并等待用户操作，**MUST NOT** 使用任何 `workaround`。

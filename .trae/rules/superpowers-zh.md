@@ -15,7 +15,7 @@ alwaysApply: true
 
 ## 可用 Skills
 
-Skills 位于 `.trae/skills/` 目录，每个 skill 有独立的 `SKILL.md` 文件。
+Skills 位于 `.agents/skills/` 目录，每个 skill 有独立的 `SKILL.md` 文件。
 
 | Skill | 触发条件 |
 |-------|---------|
