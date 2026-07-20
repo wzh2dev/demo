@@ -1,7 +1,7 @@
 ## 目录结构
 
 - Gradle/Maven 项目根目录 **MUST** 仅包含构建配置文件及项目级文档。
-- 项目根目录 **MUST** 存在 `.codegraph` 目录，如果不存在，执行 `codegraph init -i`。
+- 项目根目录 **MUST** 存在 `.codegraph` 目录；若缺失，执行 `codegraph init -i`。
 
 ## 本地环境
 
@@ -18,23 +18,23 @@
 
 > 调用工具说明:
 > - npm 包的一次性执行 **MUST** 使用 `npx`（如 `npx @fission-ai/openspec`），项目依赖安装使用 `npm install`。
-> - **MUST** 使用 `uv` 进行 Python 环境管理与代码运行，而不是直接使用 pip 或 python 运行。uv/uvx 命令位于 `/cluster/uv` 目录下。
+> - **MUST** 使用 `uv` 进行 Python 环境管理与代码运行，**MUST NOT** 直接使用 `pip` 或 `python`。uv/uvx 命令位于 `/cluster/uv` 目录下。
 > - Python 工具/包的一次性执行 **MUST** 使用 `uvx`（如 `uvx ruff check`），**MUST NOT** 使用 `uv tool install` 全局安装工具或包。
 
 ## 项目构建
 
-- **MUST NOT** 通过 `brew install` 自动安装软件。需要安装软件时，**MUST** 停止并提示用户自行安装，列出所需软件名与版本要求。
+- **MUST NOT** 通过 `brew install` 自动安装软件。若需安装软件，**MUST** 停止并提示用户自行安装，列出所需软件名与版本要求。
 - **MUST NOT** 使用 Gradle/Maven Wrapper，使用本地环境表中的版本。
 - **MUST NOT** 在 Gradle/Maven 项目级配置文件中声明 repositories 或修改全局配置文件，**MUST** 使用已有的全局配置。
 - **MUST NOT** 通过修改环境变量、`go env -w` 等方式修改 Go 配置，**MUST** 使用已有的全局配置。
 - **MUST NOT** 指定 npm 镜像源（如 `--registry`）和修改 npm 全局配置，**MUST** 使用已有的全局配置。
 - **MUST NOT** 指定 uv 镜像源（如 `--index-url`、`--extra-index-url`）和修改 uv 全局配置，**MUST** 使用已有的全局配置。
 - 命令与脚本 **MUST** 使用 `bash` 语法。
-- 联网下载 **MUST** 先直连，直连失败 3 次后使用[网络代理](http://127.0.0.1:7897)；代理再失败 3 次，**MUST** 停止并等待用户操作，**MUST NOT** 使用任何 `workaround`。
+- 联网下载 **MUST** 先直连，直连失败 3 次后使用[网络代理](http://127.0.0.1:7897)；代理仍失败 3 次，**MUST** 停止并等待用户操作，**MUST NOT** 使用任何 `workaround`。
 
 ## 运行测试
 
-- 项目运行依赖外部服务（数据库、消息队列等）时，**MUST** 停止并提示用户，列出所需服务及其版本/配置要求，由用户自行提供连接信息或启动服务。
+- 项目运行依赖外部服务（数据库、消息队列等）时，**MUST** 停止并提示用户，列出所需服务及其版本/配置要求；连接信息或服务启动 **MUST** 由用户提供。
 - **MUST NOT** 使用容器运行时（`docker`、`docker compose` 等）启动项目或服务。
 
 ## 代码提交
