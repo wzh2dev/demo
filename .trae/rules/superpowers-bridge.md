@@ -1,15 +1,15 @@
-## 变更工作流（Claude / Codex / Trae 启动先读）
+## 变更工作流（Trae 启动先读）
 
-以下是给 Claude / Codex / Trae 的 routing 指引。
+以下是给 Trae 的 routing 指引。
 
 ### 入口分流
 
 | 你看到的触发 | 应该怎么做 |
 |-------------------------------------------------------|-----------------------------------------|
-| 用户以 narrative 开「设计讨论 / 头脑风暴」                 | 先 verbal `brainstorming`，**不**写到 `docs/superpowers/specs/`；对话收敛后依下方 5 条准则升级到 `/opsx:propose` |
-| 用户直接调用 `/opsx:new` / `/opsx:ff` / `/opsx:propose` | 走 schema 既定流程；artifact instruction 会在每步注入 |
+| 用户以 narrative 开「设计讨论 / 头脑风暴」                 | 先 verbal `brainstorming`，**不**写到 `docs/superpowers/specs/`；对话收敛后依下方 5 条准则升级到 `/openspec-propose` |
+| 用户直接调用 `/openspec-new-change` / `/openspec-ff-change` / `/openspec-propose` | 走 schema 既定流程；artifact instruction 会在每步注入 |
 | 用户明确说 bug fix / typo / config 微调 / 文件更新        | 直接 PR，**不**建 change（见下方 skip 规则） |
-| 已经在某个 change 中                                     | `/opsx:continue` 或 `/opsx:apply` / `/opsx:verify` / `/opsx:archive` 推进 |
+| 已经在某个 change 中                                     | `/openspec-continue-change` 或 `/openspec-apply-change` / `/openspec-verify-change` / `/openspec-archive-change` 推进 |
 
 ### 何时**不**走 opsx（直接提 PR）
 
@@ -30,7 +30,7 @@
 4. **验收条件可陈述** —— 具体 pass 条件（例：`./mvnw clean verify` 通过 + N 个成果）
 5. **对话进入收敛** —— 最近几轮在 confirm 不在发散
 
-全满足 → 主动建议用户「要不要 `/opsx:propose`？」，用户 ack 后落地。永远不要自动触发。
+全满足 → 主动建议用户「要不要 `/openspec-propose`？」，用户 ack 后落地。永远不要自动触发。
 
 ### Front-door 反模式（别做）
 
