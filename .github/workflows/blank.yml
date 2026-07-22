@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'oracle'
-          java-version: '1.8.0_202'
+          java-version: '8.0.202'
       - uses: actions/setup-python@v5
       - uses: actions/setup-go@v5
         with:
