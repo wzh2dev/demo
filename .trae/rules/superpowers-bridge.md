@@ -11,16 +11,16 @@
 | 用户明确说 bug fix / typo / config 微调 / 文件更新        | 直接 PR，**不**建 change（见下方 skip 规则） |
 | 已经在某个 change 中                                     | `/openspec-continue-change` 或 `/openspec-apply-change` / `/openspec-verify-change` / `/openspec-archive-change` 推进 |
 
-### 何时**不**走 opsx（直接提 PR）
+### 何时**不**走 openspec（直接 PR）
 
 | 情境                                                                               | 直接提 PR? |
-|-----------------------------------------------------------------------------------|--------------|
-| 新功能 / 新 capability / 架构变更 / breaking change                                   | ❌ 要走 opsx |
-| Bug fix（不变更合约）/ 测试补写 / linter 规则 / 非破坏性升级 / typo / 文件 / config 值微调 | ✅ 直接 PR |
+|-----------------------------------------------------------------------------------|-------------------|
+| 新功能 / 新 capability / 架构变更 / breaking change                                   | ❌ 要走 openspec |
+| Bug fix（不变更合约）/ 测试补写 / linter 规则 / 非破坏性升级 / typo / 文件 / config 值微调 | ✅ 直接 PR        |
 
 原则：**流程仪式跟风险成正比**。动到对外合约 / schema / 跨系统介接 / 合规边界 → opsx；其他 → 直接 PR。
 
-### Verbal brainstorm 升级到 opsx 的 5 条准则
+### Verbal brainstorm 升级到 openspec 的 5 条准则
 
 5 条**全满足**才升级（任一缺则继续 brainstorm，不写到 `docs/superpowers/specs/`）：
 

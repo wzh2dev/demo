@@ -41,4 +41,4 @@ dist/
 # OS
 .DS_Store
 
-.codegraph/
+.trae/skills
