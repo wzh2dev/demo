@@ -73,11 +73,35 @@
       "skillPath": "skills/productivity/grilling/SKILL.md",
       "computedHash": "6a80037ed73490cf3d3b3ab67b49ef6785ac2c4059e99f0426b5a1fc2c037e97"
     },
+    "i-have-adhd": {
+      "source": "ayghri/i-have-adhd",
+      "sourceType": "github",
+      "skillPath": "skills/i-have-adhd/SKILL.md",
+      "computedHash": "b7a01828f58910ed69a5cad45a79fd618c68a339715df0d09a329eead19ef829"
+    },
     "lark-base": {
       "source": "larksuite/cli",
       "sourceType": "github",
       "skillPath": "skills/lark-base/SKILL.md",
       "computedHash": "75d87e2134fdae7d759d4df7ae0f96a4ddaa181bc590c5d190eaa8d94b39852f"
+    },
+    "lark-doc": {
+      "source": "larksuite/cli",
+      "sourceType": "github",
+      "skillPath": "skills/lark-doc/SKILL.md",
+      "computedHash": "583923b0d387877e9bd5f04245f2cbed3218c857bcf7de38775e4a7b9b48c5be"
+    },
+    "lark-shared": {
+      "source": "larksuite/cli",
+      "sourceType": "github",
+      "skillPath": "skills/lark-shared/SKILL.md",
+      "computedHash": "bf63d22bf3d241b9e23d21c5f70f031f567d215ca433da14930aeee53f65080e"
+    },
+    "lark-wiki": {
+      "source": "larksuite/cli",
+      "sourceType": "github",
+      "skillPath": "skills/lark-wiki/SKILL.md",
+      "computedHash": "a9b43785b1340b4c4a4915dc63c2925e2d180abef5c69f92b6e4ad00d504294c"
     },
     "mcp-builder": {
       "source": "jnmetacode/superpowers-zh",

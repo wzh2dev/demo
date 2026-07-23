@@ -16,5 +16,8 @@ schema: superpowers-bridge
 #     proposal:
 #       - Keep proposals under 500 words
 #       - Always include a "Non-goals" section
+#     specs:
+#       - Include Given/When/Then scenarios
+#       - Reference source files in technical notes
 #     tasks:
 #       - Break tasks into chunks of max 2 hours
