@@ -3,6 +3,13 @@
 - Gradle/Maven 项目根目录 **MUST** 仅包含构建配置文件及项目级文档。
 - 项目根目录 **MUST** 存在 `.codegraph` 目录；若缺失，执行 `codegraph init -i`。
 
+```
+.
+├── app/      # 移动端工程
+├── web/      # PC 端工程
+└── server/   # 服务端工程
+```
+
 ## 本地环境
 
 | 工具                  | 安装目录                               |
