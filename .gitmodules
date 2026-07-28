@@ -1,3 +1,9 @@
 [submodule "server"]
   path = server
   url = https://github.com/wzh2dev/demo-server.git
+[submodule "web"]
+  path = web
+  url = https://github.com/wzh2dev/demo-web.git
+[submodule "app"]
+  path = app
+  url = https://github.com/wzh2dev/demo-app.git
