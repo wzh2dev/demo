@@ -33,6 +33,12 @@
         "@modelcontextprotocol/server-postgres",
         "postgresql://postgres:postgres@xueyingying.com/demo"
       ]
+    },
+    "tencent-docs": {
+      "url": "https://docs.qq.com/openapi/mcp",
+      "headers": {
+        "Authorization": "7de167f4ab004c408a81a512674ddca6"
+      }
     }
   }
 }

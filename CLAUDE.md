@@ -57,6 +57,7 @@
 | codex     | npx @openai/codex                                            |
 | openclaw  | npx openclaw                                                 |
 | lark-cli  | npx @larksuite/cli                                           |
+| mcporter  | npx mcporter                                                 |
 
 ---
 
