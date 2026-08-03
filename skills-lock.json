@@ -193,12 +193,6 @@
       "skillPath": "skills/verification-before-completion/SKILL.md",
       "computedHash": "492c8d82d52f70f87bf3d5fbedf3bb8baaad16d4fcae86e7ec2d90c8680f4f48"
     },
-    "workflow-runner": {
-      "source": "jnmetacode/superpowers-zh",
-      "sourceType": "github",
-      "skillPath": "skills/workflow-runner/SKILL.md",
-      "computedHash": "939935bd2cac89c76a75bb9009edf1a0a8c3cd32660668db49145f377da7273a"
-    },
     "writing-plans": {
       "source": "jnmetacode/superpowers-zh",
       "sourceType": "github",
