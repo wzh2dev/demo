@@ -8,6 +8,10 @@
     "**/.svn": false,
     "**/Thumbs.db": false
   },
+  "files.watcherExclude": {
+    "**/.git": true,
+    "**/node_modules": true
+  },
   "editor.formatOnSave": true,
   "editor.formatOnPaste": false,
   "redhat.telemetry.enabled": false,
