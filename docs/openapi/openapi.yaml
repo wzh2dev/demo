@@ -1,0 +1,1591 @@
+openapi: 3.0.3
+info:
+  title: Demo API
+  description: |
+    模拟用 OpenAPI 规范文件，用于 AI 代码贡献率测试。
+    本文件覆盖用户、商品、订单、支付、库存、评论、优惠券、物流、
+    消息、搜索等十个业务域，提供完整的 paths 与 components.schemas。
+  version: 1.0.0
+  contact:
+    name: Demo Team
+    email: demo@example.com
+  license:
+    name: MIT
+servers:
+  - url: https://api.demo.example.com/v1
+    description: 生产环境
+  - url: https://api-staging.demo.example.com/v1
+    description: 预发环境
+  - url: http://localhost:8080/v1
+    description: 本地开发
+tags:
+  - name: User
+    description: 用户相关接口
+  - name: Product
+    description: 商品相关接口
+  - name: Order
+    description: 订单相关接口
+  - name: Payment
+    description: 支付相关接口
+  - name: Inventory
+    description: 库存相关接口
+  - name: Review
+    description: 评论相关接口
+  - name: Coupon
+    description: 优惠券相关接口
+  - name: Shipping
+    description: 物流相关接口
+  - name: Message
+    description: 消息相关接口
+  - name: Search
+    description: 搜索相关接口
+
+paths:
+  /users:
+    get:
+      tags: [User]
+      summary: 分页查询用户
+      operationId: listUsers
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: keyword
+          in: query
+          description: 昵称或手机号模糊匹配
+          schema:
+            type: string
+            maxLength: 64
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/UserStatus'
+      responses:
+        '200':
+          description: 用户列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [User]
+      summary: 创建用户
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /users/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    get:
+      tags: [User]
+      summary: 查询用户详情
+      operationId: getUserById
+      responses:
+        '200':
+          description: 用户详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [User]
+      summary: 更新用户
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [User]
+      summary: 删除用户
+      operationId: deleteUser
+      responses:
+        '204':
+          description: 删除成功
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /users/{userId}/addresses:
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    get:
+      tags: [User]
+      summary: 查询用户收货地址
+      operationId: listUserAddresses
+      responses:
+        '200':
+          description: 地址列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Address'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [User]
+      summary: 新增收货地址
+      operationId: createUserAddress
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+
+  /products:
+    get:
+      tags: [Product]
+      summary: 分页查询商品
+      operationId: listProducts
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: minPrice
+          in: query
+          schema:
+            type: number
+            format: double
+        - name: maxPrice
+          in: query
+          schema:
+            type: number
+            format: double
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [price_asc, price_desc, created_desc, sold_desc]
+      responses:
+        '200':
+          description: 商品列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductPage'
+    post:
+      tags: [Product]
+      summary: 创建商品
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+
+  /products/{productId}:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    get:
+      tags: [Product]
+      summary: 查询商品详情
+      operationId: getProductById
+      responses:
+        '200':
+          description: 商品详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Product]
+      summary: 更新商品
+      operationId: updateProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+    delete:
+      tags: [Product]
+      summary: 删除商品
+      operationId: deleteProduct
+      responses:
+        '204':
+          description: 删除成功
+
+  /products/{productId}/skus:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    get:
+      tags: [Product]
+      summary: 查询商品 SKU 列表
+      operationId: listProductSkus
+      responses:
+        '200':
+          description: SKU 列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sku'
+
+  /orders:
+    get:
+      tags: [Order]
+      summary: 分页查询订单
+      operationId: listOrders
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: userId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/OrderStatus'
+      responses:
+        '200':
+          description: 订单列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderPage'
+    post:
+      tags: [Order]
+      summary: 创建订单
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /orders/{orderId}:
+    parameters:
+      - $ref: '#/components/parameters/OrderId'
+    get:
+      tags: [Order]
+      summary: 查询订单详情
+      operationId: getOrderById
+      responses:
+        '200':
+          description: 订单详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Order]
+      summary: 更新订单
+      operationId: updateOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /orders/{orderId}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/OrderId'
+    post:
+      tags: [Order]
+      summary: 取消订单
+      operationId: cancelOrder
+      responses:
+        '200':
+          description: 取消成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /payments:
+    post:
+      tags: [Payment]
+      summary: 发起支付
+      operationId: createPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequest'
+      responses:
+        '201':
+          description: 发起成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /payments/{paymentId}:
+    parameters:
+      - $ref: '#/components/parameters/PaymentId'
+    get:
+      tags: [Payment]
+      summary: 查询支付详情
+      operationId: getPaymentById
+      responses:
+        '200':
+          description: 支付详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /payments/{paymentId}/refund:
+    parameters:
+      - $ref: '#/components/parameters/PaymentId'
+    post:
+      tags: [Payment]
+      summary: 申请退款
+      operationId: refundPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundRequest'
+      responses:
+        '200':
+          description: 退款受理
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+
+  /inventory/{skuId}:
+    parameters:
+      - $ref: '#/components/parameters/SkuId'
+    get:
+      tags: [Inventory]
+      summary: 查询库存
+      operationId: getInventory
+      responses:
+        '200':
+          description: 库存信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inventory'
+    put:
+      tags: [Inventory]
+      summary: 调整库存
+      operationId: updateInventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryAdjustRequest'
+      responses:
+        '200':
+          description: 调整后库存
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inventory'
+
+  /reviews:
+    get:
+      tags: [Review]
+      summary: 分页查询评论
+      operationId: listReviews
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: productId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: rating
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+      responses:
+        '200':
+          description: 评论列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPage'
+    post:
+      tags: [Review]
+      summary: 发表评论
+      operationId: createReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewCreateRequest'
+      responses:
+        '201':
+          description: 发表成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+
+  /reviews/{reviewId}:
+    parameters:
+      - $ref: '#/components/parameters/ReviewId'
+    delete:
+      tags: [Review]
+      summary: 删除评论
+      operationId: deleteReview
+      responses:
+        '204':
+          description: 删除成功
+
+  /coupons:
+    get:
+      tags: [Coupon]
+      summary: 查询优惠券列表
+      operationId: listCoupons
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/CouponStatus'
+      responses:
+        '200':
+          description: 优惠券列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CouponPage'
+    post:
+      tags: [Coupon]
+      summary: 创建优惠券
+      operationId: createCoupon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CouponCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coupon'
+
+  /coupons/{couponId}/claim:
+    parameters:
+      - $ref: '#/components/parameters/CouponId'
+    post:
+      tags: [Coupon]
+      summary: 领取优惠券
+      operationId: claimCoupon
+      responses:
+        '200':
+          description: 领取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCoupon'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /shipping/orders/{orderId}:
+    parameters:
+      - $ref: '#/components/parameters/OrderId'
+    get:
+      tags: [Shipping]
+      summary: 查询订单物流
+      operationId: getShippingByOrder
+      responses:
+        '200':
+          description: 物流信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipping'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /shipping/{shippingId}/tracks:
+    parameters:
+      - $ref: '#/components/parameters/ShippingId'
+    post:
+      tags: [Shipping]
+      summary: 上报物流轨迹
+      operationId: appendShippingTrack
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackCreateRequest'
+      responses:
+        '201':
+          description: 上报成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Track'
+
+  /messages:
+    get:
+      tags: [Message]
+      summary: 查询站内信
+      operationId: listMessages
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - name: userId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: 站内信列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagePage'
+    post:
+      tags: [Message]
+      summary: 发送站内信
+      operationId: sendMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreateRequest'
+      responses:
+        '201':
+          description: 发送成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /messages/{messageId}/read:
+    parameters:
+      - $ref: '#/components/parameters/MessageId'
+    post:
+      tags: [Message]
+      summary: 标记已读
+      operationId: markMessageRead
+      responses:
+        '204':
+          description: 标记成功
+
+  /search:
+    get:
+      tags: [Search]
+      summary: 全局搜索
+      operationId: search
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            maxLength: 128
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [product, order, user, all]
+            default: all
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: 搜索结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+
+components:
+  parameters:
+    PageNumber:
+      name: pageNumber
+      in: query
+      description: 页码，从 1 开始
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: pageSize
+      in: query
+      description: 每页数量
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    ProductId:
+      name: productId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    OrderId:
+      name: orderId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    PaymentId:
+      name: paymentId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    SkuId:
+      name: skuId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    ReviewId:
+      name: reviewId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    CouponId:
+      name: couponId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    ShippingId:
+      name: shippingId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    MessageId:
+      name: messageId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: 未认证
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: 资源冲突
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: INVALID_ARGUMENT
+        message:
+          type: string
+          example: 请求参数错误
+        details:
+          type: array
+          items:
+            type: object
+
+    UserStatus:
+      type: string
+      enum: [active, disabled, frozen]
+      default: active
+
+    OrderStatus:
+      type: string
+      enum: [pending_payment, paid, shipped, completed, cancelled, refunded]
+
+    CouponStatus:
+      type: string
+      enum: [unclaimed, claimed, used, expired]
+
+    User:
+      type: object
+      required: [id, nickname, mobile, status, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1001
+        nickname:
+          type: string
+          example: alice
+        avatar:
+          type: string
+          format: uri
+        mobile:
+          type: string
+          example: "13800000000"
+        email:
+          type: string
+          format: email
+        gender:
+          type: string
+          enum: [male, female, unknown]
+          default: unknown
+        status:
+          $ref: '#/components/schemas/UserStatus'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserCreateRequest:
+      type: object
+      required: [nickname, mobile]
+      properties:
+        nickname:
+          type: string
+          maxLength: 32
+        mobile:
+          type: string
+          pattern: '^\d{11}$'
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 64
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        nickname:
+          type: string
+        avatar:
+          type: string
+          format: uri
+        gender:
+          type: string
+          enum: [male, female, unknown]
+        status:
+          $ref: '#/components/schemas/UserStatus'
+
+    UserPage:
+      type: object
+      required: [items, total, pageNumber, pageSize]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        total:
+          type: integer
+          format: int64
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+
+    Address:
+      type: object
+      required: [id, consignee, phone, detail]
+      properties:
+        id:
+          type: integer
+          format: int64
+        consignee:
+          type: string
+        phone:
+          type: string
+        province:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        detail:
+          type: string
+        isDefault:
+          type: boolean
+          default: false
+
+    AddressCreateRequest:
+      type: object
+      required: [consignee, phone, detail]
+      properties:
+        consignee:
+          type: string
+        phone:
+          type: string
+        province:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        detail:
+          type: string
+        isDefault:
+          type: boolean
+
+    Product:
+      type: object
+      required: [id, name, price, status]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        categoryId:
+          type: integer
+          format: int64
+        brand:
+          type: string
+        price:
+          type: number
+          format: double
+        originalPrice:
+          type: number
+          format: double
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        status:
+          type: string
+          enum: [on_sale, off_sale, sold_out]
+        stock:
+          type: integer
+        sales:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    ProductCreateRequest:
+      type: object
+      required: [name, price, categoryId]
+      properties:
+        name:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        categoryId:
+          type: integer
+          format: int64
+        brand:
+          type: string
+        price:
+          type: number
+          format: double
+        originalPrice:
+          type: number
+          format: double
+        images:
+          type: array
+          items:
+            type: string
+
+    ProductUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: double
+        status:
+          type: string
+          enum: [on_sale, off_sale, sold_out]
+
+    ProductPage:
+      type: object
+      required: [items, total, pageNumber, pageSize]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        total:
+          type: integer
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+
+    Sku:
+      type: object
+      required: [id, productId, price, stock]
+      properties:
+        id:
+          type: integer
+          format: int64
+        productId:
+          type: integer
+          format: int64
+        skuCode:
+          type: string
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            color: red
+            size: M
+        price:
+          type: number
+          format: double
+        stock:
+          type: integer
+
+    Order:
+      type: object
+      required: [id, orderNo, userId, status, totalAmount, items, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        orderNo:
+          type: string
+        userId:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        totalAmount:
+          type: number
+          format: double
+        payAmount:
+          type: number
+          format: double
+        discountAmount:
+          type: number
+          format: double
+        address:
+          $ref: '#/components/schemas/Address'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        remark:
+          type: string
+        paidAt:
+          type: string
+          format: date-time
+        shippedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    OrderItem:
+      type: object
+      required: [productId, skuId, name, price, quantity]
+      properties:
+        productId:
+          type: integer
+          format: int64
+        skuId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        skuCode:
+          type: string
+        price:
+          type: number
+          format: double
+        quantity:
+          type: integer
+          minimum: 1
+        subtotal:
+          type: number
+          format: double
+
+    OrderCreateRequest:
+      type: object
+      required: [addressId, items]
+      properties:
+        addressId:
+          type: integer
+          format: int64
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [skuId, quantity]
+            properties:
+              skuId:
+                type: integer
+                format: int64
+              quantity:
+                type: integer
+                minimum: 1
+        couponId:
+          type: integer
+          format: int64
+        remark:
+          type: string
+          maxLength: 200
+
+    OrderUpdateRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        remark:
+          type: string
+
+    OrderPage:
+      type: object
+      required: [items, total, pageNumber, pageSize]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        total:
+          type: integer
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+
+    Payment:
+      type: object
+      required: [id, orderId, amount, channel, status, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        orderId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+          format: double
+        channel:
+          type: string
+          enum: [wechat, alipay, card, balance]
+        tradeNo:
+          type: string
+        status:
+          type: string
+          enum: [pending, success, failed, refunded]
+        paidAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    PaymentCreateRequest:
+      type: object
+      required: [orderId, channel]
+      properties:
+        orderId:
+          type: integer
+          format: int64
+        channel:
+          type: string
+          enum: [wechat, alipay, card, balance]
+        returnUrl:
+          type: string
+          format: uri
+
+    Refund:
+      type: object
+      required: [id, paymentId, amount, status, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        paymentId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+          format: double
+        reason:
+          type: string
+        status:
+          type: string
+          enum: [pending, success, failed]
+        createdAt:
+          type: string
+          format: date-time
+
+    RefundRequest:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: number
+          format: double
+        reason:
+          type: string
+          maxLength: 200
+
+    Inventory:
+      type: object
+      required: [skuId, available, locked]
+      properties:
+        skuId:
+          type: integer
+          format: int64
+        available:
+          type: integer
+        locked:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+
+    InventoryAdjustRequest:
+      type: object
+      required: [delta]
+      properties:
+        delta:
+          type: integer
+          description: 增量为正减少为负
+        reason:
+          type: string
+
+    Review:
+      type: object
+      required: [id, productId, userId, rating, content, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        productId:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        content:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        createdAt:
+          type: string
+          format: date-time
+
+    ReviewCreateRequest:
+      type: object
+      required: [productId, rating, content]
+      properties:
+        productId:
+          type: integer
+          format: int64
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        content:
+          type: string
+          maxLength: 500
+        images:
+          type: array
+          items:
+            type: string
+
+    ReviewPage:
+      type: object
+      required: [items, total, pageNumber, pageSize]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
+        total:
+          type: integer
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+
+    Coupon:
+      type: object
+      required: [id, name, type, value, status]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        type:
+          type: string
+          enum: [amount, percentage]
+        value:
+          type: number
+          format: double
+        minSpend:
+          type: number
+          format: double
+        status:
+          $ref: '#/components/schemas/CouponStatus'
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        total:
+          type: integer
+        claimed:
+          type: integer
+
+    CouponCreateRequest:
+      type: object
+      required: [name, type, value, startAt, endAt]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [amount, percentage]
+        value:
+          type: number
+          format: double
+        minSpend:
+          type: number
+          format: double
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        total:
+          type: integer
+
+    CouponPage:
+      type: object
+      required: [items, total, pageNumber, pageSize]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coupon'
+        total:
+          type: integer
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+
+    UserCoupon:
+      type: object
+      required: [id, userId, couponId, status]
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        couponId:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/CouponStatus'
+        claimedAt:
+          type: string
+          format: date-time
+        usedAt:
+          type: string
+          format: date-time
+
+    Shipping:
+      type: object
+      required: [id, orderId, company, trackingNo, status]
+      properties:
+        id:
+          type: integer
+          format: int64
+        orderId:
+          type: integer
+          format: int64
+        company:
+          type: string
+        trackingNo:
+          type: string
+        status:
+          type: string
+          enum: [pending, in_transit, delivered, exception]
+        tracks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Track'
+        shippedAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+
+    Track:
+      type: object
+      required: [time, location, description]
+      properties:
+        time:
+          type: string
+          format: date-time
+        location:
+          type: string
+        description:
+          type: string
+
+    TrackCreateRequest:
+      type: object
+      required: [location, description]
+      properties:
+        location:
+          type: string
+        description:
+          type: string
+        time:
+          type: string
+          format: date-time
+
+    Message:
+      type: object
+      required: [id, userId, title, content, read, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        type:
+          type: string
+          enum: [system, order, promotion]
+        read:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    MessageCreateRequest:
+      type: object
+      required: [userId, title, content]
+      properties:
+        userId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        type:
+          type: string
+          enum: [system, order, promotion]
+          default: system
+
+    MessagePage:
+      type: object
+      required: [items, total, pageNumber, pageSize]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        total:
+          type: integer
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+
+    SearchResult:
+      type: object
+      required: [total, items]
+      properties:
+        total:
+          type: integer
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [product, order, user]
+              id:
+                type: integer
+                format: int64
+              title:
+                type: string
+              snippet:
+                type: string
+              score:
+                type: number
+                format: double
