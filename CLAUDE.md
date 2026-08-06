@@ -1,9 +1,11 @@
+# CLAUDE.md
+
 ## 目录结构
 
 - Gradle/Maven 项目根目录 **MUST** 仅包含构建配置文件及项目级文档。
 - 项目根目录 **MUST** 存在 `.codegraph` 目录；若缺失，执行 `codegraph init -i`。
 
-```
+```markdown
 .
 ├── app/      # 移动端工程
 ├── web/      # PC 端工程
@@ -26,6 +28,7 @@
 | Pandoc                | /cluster/pandoc            | /cluster/pandoc/bin/pandoc              |
 
 > 调用规则:
+>
 > - JVM 工具调用时，**MUST** 为当前命令显式设置 JAVA_HOME=/cluster/jdk/Contents/Home。
 > - 环境变量应仅作用于当前命令，**MUST NOT** 修改 ~/.zshrc、~/.bashrc、~/.profile 等全局 Shell 配置。
 > - 调用工具前，如果表中的可执行文件不存在或不可执行，**MUST** 停止并报告具体路径，**MUST NOT** 自动安装其他版本或从系统 PATH 中选择替代版本。
