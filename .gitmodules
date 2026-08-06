@@ -1,3 +1,11 @@
+[submodule "app"]
+  path = app
+  url = https://github.com/wzh2dev/demo-app.git
+  branch = master
+[submodule "e2e"]
+	path = e2e
+	url = https://github.com/wzh2dev/demo-e2e.git
+  branch = master
 [submodule "server"]
   path = server
   url = https://github.com/wzh2dev/demo-server.git
@@ -5,8 +13,4 @@
 [submodule "web"]
   path = web
   url = https://github.com/wzh2dev/demo-web.git
-  branch = master
-[submodule "app"]
-  path = app
-  url = https://github.com/wzh2dev/demo-app.git
   branch = master

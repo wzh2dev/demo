@@ -5,3 +5,11 @@
 3. 新增接口必须放入对应 domain 目录。
 4. 修改接口前先定位对应 `path/schema` 文件。
 5. 开发功能时只读取相关 domain 的 OpenAPI 文件。
+
+```sh
+npx -y @apidevtools/swagger-cli validate
+```
+
+```sh
+npx -y @apidevtools/swagger-cli bundle openapi.yaml -o dist/openapi.yaml
+```
