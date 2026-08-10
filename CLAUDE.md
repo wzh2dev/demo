@@ -5,13 +5,6 @@
 - Gradle/Maven 项目根目录 **MUST** 仅包含构建配置文件及项目级文档。
 - 项目根目录 **MUST** 存在 `.codegraph` 目录；若缺失，执行 `codegraph init -i`。
 
-```markdown
-.
-├── app/      # 移动端工程
-├── web/      # PC 端工程
-└── server/   # 服务端工程
-```
-
 ## 本地工具链
 
 本机工具不依赖系统 PATH。调用下列工具时，**MUST** 使用表中给出的可执行文件路径，**MUST NOT** 根据安装目录自行猜测命令位置。
@@ -63,20 +56,21 @@
 
 ## 外部工具（附录）
 
-| 工具        | 调用命令                                                     |
-| :---------- | :----------------------------------------------------------- |
-| skills      | npx skills                                                   |
-| openspec    | npx @fission-ai/openspec                                     |
-| codegraph   | npx @colbymchenry/codegraph                                  |
-| graphify    | /cluster/uv/uvx --env-file=.env --from graphifyy --with "graphifyy[openai]" graphify . |
-| claude      | npx @anthropic-ai/claude-code                                |
-| codex       | npx @openai/codex                                            |
-| openclaw    | npx openclaw                                                 |
-| lark-cli    | npx @larksuite/cli                                           |
-| mcporter    | npx mcporter                                                 |
-| mockoon     | npx @mockoon/cli                                             |
-| prism       | npx @stoplight/prism-cli                                     |
-| browser-use | /custer/uv/uvx browser-use                                   |
+| 工具             | 调用命令                                                                             |
+| :--------------- | :----------------------------------------------------------------------------------- |
+| skills           | npx skills                                                                           |
+| openspec         | npx @fission-ai/openspec                                                             |
+| codegraph        | npx @colbymchenry/codegraph                                                          |
+| graphify         | /cluster/uv/uvx --env-file=.env --from graphifyy --with "graphifyy[openai]" graphify |
+| claude           | npx @anthropic-ai/claude-code                                                        |
+| codex            | npx @openai/codex                                                                    |
+| openclaw         | npx openclaw                                                                         |
+| lark-cli         | npx @larksuite/cli                                                                   |
+| mcporter         | npx mcporter                                                                         |
+| mockoon          | npx @mockoon/cli                                                                     |
+| prism            | npx @stoplight/prism-cli                                                             |
+| browser-use      | /custer/uv/uvx browser-use                                                           |
+| markdownlint-cli | npx markdownlint-cli                                                                 |
 
 ---
 
