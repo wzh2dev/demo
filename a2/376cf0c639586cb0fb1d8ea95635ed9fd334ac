@@ -1,0 +1,34 @@
+.mcp.json
+  h_ec0865e8a99e9f 26-27
+  s_74360f1208e3a4::t_13514280328c88 23-25,28-29
+.trae/rules/gitnexus.md
+  h_ec0865e8a99e9f 1-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "a2376cf0c639586cb0fb1d8ea95635ed9fd334ac",
+  "prompts": {},
+  "humans": {
+    "h_ec0865e8a99e9f": {
+      "author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  },
+  "sessions": {
+    "s_74360f1208e3a4": {
+      "agent_id": {
+        "tool": "trae-cue",
+        "id": "ai_tab-icr-117237a6-71ec-453d-a7ba-50127188ba6d",
+        "model": "default"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>",
+      "custom_attributes": {
+        "edit_kind": "file_edit",
+        "client_type": "plugin",
+        "tool": "trae-cue",
+        "external_session_id": "icr-117237a6-71ec-453d-a7ba-50127188ba6d",
+        "source_scene": "cue"
+      }
+    }
+  }
+}
