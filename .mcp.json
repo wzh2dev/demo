@@ -20,6 +20,13 @@
         "@next-ai-drawio/mcp-server@latest"
       ]
     },
+    "gitnexus": {
+      "command": "npx",
+      "args": [
+        "gitnexus@latest",
+        "mcp"
+      ]
+    },
     "playwright": {
       "command": "npx",
       "args": [
