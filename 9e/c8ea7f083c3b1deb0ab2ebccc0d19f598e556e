@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "9ec8ea7f083c3b1deb0ab2ebccc0d19f598e556e",
+  "prompts": {},
+  "humans": {
+    "h_ec0865e8a99e9f": {
+      "author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  }
+}
