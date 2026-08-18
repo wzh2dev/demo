@@ -71,7 +71,4 @@
 | prism            | npx @stoplight/prism-cli                                                             |
 | browser-use      | /custer/uv/uvx browser-use                                                           |
 | markdownlint-cli | npx markdownlint-cli                                                                 |
-
----
-
-@PERSONA.md
+| gitnexus         | npx gitnexus                                                                         |

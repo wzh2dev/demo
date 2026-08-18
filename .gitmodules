@@ -3,8 +3,8 @@
   url = https://github.com/wzh2dev/demo-app.git
   branch = master
 [submodule "e2e"]
-	path = e2e
-	url = https://github.com/wzh2dev/demo-e2e.git
+  path = e2e
+  url = https://github.com/wzh2dev/demo-e2e.git
   branch = master
 [submodule "server"]
   path = server

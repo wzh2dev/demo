@@ -34,11 +34,12 @@
         "--browser=chrome"
       ]
     },
-    "postgres": {
+    "dbhub": {
       "command": "npx",
       "args": [
-        "@modelcontextprotocol/server-postgres",
-        "postgresql://postgres:postgres@xueyingying.com/demo"
+        "@bytebase/dbhub@latest",
+        "--dsn",
+        "postgres://postgres:postgres@xueyingying.com/demo"
       ]
     },
     "tencent-docs": {

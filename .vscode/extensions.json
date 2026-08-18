@@ -17,6 +17,7 @@
     "DavidAnson.vscode-markdownlint",
     "Vue.volar",
     "GitHub.vscode-github-actions",
-    "mhutchie.git-graph"
+    "mhutchie.git-graph",
+    "johnstoncode.svn-scm"
   ]
 }
