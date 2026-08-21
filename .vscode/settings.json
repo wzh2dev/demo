@@ -2,10 +2,10 @@
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
   "files.exclude": {
-    "**/.DS_Store": false,
     "**/.git": false,
-    "**/.hg": false,
     "**/.svn": false,
+    "**/.hg": false,
+    "**/.DS_Store": false,
     "**/Thumbs.db": false,
     ".codegraph": true,
     "**/.gitnexus": true
@@ -14,7 +14,14 @@
     "**/.git": true,
     "**/node_modules": true,
     ".codegraph": true,
-    "**/.gitnexus": true
+    "**/.gitnexus": true,
+    ".agents": true,
+    ".trae": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    ".agents": true,
+    ".trae": true
   },
   "editor.formatOnSave": true,
   "editor.formatOnPaste": false,

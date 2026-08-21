@@ -62,6 +62,7 @@
 | openspec         | npx @fission-ai/openspec                                                             |
 | codegraph        | npx @colbymchenry/codegraph                                                          |
 | graphify         | /cluster/uv/uvx --env-file=.env --from graphifyy --with "graphifyy[openai]" graphify |
+| gitnexus         | npx gitnexus                                                                         |
 | claude           | npx @anthropic-ai/claude-code                                                        |
 | codex            | npx @openai/codex                                                                    |
 | openclaw         | npx openclaw                                                                         |
@@ -71,4 +72,3 @@
 | prism            | npx @stoplight/prism-cli                                                             |
 | browser-use      | /custer/uv/uvx browser-use                                                           |
 | markdownlint-cli | npx markdownlint-cli                                                                 |
-| gitnexus         | npx gitnexus                                                                         |
