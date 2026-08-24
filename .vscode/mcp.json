@@ -2,16 +2,11 @@
   "servers": {
     "drawio": {
       "command": "npx",
-      "args": [
-        "@next-ai-drawio/mcp-server@latest"
-      ]
+      "args": ["@next-ai-drawio/mcp-server@latest"]
     },
     "playwright": {
       "command": "npx",
-      "args": [
-        "@playwright/mcp@latest",
-        "--browser=chrome"
-      ]
+      "args": ["@playwright/mcp@latest", "--browser=chrome"]
     }
   }
 }

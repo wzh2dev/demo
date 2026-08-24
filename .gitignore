@@ -42,3 +42,4 @@ dist/
 .DS_Store
 
 .trae/skills
+tmp/

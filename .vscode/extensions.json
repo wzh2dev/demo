@@ -18,6 +18,7 @@
     "Vue.volar",
     "GitHub.vscode-github-actions",
     "mhutchie.git-graph",
-    "johnstoncode.svn-scm"
+    "johnstoncode.svn-scm",
+    "esbenp.prettier-vscode"
   ]
 }
