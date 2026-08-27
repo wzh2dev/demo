@@ -2,7 +2,7 @@
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 1000,
   "files.exclude": {
-    "**/.git": false,
+    "**/.git": true,
     "**/.svn": false,
     "**/.hg": false,
     "**/.DS_Store": false,
