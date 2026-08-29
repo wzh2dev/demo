@@ -1,0 +1,319 @@
+.markdownlint.json
+  s_c5e30110ec8bb1::t_da6734ae18464a 2-5
+README.md
+  s_c5e30110ec8bb1::t_da6734ae18464a 2-7
+skills-lock.json
+  s_c5e30110ec8bb1::t_da6734ae18464a 4-9,221
+CLAUDE.md
+  s_c5e30110ec8bb1::t_da6734ae18464a 59-73
+.agents/skills/archify/LICENSE
+  s_c5e30110ec8bb1::t_ef3b5d79e6567d 1-22
+.agents/skills/archify/SKILL.md
+  s_c5e30110ec8bb1::t_3980015ab2e8ed 1-104
+.agents/skills/archify/assets/template.html
+  s_c5e30110ec8bb1::t_f0f8757f12db92 1-13151
+.agents/skills/archify/bin/archify.mjs
+  s_c5e30110ec8bb1::t_357c156c946164 1-1522
+.agents/skills/archify/bin/open-artifact.mjs
+  s_c5e30110ec8bb1::t_3d0abf7858f032 1-86
+.agents/skills/archify/bin/preview.mjs
+  s_c5e30110ec8bb1::t_e003acc3b251c8 1-648
+.agents/skills/archify/delta/architecture-delta.mjs
+  s_c5e30110ec8bb1::t_4abb99e797528f 1-1169
+.agents/skills/archify/examples/agent-run.lifecycle.json
+  s_c5e30110ec8bb1::t_2ec66b45c8ab1e 1-72
+.agents/skills/archify/examples/agent-tool-call.workflow.json
+  s_c5e30110ec8bb1::t_b770f720296583 1-111
+.agents/skills/archify/examples/async-job-roundtrip.sequence.json
+  s_c5e30110ec8bb1::t_70ac945436f5e6 1-62
+.agents/skills/archify/examples/cache-miss-request.sequence.json
+  s_c5e30110ec8bb1::t_6b89b9c242889a 1-82
+.agents/skills/archify/examples/checkout-platform.base.architecture.json
+  s_c5e30110ec8bb1::t_6a603af49849ac 1-32
+.agents/skills/archify/examples/checkout-platform.head.architecture.json
+  s_c5e30110ec8bb1::t_20c95c4aaae3f9 1-32
+.agents/skills/archify/examples/dataflow-product-analytics.html
+  s_c5e30110ec8bb1::t_503702044e7592 1-13263
+.agents/skills/archify/examples/deployment-release.lifecycle.json
+  s_c5e30110ec8bb1::t_713a2c352b6e57 1-50
+.agents/skills/archify/examples/event-stream.dataflow.json
+  s_c5e30110ec8bb1::t_1946d59c65dd68 1-58
+.agents/skills/archify/examples/incident-response.workflow.json
+  s_c5e30110ec8bb1::t_3614b46aceca5e 1-65
+.agents/skills/archify/examples/lifecycle-agent-run.html
+  s_c5e30110ec8bb1::t_f7ce04b37eef21 1-13212
+.agents/skills/archify/examples/product-analytics.dataflow.json
+  s_c5e30110ec8bb1::t_9675e9f347e326 1-77
+.agents/skills/archify/examples/production-deployment.architecture.json
+  s_c5e30110ec8bb1::t_7f7182d6d7f513 1-72
+.agents/skills/archify/examples/release-delivery.workflow.json
+  s_c5e30110ec8bb1::t_6ad2fc4d030754 1-63
+.agents/skills/archify/examples/sequence-cache-miss-request.html
+  s_c5e30110ec8bb1::t_2f56dc7a60c7cc 1-13278
+.agents/skills/archify/examples/web-app-rendered.html
+  s_c5e30110ec8bb1::t_2ebd3800474614 1-13218
+.agents/skills/archify/examples/web-app.architecture.json
+  s_c5e30110ec8bb1::t_a12de6937fa397 1-47
+.agents/skills/archify/examples/workflow-agent-tool-call-rendered.html
+  s_c5e30110ec8bb1::t_407d58f0992f36 1-13290
+.agents/skills/archify/package-lock.json
+  s_c5e30110ec8bb1::t_0b25958f08e13a 1-80
+.agents/skills/archify/package.json
+  s_c5e30110ec8bb1::t_e498832fa2242c 1-29
+.agents/skills/archify/recipes/scenarios.mjs
+  s_c5e30110ec8bb1::t_7b311f181848e2 1-350
+.agents/skills/archify/references/authoring-contract.md
+  s_c5e30110ec8bb1::t_ca7d6c1ecebfcc 1-98
+.agents/skills/archify/references/delivery-contract.md
+  s_c5e30110ec8bb1::t_4583e9ad12a628 1-59
+.agents/skills/archify/references/viewer-runtime.md
+  s_c5e30110ec8bb1::t_ee5622f319a76c 1-45
+.agents/skills/archify/renderers/architecture/grid.mjs
+  s_c5e30110ec8bb1::t_f7b02eb4ac34be 1-62
+.agents/skills/archify/renderers/architecture/render-architecture.mjs
+  s_c5e30110ec8bb1::t_27e1c543c7b5a1 1-726
+.agents/skills/archify/renderers/dataflow/README.md
+  s_c5e30110ec8bb1::t_46a4da28c70974 1-105
+.agents/skills/archify/renderers/dataflow/render-dataflow.mjs
+  s_c5e30110ec8bb1::t_53f40ac495a978 1-448
+.agents/skills/archify/renderers/lifecycle/README.md
+  s_c5e30110ec8bb1::t_1d6c9767c68886 1-111
+.agents/skills/archify/renderers/lifecycle/render-lifecycle.mjs
+  s_c5e30110ec8bb1::t_967d41686103ef 1-520
+.agents/skills/archify/renderers/sequence/README.md
+  s_c5e30110ec8bb1::t_c4a204976ab9f1 1-104
+.agents/skills/archify/renderers/sequence/render-sequence.mjs
+  s_c5e30110ec8bb1::t_82d14af3bb8853 1-436
+.agents/skills/archify/renderers/shared/cli.mjs
+  s_c5e30110ec8bb1::t_e2f55746af463c 1-207
+.agents/skills/archify/renderers/shared/diagnostics.mjs
+  s_c5e30110ec8bb1::t_a98ff09d35aa11 1-116
+.agents/skills/archify/renderers/shared/engineering-profiles.mjs
+  s_c5e30110ec8bb1::t_411032b0ddb333 1-157
+.agents/skills/archify/renderers/shared/generated-validators.mjs
+  s_c5e30110ec8bb1::t_ce78acca99508b 1-13
+.agents/skills/archify/renderers/shared/geometry.mjs
+  s_c5e30110ec8bb1::t_c19d5dc20916b0 1-1305
+.agents/skills/archify/renderers/shared/layout-report.mjs
+  s_c5e30110ec8bb1::t_c35e266bb0f954 1-40
+.agents/skills/archify/renderers/shared/legend.mjs
+  s_c5e30110ec8bb1::t_fd0b23e72704b1 1-215
+.agents/skills/archify/renderers/shared/output-path.mjs
+  s_c5e30110ec8bb1::t_e04df46c7ec95a 1-321
+.agents/skills/archify/renderers/shared/repository-evidence.mjs
+  s_c5e30110ec8bb1::t_5943234e0038a9 1-235
+.agents/skills/archify/renderers/shared/text-fit.mjs
+  s_c5e30110ec8bb1::t_bbdf5bbc9035f2 1-49
+.agents/skills/archify/renderers/shared/utils.mjs
+  s_c5e30110ec8bb1::t_78fd7677c2f0be 1-170
+.agents/skills/archify/renderers/shared/validator.mjs
+  s_c5e30110ec8bb1::t_b7a028ba9931ed 1-86
+.agents/skills/archify/renderers/workflow/README.md
+  s_c5e30110ec8bb1::t_214dc63938e865 1-122
+.agents/skills/archify/renderers/workflow/render-workflow.mjs
+  s_c5e30110ec8bb1::t_f5420ee20d5916 1-644
+.agents/skills/archify/schemas/README.md
+  s_c5e30110ec8bb1::t_4a653e154a8a8e 1-174
+.agents/skills/archify/schemas/architecture.schema.json
+  s_c5e30110ec8bb1::t_8ef7473767c9be 1-174
+.agents/skills/archify/schemas/common.schema.json
+  s_c5e30110ec8bb1::t_d50fb151b5a0c3 1-74
+.agents/skills/archify/schemas/dataflow.schema.json
+  s_c5e30110ec8bb1::t_817eb4016a7dc9 1-259
+.agents/skills/archify/schemas/lifecycle.schema.json
+  s_c5e30110ec8bb1::t_2c681afb19b28f 1-282
+.agents/skills/archify/schemas/sequence.schema.json
+  s_c5e30110ec8bb1::t_ca1fc13ff3a3f8 1-224
+.agents/skills/archify/schemas/workflow.schema.json
+  s_c5e30110ec8bb1::t_b857f0085d2a28 1-372
+.agents/skills/archify/scripts/check-render-output.mjs
+  s_c5e30110ec8bb1::t_e34d098fccbc92 1-776
+.agents/skills/archify/scripts/generate-validators.mjs
+  s_c5e30110ec8bb1::t_b6f6a697bc9c47 1-66
+.agents/skills/archify/scripts/render-examples.mjs
+  s_c5e30110ec8bb1::t_c6490bb95f3356 1-26
+.agents/skills/archify/test/animation.test.mjs
+  s_c5e30110ec8bb1::t_d721806e9e870f 1-174
+.agents/skills/archify/test/architecture-delta.test.mjs
+  s_c5e30110ec8bb1::t_7c88d1db00a5e5 1-457
+.agents/skills/archify/test/authored-reachability.test.mjs
+  s_c5e30110ec8bb1::t_fb384d735ff794 1-95
+.agents/skills/archify/test/automatic-port-spread.test.mjs
+  s_c5e30110ec8bb1::t_a2dbbcb3f86962 1-238
+.agents/skills/archify/test/chapter-delta-preview.test.mjs
+  s_c5e30110ec8bb1::t_beba8a0bab1256 1-157
+.agents/skills/archify/test/chapter-handoff.test.mjs
+  s_c5e30110ec8bb1::t_fded4d4d30ab7a 1-97
+.agents/skills/archify/test/chapter-rail.test.mjs
+  s_c5e30110ec8bb1::t_98c63858bdb2a1 1-86
+.agents/skills/archify/test/cli.test.mjs
+  s_c5e30110ec8bb1::t_f27cb5036d2873 1-647
+.agents/skills/archify/test/community-proof-intake.test.mjs
+  s_c5e30110ec8bb1::t_b5a56228307baa 1-90
+.agents/skills/archify/test/cursor-onboarding.test.mjs
+  s_c5e30110ec8bb1::t_2c8c37996b2a42 1-74
+.agents/skills/archify/test/degraded.test.mjs
+  s_c5e30110ec8bb1::t_a341c667096544 1-161
+.agents/skills/archify/test/delivery-contract.test.mjs
+  s_c5e30110ec8bb1::t_d319c1728153f4 1-32
+.agents/skills/archify/test/diagram-guide.test.mjs
+  s_c5e30110ec8bb1::t_a9de6a9a3c2809 1-92
+.agents/skills/archify/test/engineering-profile.test.mjs
+  s_c5e30110ec8bb1::t_6ed1bf56fe188e 1-209
+.agents/skills/archify/test/finder.test.mjs
+  s_c5e30110ec8bb1::t_61000b30196b24 1-103
+.agents/skills/archify/test/fixtures/v1-baseline/agent-run.lifecycle.json
+  s_c5e30110ec8bb1::t_c1874de1a452a8 1-64
+.agents/skills/archify/test/fixtures/v1-baseline/agent-tool-call.workflow.json
+  s_c5e30110ec8bb1::t_f9a3744770f702 1-88
+.agents/skills/archify/test/fixtures/v1-baseline/cache-miss-request.sequence.json
+  s_c5e30110ec8bb1::t_2e250cd6c026c4 1-75
+.agents/skills/archify/test/fixtures/v1-baseline/product-analytics.dataflow.json
+  s_c5e30110ec8bb1::t_80a7541ee70195 1-70
+.agents/skills/archify/test/fixtures/v1-baseline/web-app.architecture.json
+  s_c5e30110ec8bb1::t_0ed81c2cbfde45 1-41
+.agents/skills/archify/test/gallery.test.mjs
+  s_c5e30110ec8bb1::t_1f146cc482163e 1-124
+.agents/skills/archify/test/generate-validators.test.mjs
+  s_c5e30110ec8bb1::t_733485da26ea0d 1-40
+.agents/skills/archify/test/geometry.test.mjs
+  s_c5e30110ec8bb1::t_5206195e53ca98 1-662
+.agents/skills/archify/test/golden.mjs
+  s_c5e30110ec8bb1::t_61536d940f5c25 1-207
+.agents/skills/archify/test/grid.test.mjs
+  s_c5e30110ec8bb1::t_cc83e87fa36024 1-47
+.agents/skills/archify/test/guide-page.test.mjs
+  s_c5e30110ec8bb1::t_bf5843aec6d23b 1-48
+.agents/skills/archify/test/guide.test.mjs
+  s_c5e30110ec8bb1::t_bd85aab0c4e461 1-81
+.agents/skills/archify/test/guided-views.test.mjs
+  s_c5e30110ec8bb1::t_4c73089e0f4bd0 1-143
+.agents/skills/archify/test/intent-trace.test.mjs
+  s_c5e30110ec8bb1::t_c4948a7290876f 1-95
+.agents/skills/archify/test/landing.test.mjs
+  s_c5e30110ec8bb1::t_360bd3cddeaef8 1-97
+.agents/skills/archify/test/layout-rules.test.mjs
+  s_c5e30110ec8bb1::t_f46ab2374bd3c6 1-769
+.agents/skills/archify/test/legend-contract.test.mjs
+  s_c5e30110ec8bb1::t_5ab359c3471285 1-404
+.agents/skills/archify/test/motion-governor.test.mjs
+  s_c5e30110ec8bb1::t_cbf55fa04297d7 1-111
+.agents/skills/archify/test/open-artifact.test.mjs
+  s_c5e30110ec8bb1::t_10a5797ab20733 1-118
+.agents/skills/archify/test/ordinary-model-floor.test.mjs
+  s_c5e30110ec8bb1::t_0d6ebcac5764d0 1-1024
+.agents/skills/archify/test/output-path.test.mjs
+  s_c5e30110ec8bb1::t_4a754802c23a66 1-588
+.agents/skills/archify/test/presentation.test.mjs
+  s_c5e30110ec8bb1::t_7e39a7f5603d2a 1-71
+.agents/skills/archify/test/preset-tryon.test.mjs
+  s_c5e30110ec8bb1::t_08caadb1a032e2 1-102
+.agents/skills/archify/test/preview-contract.test.mjs
+  s_c5e30110ec8bb1::t_7f70c68883b54b 1-41
+.agents/skills/archify/test/preview.test.mjs
+  s_c5e30110ec8bb1::t_93e13a9e72a9fe 1-499
+.agents/skills/archify/test/proof-aperture.test.mjs
+  s_c5e30110ec8bb1::t_e33fc574f5b666 1-78
+.agents/skills/archify/test/reach-share-card.test.mjs
+  s_c5e30110ec8bb1::t_55d8361c66524c 1-147
+.agents/skills/archify/test/readme-showcase.test.mjs
+  s_c5e30110ec8bb1::t_0d81447efbf9e0 1-200
+.agents/skills/archify/test/real-repository-proof.test.mjs
+  s_c5e30110ec8bb1::t_58ce2ee74a8c80 1-125
+.agents/skills/archify/test/relationship-direct-explorer.test.mjs
+  s_c5e30110ec8bb1::t_3c9f7d475fb958 1-115
+.agents/skills/archify/test/relationship-lens.test.mjs
+  s_c5e30110ec8bb1::t_5dd3cb3417a18a 1-127
+.agents/skills/archify/test/relationship-permalink.test.mjs
+  s_c5e30110ec8bb1::t_fbb46579d7d05f 1-123
+.agents/skills/archify/test/relationship-pulse.test.mjs
+  s_c5e30110ec8bb1::t_10fd30080ef6f6 1-122
+.agents/skills/archify/test/release-identity.test.mjs
+  s_c5e30110ec8bb1::t_10ace16369a567 1-318
+.agents/skills/archify/test/release-package-gates.test.mjs
+  s_c5e30110ec8bb1::t_c0be413080ec6e 1-164
+.agents/skills/archify/test/render-output-checks.test.mjs
+  s_c5e30110ec8bb1::t_70d8469bf86719 1-362
+.agents/skills/archify/test/repair-receipt.test.mjs
+  s_c5e30110ec8bb1::t_e580ab127838a4 1-149
+.agents/skills/archify/test/repository-evidence.test.mjs
+  s_c5e30110ec8bb1::t_92407a21e305ee 1-203
+.agents/skills/archify/test/route-journey.test.mjs
+  s_c5e30110ec8bb1::t_dde25e2616c708 1-123
+.agents/skills/archify/test/route-probe.test.mjs
+  s_c5e30110ec8bb1::t_c01dff28066796 1-114
+.agents/skills/archify/test/route-share-card.test.mjs
+  s_c5e30110ec8bb1::t_5888d6fa8034d0 1-163
+.agents/skills/archify/test/semantic-camera.test.mjs
+  s_c5e30110ec8bb1::t_25d48420be7a2b 1-88
+.agents/skills/archify/test/semantic-flow.test.mjs
+  s_c5e30110ec8bb1::t_bf54f5ed4d7c01 1-90
+.agents/skills/archify/test/semantic-legend-gateway.test.mjs
+  s_c5e30110ec8bb1::t_94a2f2e0c0e7dd 1-140
+.agents/skills/archify/test/semantic-lens.test.mjs
+  s_c5e30110ec8bb1::t_c5647cb337d707 1-103
+.agents/skills/archify/test/semantic-passport.test.mjs
+  s_c5e30110ec8bb1::t_833d0b2cc0c2ed 1-99
+.agents/skills/archify/test/semantic-radar.test.mjs
+  s_c5e30110ec8bb1::t_0968e5049d028c 1-98
+.agents/skills/archify/test/semantic-zoom.test.mjs
+  s_c5e30110ec8bb1::t_2cd5248ffbd0ed 1-85
+.agents/skills/archify/test/settled-flow.test.mjs
+  s_c5e30110ec8bb1::t_493a5586d66cf5 1-97
+.agents/skills/archify/test/share-card-export.test.mjs
+  s_c5e30110ec8bb1::t_021a3f26ba256a 1-132
+.agents/skills/archify/test/skill-metadata.test.mjs
+  s_c5e30110ec8bb1::t_3740c6d1eb4fd6 1-48
+.agents/skills/archify/test/start-page.test.mjs
+  s_c5e30110ec8bb1::t_d7419f226115c4 1-125
+.agents/skills/archify/test/story-beat-navigator.test.mjs
+  s_c5e30110ec8bb1::t_2956b3a5e7fdef 1-103
+.agents/skills/archify/test/story-carrier.test.mjs
+  s_c5e30110ec8bb1::t_0773041355ef42 1-90
+.agents/skills/archify/test/story-director-strip.test.mjs
+  s_c5e30110ec8bb1::t_4ffc8876ebc8ec 1-91
+.agents/skills/archify/test/story-follow-camera.test.mjs
+  s_c5e30110ec8bb1::t_ef449b370d25be 1-103
+.agents/skills/archify/test/story-horizon.test.mjs
+  s_c5e30110ec8bb1::t_e989d5307d3e4d 1-89
+.agents/skills/archify/test/story-moment-link.test.mjs
+  s_c5e30110ec8bb1::t_731566db57765d 1-93
+.agents/skills/archify/test/story-shelf.test.mjs
+  s_c5e30110ec8bb1::t_29da16a12f6900 1-84
+.agents/skills/archify/test/story-trail.test.mjs
+  s_c5e30110ec8bb1::t_c6f619e22f18db 1-81
+.agents/skills/archify/test/v1-compatibility.test.mjs
+  s_c5e30110ec8bb1::t_a70221b078f4c2 1-313
+.agents/skills/archify/test/webm-artifact.smoke.mjs
+  s_c5e30110ec8bb1::t_bc0f85eda2c128 1-1820
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "7d3d6a6adbef2339a8e2f2a9889b8eecb2ae0e39",
+  "prompts": {},
+  "humans": {
+    "h_ec0865e8a99e9f": {
+      "author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  },
+  "sessions": {
+    "s_c5e30110ec8bb1": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a73ddb9fa8cdde5d23b5cd2",
+        "model": "glm-5.2__dev"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>",
+      "custom_attributes": {
+        "operation_id": "6a797abfc466718d60d25fa8",
+        "session_id": "6a73ddb9fa8cdde5d23b5cd2",
+        "tool_name": "RunCommand",
+        "display_model_name": "GLM-5.2",
+        "tool_use_id": "6a797abfc466718d60d25fa8",
+        "external_session_id": "6a73ddb9fa8cdde5d23b5cd2",
+        "edit_kind": "bash"
+      }
+    }
+  }
+}
