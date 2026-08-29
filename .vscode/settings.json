@@ -40,14 +40,14 @@
       "value": "/cluster/jdk-17.0.12.jdk/Contents/Home"
     }
   ],
-  // "js/ts.tsserver.node.path": "E:\\node-v22.22.1-win-x64\\node",
+  "js/ts.tsserver.node.path": "E:\\node-v22.22.1-win-x64\\node",
   "python.defaultInterpreterPath": "E:\\python-3.8.9\\python",
   "extensions": {
     "ignoreRecommendations": true,
     "showRecommendationsOnlyOnDemand": false
   },
   "terminal.integrated.env.windows": {
-    "a": "b"
+    "PATH": "D:\\node-v22.22.0-win-x64;${env:PATH}"
   },
   "xml.format.preserveAttributeLineBreaks": false,
   "xml.format.preservedNewlines": 1,
