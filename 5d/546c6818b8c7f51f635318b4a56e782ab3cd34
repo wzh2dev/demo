@@ -1,0 +1,19 @@
+.vscode/settings.json
+  s_c213ba4ed792d1::t_cef5821a6746d6 59,63,66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "5d546c6818b8c7f51f635318b4a56e782ab3cd34",
+  "prompts": {},
+  "sessions": {
+    "s_c213ba4ed792d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "s_c213ba4ed792d1",
+        "model": "unknown"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  }
+}
