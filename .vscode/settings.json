@@ -40,7 +40,6 @@
       "value": "/cluster/jdk-17.0.12.jdk/Contents/Home"
     }
   ],
-  "js/ts.tsserver.node.path": "E:\\node-v22.22.1-win-x64\\node",
   "python.defaultInterpreterPath": "E:\\python-3.8.9\\python",
   "extensions": {
     "ignoreRecommendations": true,
@@ -57,16 +56,14 @@
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true
   },
-  "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "[jsonc]": {
+  "[json][jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[javascript][typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "go.goroot": "/cluster/go",
+  "gitai.enableCheckpointLogging": true,
   // for trae
   "workbench.colorTheme": "Light",
   "java.configuration.updateBuildConfiguration": "automatic",
@@ -88,5 +85,4 @@
       "password": "root"
     }
   ]
-  // "typescript.tsserver.nodePath": "E:\\node-v22.22.1-win-x64\\node",
 }
