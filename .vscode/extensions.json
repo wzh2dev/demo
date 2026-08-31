@@ -19,6 +19,7 @@
     "GitHub.vscode-github-actions",
     "mhutchie.git-graph",
     "johnstoncode.svn-scm",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "ms-playwright.playwright"
   ]
 }
