@@ -1,0 +1,19 @@
+web
+  s_f9941f1738c9cb::t_6a3dfe25ffb128 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "7361384bdf1ed65b500cdadc37cf28c9edbff1a2",
+  "prompts": {},
+  "sessions": {
+    "s_f9941f1738c9cb": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a92e08b9cadfefe14cd4994",
+        "model": "glm-5.3__dev"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  }
+}
