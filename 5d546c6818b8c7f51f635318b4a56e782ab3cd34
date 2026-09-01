@@ -1,0 +1,37 @@
+.vscode/settings.json
+  s_3e37792483951a::t_b3c2a97e677a95 66
+  s_3e37792483951a::t_7240bfec0e298e 59,63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "5d546c6818b8c7f51f635318b4a56e782ab3cd34",
+  "prompts": {},
+  "humans": {
+    "h_ec0865e8a99e9f": {
+      "author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  },
+  "sessions": {
+    "s_3e37792483951a": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a94f3531b29d797e604bb03",
+        "model": "glm-5.3__max"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>",
+      "custom_attributes": {
+        "operation_id": "6a95344e1b29d797e604bbe7",
+        "source_scene": "agent",
+        "session_id": "6a94f3531b29d797e604bb03",
+        "client_type": "ide",
+        "runtime_client": "trae-tob-git-ai",
+        "tool_use_id": "6a95344e1b29d797e604bbe7",
+        "display_model_name": "GLM-5.3",
+        "external_session_id": "6a94f3531b29d797e604bb03",
+        "tool_name": "RunCommand",
+        "edit_kind": "bash"
+      }
+    }
+  }
+}
