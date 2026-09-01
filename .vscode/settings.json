@@ -64,6 +64,7 @@
   },
   "go.goroot": "/cluster/go",
   "gitai.enableCheckpointLogging": true,
+  "npm.exclude": ["**/.agents/**"],
   // for trae
   "workbench.colorTheme": "Light",
   "java.configuration.updateBuildConfiguration": "automatic",
