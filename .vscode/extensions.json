@@ -20,6 +20,7 @@
     "mhutchie.git-graph",
     "johnstoncode.svn-scm",
     "esbenp.prettier-vscode",
-    "ms-playwright.playwright"
+    "ms-playwright.playwright",
+    "eslint.vscode-eslint"
   ]
 }
