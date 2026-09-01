@@ -1,0 +1,32 @@
+.vscode/extensions.json
+  s_bf2d0f2f9d453d::t_cc62c475f15938 24
+  s_bf2d0f2f9d453d::t_90430b40c39708 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "30ee592cd3c3cc515011bb5f27ba2c64a8ed0a02",
+  "prompts": {},
+  "humans": {
+    "h_ec0865e8a99e9f": {
+      "author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  },
+  "sessions": {
+    "s_bf2d0f2f9d453d": {
+      "agent_id": {
+        "tool": "trae-code-edit",
+        "id": "ai_tab-20260902000952010000046242356B86A",
+        "model": "default"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>",
+      "custom_attributes": {
+        "external_session_id": "20260902000952010000046242356B86A",
+        "tool": "trae-code-edit",
+        "client_type": "ide",
+        "source_scene": "cue",
+        "edit_kind": "file_edit"
+      }
+    }
+  }
+}
