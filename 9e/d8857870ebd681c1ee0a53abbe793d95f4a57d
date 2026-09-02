@@ -1,0 +1,19 @@
+.git-ai-ignore
+  s_128d413cccea60::t_b47060e7f3fd2c 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "9ed8857870ebd681c1ee0a53abbe793d95f4a57d",
+  "prompts": {},
+  "sessions": {
+    "s_128d413cccea60": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "s_128d413cccea60",
+        "model": "unknown"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  }
+}
