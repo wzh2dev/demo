@@ -1,0 +1,36 @@
+docs/openapi/swagger.json
+  s_5e9b32d1f9d910::t_6344f559c8dcd1 1-2817
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "622156a9d434b7e1fe2ff4125e5acd9e252395a8",
+  "prompts": {},
+  "humans": {
+    "h_ec0865e8a99e9f": {
+      "author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  },
+  "sessions": {
+    "s_5e9b32d1f9d910": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a9622901b29d797e604bbf8",
+        "model": "glm-5.3__max"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>",
+      "custom_attributes": {
+        "display_model_name": "GLM-5.3",
+        "tool_use_id": "6a96351e1b29d797e604bc40",
+        "edit_kind": "bash",
+        "external_session_id": "6a9622901b29d797e604bbf8",
+        "source_scene": "agent",
+        "session_id": "6a9622901b29d797e604bbf8",
+        "runtime_client": "trae-tob-git-ai",
+        "tool_name": "RunCommand",
+        "client_type": "ide",
+        "operation_id": "6a96351e1b29d797e604bc40"
+      }
+    }
+  }
+}
