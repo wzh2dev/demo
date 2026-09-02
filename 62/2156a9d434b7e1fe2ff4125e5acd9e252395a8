@@ -1,0 +1,19 @@
+docs/openapi/swagger.json
+  s_9febe3674f7e67::t_446ba833078e2e 1-2817
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "622156a9d434b7e1fe2ff4125e5acd9e252395a8",
+  "prompts": {},
+  "sessions": {
+    "s_9febe3674f7e67": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "s_9febe3674f7e67",
+        "model": "unknown"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  }
+}
