@@ -1,0 +1,2817 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "contact": {
+      "email": "demo@example.com",
+      "name": "Demo Team"
+    },
+    "description": "模拟用 OpenAPI 规范文件，用于 AI 代码贡献率测试。\n本文件覆盖用户、商品、订单、支付、库存、评论、优惠券、物流、\n消息、搜索等十个业务域，提供完整的 paths 与 components.schemas。\n",
+    "license": {
+      "name": "MIT"
+    },
+    "title": "Demo API",
+    "version": "1.0.0"
+  },
+  "host": "api.demo.example.com",
+  "basePath": "/v1",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/coupons": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "default": 1,
+            "description": "页码，从 1 开始",
+            "in": "query",
+            "minimum": 1,
+            "name": "pageNumber",
+            "type": "integer"
+          },
+          {
+            "default": 20,
+            "description": "每页数量",
+            "in": "query",
+            "maximum": 100,
+            "minimum": 1,
+            "name": "pageSize",
+            "type": "integer"
+          },
+          {
+            "enum": [
+              "unclaimed",
+              "claimed",
+              "used",
+              "expired"
+            ],
+            "in": "query",
+            "name": "status",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "优惠券列表",
+            "schema": {
+              "$ref": "#/definitions/CouponPage"
+            }
+          }
+        },
+        "tags": [
+          "Coupon"
+        ],
+        "operationId": "listCoupons",
+        "summary": "查询优惠券列表"
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CouponCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "schema": {
+              "$ref": "#/definitions/Coupon"
+            }
+          }
+        },
+        "tags": [
+          "Coupon"
+        ],
+        "operationId": "createCoupon",
+        "summary": "创建优惠券"
+      }
+    },
+    "/coupons/{couponId}/claim": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "couponId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "领取成功",
+            "schema": {
+              "$ref": "#/definitions/UserCoupon"
+            }
+          },
+          "409": {
+            "description": "资源冲突",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "Coupon"
+        ],
+        "operationId": "claimCoupon",
+        "summary": "领取优惠券"
+      }
+    },
+    "/inventory/{skuId}": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "skuId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "库存信息",
+            "schema": {
+              "$ref": "#/definitions/Inventory"
+            }
+          }
+        },
+        "tags": [
+          "Inventory"
+        ],
+        "operationId": "getInventory",
+        "summary": "查询库存"
+      },
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/InventoryAdjustRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "调整后库存",
+            "schema": {
+              "$ref": "#/definitions/Inventory"
+            }
+          }
+        },
+        "tags": [
+          "Inventory"
+        ],
+        "operationId": "updateInventory",
+        "summary": "调整库存"
+      }
+    },
+    "/messages": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "default": 1,
+            "description": "页码，从 1 开始",
+            "in": "query",
+            "minimum": 1,
+            "name": "pageNumber",
+            "type": "integer"
+          },
+          {
+            "default": 20,
+            "description": "每页数量",
+            "in": "query",
+            "maximum": 100,
+            "minimum": 1,
+            "name": "pageSize",
+            "type": "integer"
+          },
+          {
+            "format": "int64",
+            "in": "query",
+            "name": "userId",
+            "type": "integer"
+          },
+          {
+            "default": false,
+            "in": "query",
+            "name": "unreadOnly",
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "站内信列表",
+            "schema": {
+              "$ref": "#/definitions/MessagePage"
+            }
+          }
+        },
+        "tags": [
+          "Message"
+        ],
+        "operationId": "listMessages",
+        "summary": "查询站内信"
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MessageCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "发送成功",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        },
+        "tags": [
+          "Message"
+        ],
+        "operationId": "sendMessage",
+        "summary": "发送站内信"
+      }
+    },
+    "/messages/{messageId}/read": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "messageId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "标记成功"
+          }
+        },
+        "tags": [
+          "Message"
+        ],
+        "operationId": "markMessageRead",
+        "summary": "标记已读"
+      }
+    },
+    "/orders": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "default": 1,
+            "description": "页码，从 1 开始",
+            "in": "query",
+            "minimum": 1,
+            "name": "pageNumber",
+            "type": "integer"
+          },
+          {
+            "default": 20,
+            "description": "每页数量",
+            "in": "query",
+            "maximum": 100,
+            "minimum": 1,
+            "name": "pageSize",
+            "type": "integer"
+          },
+          {
+            "format": "int64",
+            "in": "query",
+            "name": "userId",
+            "type": "integer"
+          },
+          {
+            "enum": [
+              "pending_payment",
+              "paid",
+              "shipped",
+              "completed",
+              "cancelled",
+              "refunded"
+            ],
+            "in": "query",
+            "name": "status",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "订单列表",
+            "schema": {
+              "$ref": "#/definitions/OrderPage"
+            }
+          }
+        },
+        "tags": [
+          "Order"
+        ],
+        "operationId": "listOrders",
+        "summary": "分页查询订单"
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "资源冲突",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "Order"
+        ],
+        "operationId": "createOrder",
+        "summary": "创建订单"
+      }
+    },
+    "/orders/{orderId}": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "orderId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "订单详情",
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "Order"
+        ],
+        "operationId": "getOrderById",
+        "summary": "查询订单详情"
+      },
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          }
+        },
+        "tags": [
+          "Order"
+        ],
+        "operationId": "updateOrder",
+        "summary": "更新订单"
+      }
+    },
+    "/orders/{orderId}/cancel": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "orderId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "取消成功",
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          },
+          "409": {
+            "description": "资源冲突",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "Order"
+        ],
+        "operationId": "cancelOrder",
+        "summary": "取消订单"
+      }
+    },
+    "/payments": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PaymentCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "发起成功",
+            "schema": {
+              "$ref": "#/definitions/Payment"
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "Payment"
+        ],
+        "operationId": "createPayment",
+        "summary": "发起支付"
+      }
+    },
+    "/payments/{paymentId}": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "paymentId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "支付详情",
+            "schema": {
+              "$ref": "#/definitions/Payment"
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "Payment"
+        ],
+        "operationId": "getPaymentById",
+        "summary": "查询支付详情"
+      }
+    },
+    "/payments/{paymentId}/refund": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "paymentId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RefundRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "退款受理",
+            "schema": {
+              "$ref": "#/definitions/Refund"
+            }
+          }
+        },
+        "tags": [
+          "Payment"
+        ],
+        "operationId": "refundPayment",
+        "summary": "申请退款"
+      }
+    },
+    "/products": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "default": 1,
+            "description": "页码，从 1 开始",
+            "in": "query",
+            "minimum": 1,
+            "name": "pageNumber",
+            "type": "integer"
+          },
+          {
+            "default": 20,
+            "description": "每页数量",
+            "in": "query",
+            "maximum": 100,
+            "minimum": 1,
+            "name": "pageSize",
+            "type": "integer"
+          },
+          {
+            "format": "int64",
+            "in": "query",
+            "name": "categoryId",
+            "type": "integer"
+          },
+          {
+            "format": "double",
+            "in": "query",
+            "name": "minPrice",
+            "type": "number"
+          },
+          {
+            "format": "double",
+            "in": "query",
+            "name": "maxPrice",
+            "type": "number"
+          },
+          {
+            "enum": [
+              "price_asc",
+              "price_desc",
+              "created_desc",
+              "sold_desc"
+            ],
+            "in": "query",
+            "name": "sort",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "商品列表",
+            "schema": {
+              "$ref": "#/definitions/ProductPage"
+            }
+          }
+        },
+        "tags": [
+          "Product"
+        ],
+        "operationId": "listProducts",
+        "summary": "分页查询商品"
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProductCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          }
+        },
+        "tags": [
+          "Product"
+        ],
+        "operationId": "createProduct",
+        "summary": "创建商品"
+      }
+    },
+    "/products/{productId}": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "productId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "delete": {
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "删除成功"
+          }
+        },
+        "tags": [
+          "Product"
+        ],
+        "operationId": "deleteProduct",
+        "summary": "删除商品"
+      },
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "商品详情",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "Product"
+        ],
+        "operationId": "getProductById",
+        "summary": "查询商品详情"
+      },
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProductUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          }
+        },
+        "tags": [
+          "Product"
+        ],
+        "operationId": "updateProduct",
+        "summary": "更新商品"
+      }
+    },
+    "/products/{productId}/skus": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "productId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "SKU 列表",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Sku"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "tags": [
+          "Product"
+        ],
+        "operationId": "listProductSkus",
+        "summary": "查询商品 SKU 列表"
+      }
+    },
+    "/reviews": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "default": 1,
+            "description": "页码，从 1 开始",
+            "in": "query",
+            "minimum": 1,
+            "name": "pageNumber",
+            "type": "integer"
+          },
+          {
+            "default": 20,
+            "description": "每页数量",
+            "in": "query",
+            "maximum": 100,
+            "minimum": 1,
+            "name": "pageSize",
+            "type": "integer"
+          },
+          {
+            "format": "int64",
+            "in": "query",
+            "name": "productId",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "maximum": 5,
+            "minimum": 1,
+            "name": "rating",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "评论列表",
+            "schema": {
+              "$ref": "#/definitions/ReviewPage"
+            }
+          }
+        },
+        "tags": [
+          "Review"
+        ],
+        "operationId": "listReviews",
+        "summary": "分页查询评论"
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReviewCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "发表成功",
+            "schema": {
+              "$ref": "#/definitions/Review"
+            }
+          }
+        },
+        "tags": [
+          "Review"
+        ],
+        "operationId": "createReview",
+        "summary": "发表评论"
+      }
+    },
+    "/reviews/{reviewId}": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "reviewId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "delete": {
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "删除成功"
+          }
+        },
+        "tags": [
+          "Review"
+        ],
+        "operationId": "deleteReview",
+        "summary": "删除评论"
+      }
+    },
+    "/search": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "maxLength": 128,
+            "name": "q",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "default": "all",
+            "enum": [
+              "product",
+              "order",
+              "user",
+              "all"
+            ],
+            "in": "query",
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "default": 1,
+            "description": "页码，从 1 开始",
+            "in": "query",
+            "minimum": 1,
+            "name": "pageNumber",
+            "type": "integer"
+          },
+          {
+            "default": 20,
+            "description": "每页数量",
+            "in": "query",
+            "maximum": 100,
+            "minimum": 1,
+            "name": "pageSize",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "搜索结果",
+            "schema": {
+              "$ref": "#/definitions/SearchResult"
+            }
+          }
+        },
+        "tags": [
+          "Search"
+        ],
+        "operationId": "search",
+        "summary": "全局搜索"
+      }
+    },
+    "/shipping/orders/{orderId}": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "orderId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "物流信息",
+            "schema": {
+              "$ref": "#/definitions/Shipping"
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "Shipping"
+        ],
+        "operationId": "getShippingByOrder",
+        "summary": "查询订单物流"
+      }
+    },
+    "/shipping/{shippingId}/tracks": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "shippingId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TrackCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "上报成功",
+            "schema": {
+              "$ref": "#/definitions/Track"
+            }
+          }
+        },
+        "tags": [
+          "Shipping"
+        ],
+        "operationId": "appendShippingTrack",
+        "summary": "上报物流轨迹"
+      }
+    },
+    "/users": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "default": 1,
+            "description": "页码，从 1 开始",
+            "in": "query",
+            "minimum": 1,
+            "name": "pageNumber",
+            "type": "integer"
+          },
+          {
+            "default": 20,
+            "description": "每页数量",
+            "in": "query",
+            "maximum": 100,
+            "minimum": 1,
+            "name": "pageSize",
+            "type": "integer"
+          },
+          {
+            "description": "昵称或手机号模糊匹配",
+            "in": "query",
+            "maxLength": 64,
+            "name": "keyword",
+            "type": "string"
+          },
+          {
+            "default": "active",
+            "enum": [
+              "active",
+              "disabled",
+              "frozen"
+            ],
+            "in": "query",
+            "name": "status",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "用户列表",
+            "schema": {
+              "$ref": "#/definitions/UserPage"
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "未认证",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "operationId": "listUsers",
+        "summary": "分页查询用户"
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "资源冲突",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "operationId": "createUser",
+        "summary": "创建用户"
+      }
+    },
+    "/users/{userId}": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "userId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "删除成功"
+          },
+          "404": {
+            "description": "资源不存在",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "operationId": "deleteUser",
+        "summary": "删除用户"
+      },
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "用户详情",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "operationId": "getUserById",
+        "summary": "查询用户详情"
+      },
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "请求参数错误",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "operationId": "updateUser",
+        "summary": "更新用户"
+      }
+    },
+    "/users/{userId}/addresses": {
+      "parameters": [
+        {
+          "format": "int64",
+          "in": "path",
+          "name": "userId",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "地址列表",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Address"
+              },
+              "type": "array"
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "operationId": "listUserAddresses",
+        "summary": "查询用户收货地址"
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AddressCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "创建成功",
+            "schema": {
+              "$ref": "#/definitions/Address"
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "operationId": "createUserAddress",
+        "summary": "新增收货地址"
+      }
+    }
+  },
+  "definitions": {
+    "Address": {
+      "properties": {
+        "city": {
+          "type": "string"
+        },
+        "consignee": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "isDefault": {
+          "default": false,
+          "type": "boolean"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "consignee",
+        "phone",
+        "detail"
+      ],
+      "type": "object"
+    },
+    "AddressCreateRequest": {
+      "properties": {
+        "city": {
+          "type": "string"
+        },
+        "consignee": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "consignee",
+        "phone",
+        "detail"
+      ],
+      "type": "object"
+    },
+    "Coupon": {
+      "properties": {
+        "claimed": {
+          "type": "integer"
+        },
+        "endAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "minSpend": {
+          "format": "double",
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        },
+        "startAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/CouponStatus"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "type": {
+          "enum": [
+            "amount",
+            "percentage"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type",
+        "value",
+        "status"
+      ],
+      "type": "object"
+    },
+    "CouponCreateRequest": {
+      "properties": {
+        "endAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "minSpend": {
+          "format": "double",
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        },
+        "startAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "type": {
+          "enum": [
+            "amount",
+            "percentage"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "value",
+        "startAt",
+        "endAt"
+      ],
+      "type": "object"
+    },
+    "CouponPage": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/definitions/Coupon"
+          },
+          "type": "array"
+        },
+        "pageNumber": {
+          "type": "integer"
+        },
+        "pageSize": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "items",
+        "total",
+        "pageNumber",
+        "pageSize"
+      ],
+      "type": "object"
+    },
+    "CouponStatus": {
+      "enum": [
+        "unclaimed",
+        "claimed",
+        "used",
+        "expired"
+      ],
+      "type": "string"
+    },
+    "Error": {
+      "properties": {
+        "code": {
+          "example": "INVALID_ARGUMENT",
+          "type": "string"
+        },
+        "details": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "message": {
+          "example": "请求参数错误",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "type": "object"
+    },
+    "Inventory": {
+      "properties": {
+        "available": {
+          "type": "integer"
+        },
+        "locked": {
+          "type": "integer"
+        },
+        "skuId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "updatedAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "skuId",
+        "available",
+        "locked"
+      ],
+      "type": "object"
+    },
+    "InventoryAdjustRequest": {
+      "properties": {
+        "delta": {
+          "description": "增量为正减少为负",
+          "type": "integer"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "delta"
+      ],
+      "type": "object"
+    },
+    "Message": {
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "read": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "system",
+            "order",
+            "promotion"
+          ],
+          "type": "string"
+        },
+        "userId": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "content",
+        "read",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "MessageCreateRequest": {
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "default": "system",
+          "enum": [
+            "system",
+            "order",
+            "promotion"
+          ],
+          "type": "string"
+        },
+        "userId": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "userId",
+        "title",
+        "content"
+      ],
+      "type": "object"
+    },
+    "MessagePage": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/definitions/Message"
+          },
+          "type": "array"
+        },
+        "pageNumber": {
+          "type": "integer"
+        },
+        "pageSize": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "items",
+        "total",
+        "pageNumber",
+        "pageSize"
+      ],
+      "type": "object"
+    },
+    "Order": {
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/Address"
+        },
+        "completedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "discountAmount": {
+          "format": "double",
+          "type": "number"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/definitions/OrderItem"
+          },
+          "type": "array"
+        },
+        "orderNo": {
+          "type": "string"
+        },
+        "paidAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "payAmount": {
+          "format": "double",
+          "type": "number"
+        },
+        "remark": {
+          "type": "string"
+        },
+        "shippedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/OrderStatus"
+        },
+        "totalAmount": {
+          "format": "double",
+          "type": "number"
+        },
+        "userId": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "orderNo",
+        "userId",
+        "status",
+        "totalAmount",
+        "items",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "OrderCreateRequest": {
+      "properties": {
+        "addressId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "couponId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "items": {
+          "items": {
+            "properties": {
+              "quantity": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "skuId": {
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "skuId",
+              "quantity"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "remark": {
+          "maxLength": 200,
+          "type": "string"
+        }
+      },
+      "required": [
+        "addressId",
+        "items"
+      ],
+      "type": "object"
+    },
+    "OrderItem": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "price": {
+          "format": "double",
+          "type": "number"
+        },
+        "productId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "quantity": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "skuCode": {
+          "type": "string"
+        },
+        "skuId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "subtotal": {
+          "format": "double",
+          "type": "number"
+        }
+      },
+      "required": [
+        "productId",
+        "skuId",
+        "name",
+        "price",
+        "quantity"
+      ],
+      "type": "object"
+    },
+    "OrderPage": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/definitions/Order"
+          },
+          "type": "array"
+        },
+        "pageNumber": {
+          "type": "integer"
+        },
+        "pageSize": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "items",
+        "total",
+        "pageNumber",
+        "pageSize"
+      ],
+      "type": "object"
+    },
+    "OrderStatus": {
+      "enum": [
+        "pending_payment",
+        "paid",
+        "shipped",
+        "completed",
+        "cancelled",
+        "refunded"
+      ],
+      "type": "string"
+    },
+    "OrderUpdateRequest": {
+      "properties": {
+        "remark": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/OrderStatus"
+        }
+      },
+      "type": "object"
+    },
+    "Payment": {
+      "properties": {
+        "amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "channel": {
+          "enum": [
+            "wechat",
+            "alipay",
+            "card",
+            "balance"
+          ],
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "orderId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "paidAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "success",
+            "failed",
+            "refunded"
+          ],
+          "type": "string"
+        },
+        "tradeNo": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "orderId",
+        "amount",
+        "channel",
+        "status",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "PaymentCreateRequest": {
+      "properties": {
+        "channel": {
+          "enum": [
+            "wechat",
+            "alipay",
+            "card",
+            "balance"
+          ],
+          "type": "string"
+        },
+        "orderId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "returnUrl": {
+          "format": "uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "orderId",
+        "channel"
+      ],
+      "type": "object"
+    },
+    "Product": {
+      "properties": {
+        "brand": {
+          "type": "string"
+        },
+        "categoryId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "images": {
+          "items": {
+            "format": "uri",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "originalPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "price": {
+          "format": "double",
+          "type": "number"
+        },
+        "sales": {
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "on_sale",
+            "off_sale",
+            "sold_out"
+          ],
+          "type": "string"
+        },
+        "stock": {
+          "type": "integer"
+        },
+        "subtitle": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "price",
+        "status"
+      ],
+      "type": "object"
+    },
+    "ProductCreateRequest": {
+      "properties": {
+        "brand": {
+          "type": "string"
+        },
+        "categoryId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "images": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "originalPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "price": {
+          "format": "double",
+          "type": "number"
+        },
+        "subtitle": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "price",
+        "categoryId"
+      ],
+      "type": "object"
+    },
+    "ProductPage": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/definitions/Product"
+          },
+          "type": "array"
+        },
+        "pageNumber": {
+          "type": "integer"
+        },
+        "pageSize": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "items",
+        "total",
+        "pageNumber",
+        "pageSize"
+      ],
+      "type": "object"
+    },
+    "ProductUpdateRequest": {
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "price": {
+          "format": "double",
+          "type": "number"
+        },
+        "status": {
+          "enum": [
+            "on_sale",
+            "off_sale",
+            "sold_out"
+          ],
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Refund": {
+      "properties": {
+        "amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "paymentId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "success",
+            "failed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "paymentId",
+        "amount",
+        "status",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "RefundRequest": {
+      "properties": {
+        "amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "reason": {
+          "maxLength": 200,
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount"
+      ],
+      "type": "object"
+    },
+    "Review": {
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "images": {
+          "items": {
+            "format": "uri",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "productId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "rating": {
+          "maximum": 5,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "userId": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "userId",
+        "rating",
+        "content",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "ReviewCreateRequest": {
+      "properties": {
+        "content": {
+          "maxLength": 500,
+          "type": "string"
+        },
+        "images": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "productId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "rating": {
+          "maximum": 5,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "productId",
+        "rating",
+        "content"
+      ],
+      "type": "object"
+    },
+    "ReviewPage": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/definitions/Review"
+          },
+          "type": "array"
+        },
+        "pageNumber": {
+          "type": "integer"
+        },
+        "pageSize": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "items",
+        "total",
+        "pageNumber",
+        "pageSize"
+      ],
+      "type": "object"
+    },
+    "SearchResult": {
+      "properties": {
+        "items": {
+          "items": {
+            "properties": {
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "score": {
+                "format": "double",
+                "type": "number"
+              },
+              "snippet": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "product",
+                  "order",
+                  "user"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total",
+        "items"
+      ],
+      "type": "object"
+    },
+    "Shipping": {
+      "properties": {
+        "company": {
+          "type": "string"
+        },
+        "deliveredAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "orderId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "shippedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "in_transit",
+            "delivered",
+            "exception"
+          ],
+          "type": "string"
+        },
+        "trackingNo": {
+          "type": "string"
+        },
+        "tracks": {
+          "items": {
+            "$ref": "#/definitions/Track"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "orderId",
+        "company",
+        "trackingNo",
+        "status"
+      ],
+      "type": "object"
+    },
+    "Sku": {
+      "properties": {
+        "attributes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "example": {
+            "color": "red",
+            "size": "M"
+          },
+          "type": "object"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "price": {
+          "format": "double",
+          "type": "number"
+        },
+        "productId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "skuCode": {
+          "type": "string"
+        },
+        "stock": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "price",
+        "stock"
+      ],
+      "type": "object"
+    },
+    "Track": {
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "time": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "time",
+        "location",
+        "description"
+      ],
+      "type": "object"
+    },
+    "TrackCreateRequest": {
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "time": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "location",
+        "description"
+      ],
+      "type": "object"
+    },
+    "User": {
+      "properties": {
+        "avatar": {
+          "format": "uri",
+          "type": "string"
+        },
+        "createdAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "email": {
+          "format": "email",
+          "type": "string"
+        },
+        "gender": {
+          "default": "unknown",
+          "enum": [
+            "male",
+            "female",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "id": {
+          "example": 1001,
+          "format": "int64",
+          "type": "integer"
+        },
+        "mobile": {
+          "example": "13800000000",
+          "type": "string"
+        },
+        "nickname": {
+          "example": "alice",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/UserStatus"
+        },
+        "updatedAt": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "nickname",
+        "mobile",
+        "status",
+        "createdAt"
+      ],
+      "type": "object"
+    },
+    "UserCoupon": {
+      "properties": {
+        "claimedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "couponId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/definitions/CouponStatus"
+        },
+        "usedAt": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "userId": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "couponId",
+        "status"
+      ],
+      "type": "object"
+    },
+    "UserCreateRequest": {
+      "properties": {
+        "email": {
+          "format": "email",
+          "type": "string"
+        },
+        "mobile": {
+          "pattern": "^\\d{11}$",
+          "type": "string"
+        },
+        "nickname": {
+          "maxLength": 32,
+          "type": "string"
+        },
+        "password": {
+          "format": "password",
+          "maxLength": 64,
+          "minLength": 8,
+          "type": "string"
+        }
+      },
+      "required": [
+        "nickname",
+        "mobile"
+      ],
+      "type": "object"
+    },
+    "UserPage": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/definitions/User"
+          },
+          "type": "array"
+        },
+        "pageNumber": {
+          "type": "integer"
+        },
+        "pageSize": {
+          "type": "integer"
+        },
+        "total": {
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "items",
+        "total",
+        "pageNumber",
+        "pageSize"
+      ],
+      "type": "object"
+    },
+    "UserStatus": {
+      "default": "active",
+      "enum": [
+        "active",
+        "disabled",
+        "frozen"
+      ],
+      "type": "string"
+    },
+    "UserUpdateRequest": {
+      "properties": {
+        "avatar": {
+          "format": "uri",
+          "type": "string"
+        },
+        "gender": {
+          "enum": [
+            "male",
+            "female",
+            "unknown"
+          ],
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/UserStatus"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "tags": [
+    {
+      "description": "用户相关接口",
+      "name": "User"
+    },
+    {
+      "description": "商品相关接口",
+      "name": "Product"
+    },
+    {
+      "description": "订单相关接口",
+      "name": "Order"
+    },
+    {
+      "description": "支付相关接口",
+      "name": "Payment"
+    },
+    {
+      "description": "库存相关接口",
+      "name": "Inventory"
+    },
+    {
+      "description": "评论相关接口",
+      "name": "Review"
+    },
+    {
+      "description": "优惠券相关接口",
+      "name": "Coupon"
+    },
+    {
+      "description": "物流相关接口",
+      "name": "Shipping"
+    },
+    {
+      "description": "消息相关接口",
+      "name": "Message"
+    },
+    {
+      "description": "搜索相关接口",
+      "name": "Search"
+    }
+  ],
+  "x-components": {
+    "parameters": {
+      "CouponId": {
+        "format": "int64",
+        "in": "path",
+        "name": "couponId",
+        "required": true,
+        "type": "integer"
+      },
+      "MessageId": {
+        "format": "int64",
+        "in": "path",
+        "name": "messageId",
+        "required": true,
+        "type": "integer"
+      },
+      "OrderId": {
+        "format": "int64",
+        "in": "path",
+        "name": "orderId",
+        "required": true,
+        "type": "integer"
+      },
+      "PageNumber": {
+        "default": 1,
+        "description": "页码，从 1 开始",
+        "in": "query",
+        "minimum": 1,
+        "name": "pageNumber",
+        "type": "integer"
+      },
+      "PageSize": {
+        "default": 20,
+        "description": "每页数量",
+        "in": "query",
+        "maximum": 100,
+        "minimum": 1,
+        "name": "pageSize",
+        "type": "integer"
+      },
+      "PaymentId": {
+        "format": "int64",
+        "in": "path",
+        "name": "paymentId",
+        "required": true,
+        "type": "integer"
+      },
+      "ProductId": {
+        "format": "int64",
+        "in": "path",
+        "name": "productId",
+        "required": true,
+        "type": "integer"
+      },
+      "ReviewId": {
+        "format": "int64",
+        "in": "path",
+        "name": "reviewId",
+        "required": true,
+        "type": "integer"
+      },
+      "ShippingId": {
+        "format": "int64",
+        "in": "path",
+        "name": "shippingId",
+        "required": true,
+        "type": "integer"
+      },
+      "SkuId": {
+        "format": "int64",
+        "in": "path",
+        "name": "skuId",
+        "required": true,
+        "type": "integer"
+      },
+      "UserId": {
+        "format": "int64",
+        "in": "path",
+        "name": "userId",
+        "required": true,
+        "type": "integer"
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "description": "请求参数错误"
+      },
+      "Conflict": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "description": "资源冲突"
+      },
+      "NotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "description": "资源不存在"
+      },
+      "Unauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "description": "未认证"
+      }
+    }
+  }
+}
