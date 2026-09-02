@@ -1,0 +1,19 @@
+web
+  s_d46838ec1db557::t_3415db6b9cc8f7 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "e8ed40694066e8e7957b633eae60767e0af91f78",
+  "prompts": {},
+  "sessions": {
+    "s_d46838ec1db557": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "s_d46838ec1db557",
+        "model": "unknown"
+      },
+      "human_author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  }
+}
