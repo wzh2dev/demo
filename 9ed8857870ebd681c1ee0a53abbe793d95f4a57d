@@ -1,0 +1,14 @@
+.git-ai-ignore
+  h_ec0865e8a99e9f 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "9ed8857870ebd681c1ee0a53abbe793d95f4a57d",
+  "prompts": {},
+  "humans": {
+    "h_ec0865e8a99e9f": {
+      "author": "Claude Sonnet 5 <noreply@anthropic.com>"
+    }
+  }
+}
