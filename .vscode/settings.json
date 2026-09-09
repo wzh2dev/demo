@@ -56,11 +56,20 @@
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true
   },
-  "[json][jsonc]": {
+  "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "[javascript][typescript]": {
+  "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[sql]": {
+    "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc"
   },
   "go.goroot": "/cluster/go",
   "gitai.enableCheckpointLogging": true,

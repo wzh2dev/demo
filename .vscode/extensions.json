@@ -21,6 +21,8 @@
     "johnstoncode.svn-scm",
     "esbenp.prettier-vscode",
     "ms-playwright.playwright",
-    "eslint.vscode-eslint"
+    "dbaeumer.vscode-eslint",
+    "ReneSaarsoo.sql-formatter-vsc",
+    "usernamehw.errorlens"
   ]
 }
