@@ -1,0 +1,4 @@
+{
+  "skipContextFiles": true, // alias of skipAgentsMd: keep your own AGENTS.md/CLAUDE.md
+  "skipSkills": true, // don't install standard skill files under .claude/skills/ and .agents/skills/
+}

@@ -43,3 +43,8 @@ dist/
 
 .trae/skills
 tmp/
+
+# ai sdd
+.ai-sdd/
+scenarios*
+project-profile.yaml
