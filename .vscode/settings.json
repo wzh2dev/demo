@@ -40,6 +40,7 @@
       "value": "/cluster/jdk-17.0.12.jdk/Contents/Home"
     }
   ],
+  "maven.view": "hierarchical",
   "python.defaultInterpreterPath": "E:\\python-3.8.9\\python",
   "extensions": {
     "ignoreRecommendations": true,
