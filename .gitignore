@@ -48,3 +48,5 @@ tmp/
 .ai-sdd/
 scenarios*
 project-profile.yaml
+
+.vagrant
