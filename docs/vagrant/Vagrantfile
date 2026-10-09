@@ -17,9 +17,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", name: "disable_selinux", reboot: true, path: "01_disable_selinux.sh"
   config.vm.provision "shell", name: "setup_root_ssh", path: "02_setup_root_ssh.sh"
 
-  # config.vm.provision "shell", name: "install_containerd", path: "03_install_containerd.sh"
-  # config.vm.provision "shell", name: "install_kubernetes", path: "04_install_kubernetes.sh"
-  # config.vm.provision "shell", name: "install_etcd", path: "05_install_etcd.sh"
+  config.vm.provision "shell", name: "install_containerd", path: "03_install_containerd.sh"
+  config.vm.provision "shell", name: "install_kubernetes", path: "04_install_kubernetes.sh"
+  config.vm.provision "shell", name: "install_etcd", path: "05_install_etcd.sh"
 
   config.vm.provision "shell", name: "generate_root_ca", path: "06_generate_root_ca.sh"
   config.vm.provision "shell", name: "generate_root_ca_config", path: "07_generate_root_ca_config.sh"

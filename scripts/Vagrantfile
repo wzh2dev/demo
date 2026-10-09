@@ -10,9 +10,6 @@ Vagrant.configure("2") do |config|
     v.vmx["numvcpus"] = "2"
   end
   config.ssh.insert_key = false
-  config.vm.provision "shell", name: "disable_swap", path: "00_disable_swap.sh"
-  config.vm.provision "shell", name: "disable_selinux", reboot: true, path: "01_disable_selinux.sh"
-  config.vm.provision "shell", name: "setup_root_ssh", path: "02_setup_root_ssh.sh"
 
   nodes = {
     "node1" => "10.0.0.101",
