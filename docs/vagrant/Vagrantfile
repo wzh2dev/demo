@@ -1,0 +1,36 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  config.vm.box_version = "2004.01"
+  config.vm.provider "vmware_desktop" do |v|
+    v.vmx["memsize"] = "4096"
+    v.vmx["numvcpus"] = "2"
+  end
+  config.vm.hostname = "node1"
+  config.vm.network "private_network", ip: "10.0.0.1"
+
+  config.ssh.insert_key = false
+
+  config.vm.provision "shell", name: "disable_swap", path: "00_disable_swap.sh"
+  config.vm.provision "shell", name: "disable_selinux", reboot: true, path: "01_disable_selinux.sh"
+  config.vm.provision "shell", name: "setup_root_ssh", path: "02_setup_root_ssh.sh"
+
+  # config.vm.provision "shell", name: "install_containerd", path: "03_install_containerd.sh"
+  # config.vm.provision "shell", name: "install_kubernetes", path: "04_install_kubernetes.sh"
+  # config.vm.provision "shell", name: "install_etcd", path: "05_install_etcd.sh"
+
+  config.vm.provision "shell", name: "generate_root_ca", path: "06_generate_root_ca.sh"
+  config.vm.provision "shell", name: "generate_root_ca_config", path: "07_generate_root_ca_config.sh"
+  config.vm.provision "shell", name: "generate_etcd_intermediate_ca", path: "08_generate_etcd_intermediate_ca.sh"
+  config.vm.provision "shell", name: "generate_etcd_ca_config", path: "09_generate_etcd_ca_config.sh"
+  config.vm.provision "shell", name: "generate_etcd_server_cert", path: "10_generate_etcd_server_cert.sh"
+  config.vm.provision "shell", name: "generate_etcd_peer_cert", path: "11_generate_etcd_peer_cert.sh"
+
+  config.vm.provision "shell", name: "generate_kubernetes_intermediate_ca", path: "12_generate_kubernetes_intermediate_ca.sh"
+  config.vm.provision "shell", name: "generate_kubernetes_ca_config", path: "13_generate_kubernetes_ca_config.sh"
+  config.vm.provision "shell", name: "generate_kube_apiserver_cert", path: "14_generate_kube_apiserver_cert.sh"
+
+  config.vm.provision "shell", name: "start_etcd", path: "15_start_etcd.sh"
+end

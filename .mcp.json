@@ -14,6 +14,12 @@
         "--mcp"
       ]
     },
+    "context-mode": {
+      "command": "npx",
+      "args": [
+        "context-mode"
+      ]
+    },
     "drawio": {
       "command": "npx",
       "args": [
@@ -47,6 +53,24 @@
       "headers": {
         "Authorization": "7de167f4ab004c408a81a512674ddca6"
       }
+    },
+    "openlore": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "openlore",
+        "mcp",
+        "--preset",
+        "substrate"
+      ]
     }
+  },
+  "_openlore": {
+    "managed": true,
+    "version": 1,
+    "fingerprint": "89c314c0a65f5af5",
+    "paths": [
+      "mcpServers.openlore"
+    ]
   }
 }
