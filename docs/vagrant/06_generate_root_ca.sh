@@ -26,12 +26,13 @@ authorityKeyIdentifier = keyid:always
 EOF
 
 openssl genrsa -aes256 -out /cluster/pki/root.key -passout pass:root 4096
-openssl req -x509 -new -sha256 \
+openssl req -x509 -new \
   -config /cluster/pki/root.cnf \
   -extensions v3_ca \
   -key /cluster/pki/root.key \
   -passin pass:root \
   -out /cluster/pki/root.crt \
-  -days 3650
+  -days 3650 \
+  -sha256
 
 openssl verify -CAfile /cluster/pki/root.crt /cluster/pki/root.crt

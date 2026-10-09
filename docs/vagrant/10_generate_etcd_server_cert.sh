@@ -30,6 +30,7 @@ subjectAltName = @SubjectAlternativeName
 DNS.1 = localhost
 DNS.2 = node1
 IP.1 = 127.0.0.1
+IP.2 = 10.0.0.1
 
 EOF
 

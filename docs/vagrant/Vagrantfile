@@ -31,4 +31,6 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", name: "generate_kubernetes_intermediate_ca", path: "12_generate_kubernetes_intermediate_ca.sh"
   config.vm.provision "shell", name: "generate_kubernetes_ca_config", path: "13_generate_kubernetes_ca_config.sh"
   config.vm.provision "shell", name: "generate_kube_apiserver_cert", path: "14_generate_kube_apiserver_cert.sh"
+
+  config.vm.provision "shell", name: "start_etcd", path: "15_start_etcd.sh"
 end
