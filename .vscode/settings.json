@@ -7,8 +7,8 @@
     "**/.hg": false,
     "**/.DS_Store": false,
     "**/Thumbs.db": false,
-    ".codegraph": true,
-    "**/.gitnexus": true
+    ".codegraph": false,
+    "**/.gitnexus": false
   },
   "files.watcherExclude": {
     ".codegraph": true,

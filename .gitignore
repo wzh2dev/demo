@@ -50,3 +50,6 @@ scenarios*
 project-profile.yaml
 
 .vagrant
+
+# openlore analysis artifacts
+.openlore/
