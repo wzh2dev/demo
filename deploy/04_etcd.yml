@@ -3,8 +3,8 @@
     url: https://github.com/etcd-io/etcd/releases/download/v3.5.13/etcd-v3.5.13-linux-amd64.tar.gz
     dest: /tmp/etcd.tar.gz
   environment:
-    http_proxy: http://10.0.0.1:7897
-    https_proxy: http://10.0.0.1:7897
+    http_proxy: http://192.168.1.1:7897
+    https_proxy: http://192.168.1.1:7897
 
 - name: 解压 etcd
   ansible.builtin.unarchive:

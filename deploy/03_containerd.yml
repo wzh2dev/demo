@@ -13,8 +13,8 @@
     url: https://github.com/containerd/containerd/releases/download/v1.7.36/containerd-1.7.36-linux-amd64.tar.gz
     dest: /tmp/containerd.tar.gz
   environment:
-    http_proxy: http://10.0.0.1:7897
-    https_proxy: http://10.0.0.1:7897
+    http_proxy: http://192.168.1.1:7897
+    https_proxy: http://192.168.1.1:7897
 
 - name: 解压 containerd 到 /cluster/containerd
   ansible.builtin.unarchive:
@@ -29,5 +29,45 @@
     dest: /cluster/runc/runc
     mode: "0755"
   environment:
-    http_proxy: http://10.0.0.1:7897
-    https_proxy: http://10.0.0.1:7897
+    http_proxy: http://192.168.1.1:7897
+    https_proxy: http://192.168.1.1:7897
+
+- name: 生成 containerd 配置文件
+  ansible.builtin.copy:
+    dest: /cluster/containerd/config.toml
+    content: |
+      version = 2
+
+      [plugins."io.containerd.grpc.v1.cri"]
+        sandbox_image = "registry.k8s.io/pause:3.9"
+
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+          runtime_type = "io.containerd.runc.v2"
+
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+            BinaryName = "/cluster/runc/runc"
+            SystemdCgroup = true
+
+- name: 检查 containerd tmux 会话是否存在
+  ansible.builtin.command: tmux has-session -t containerd
+  register: containerd_tmux_session
+  changed_when: false
+  failed_when: false
+
+- name: 使用 tmux 后台启动 containerd
+  ansible.builtin.command: >
+    tmux new-session -d -s containerd
+    "PATH=/cluster/containerd/bin:/cluster/runc:$PATH
+    /cluster/containerd/bin/containerd --config /cluster/containerd/config.toml"
+  when: containerd_tmux_session.rc != 0
+
+- name: 等待 containerd 接口就绪
+  ansible.builtin.command: >
+    /cluster/containerd/bin/ctr
+    --address /run/containerd/containerd.sock
+    version
+  register: containerd_health
+  until: containerd_health.rc == 0
+  retries: 20
+  delay: 3
+  changed_when: false

@@ -73,14 +73,15 @@
         baseurl: https://mirrors.aliyun.com/centos-vault/7.9.2009/os/$basearch/
         gpgcheck: false
         enabled: true
+      register: aliyun_base_repo
 
     - name: 清理 yum 缓存
       ansible.builtin.command: yum clean all
-      changed_when: false
+      when: aliyun_base_repo is changed
 
     - name: 重建 yum 缓存
       ansible.builtin.command: yum makecache
-      changed_when: false
+      when: aliyun_base_repo is changed
 
     - name: 安装 tmux
       ansible.builtin.yum:

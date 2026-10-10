@@ -42,7 +42,7 @@
     - name: 取回 etcd 中间 CA 证书到控制端
       ansible.builtin.fetch:
         src: /cluster/pki/etcd/etcd.crt
-        dest: /tmp
+        dest: /tmp/
         flat: true
       tags: [pki]
       run_once: true
@@ -50,7 +50,7 @@
     - name: 取回 k8s 中间 CA 证书到控制端
       ansible.builtin.fetch:
         src: /cluster/pki/k8s/k8s.crt
-        dest: /tmp
+        dest: /tmp/
         flat: true
       tags: [pki]
       run_once: true
