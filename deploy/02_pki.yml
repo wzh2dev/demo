@@ -412,7 +412,7 @@
               [ v3_req ]
               basicConstraints       = critical, CA:FALSE
               keyUsage               = critical, digitalSignature, keyEncipherment
-              extendedKeyUsage       = serverAuth
+              extendedKeyUsage       = serverAuth, clientAuth
               subjectKeyIdentifier   = hash
               authorityKeyIdentifier = keyid,issuer
               subjectAltName         = @alt_names
