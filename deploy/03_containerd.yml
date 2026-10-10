@@ -32,22 +32,6 @@
     http_proxy: http://192.168.1.1:7897
     https_proxy: http://192.168.1.1:7897
 
-- name: 生成 containerd 配置文件
-  ansible.builtin.copy:
-    dest: /cluster/containerd/config.toml
-    content: |
-      version = 2
-
-      [plugins."io.containerd.grpc.v1.cri"]
-        sandbox_image = "registry.k8s.io/pause:3.9"
-
-        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-          runtime_type = "io.containerd.runc.v2"
-
-          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-            BinaryName = "/cluster/runc/runc"
-            SystemdCgroup = true
-
 - name: 检查 containerd tmux 会话是否存在
   ansible.builtin.command: tmux has-session -t containerd
   register: containerd_tmux_session
@@ -56,9 +40,10 @@
 
 - name: 使用 tmux 后台启动 containerd
   ansible.builtin.command: >
-    tmux new-session -d -s containerd
-    "PATH=/cluster/containerd/bin:/cluster/runc:$PATH
-    /cluster/containerd/bin/containerd --config /cluster/containerd/config.toml"
+    tmux new-session
+    -d
+    -s containerd
+    /cluster/containerd/bin/containerd
   when: containerd_tmux_session.rc != 0
 
 - name: 等待 containerd 接口就绪
