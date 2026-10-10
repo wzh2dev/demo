@@ -61,8 +61,12 @@
   tasks:
     - name: 创建仅限 root 访问的 CA 目录
       ansible.builtin.file:
-        path: /cluster/pki
+        path: "{{ item }}"
         state: directory
+      loop:
+        - /cluster/pki
+        - /cluster/pki/etcd
+        - /cluster/pki/k8s
       when: inventory_hostname not in groups['ca']
 
     - name: 分发 root CA 证书到其余节点
