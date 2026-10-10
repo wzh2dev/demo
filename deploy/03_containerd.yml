@@ -7,14 +7,16 @@
     - "/cluster/runc"
 
 - name: 下载 containerd 压缩包
-  ansible.builtin.get_url:
-    url: https://github.com/containerd/containerd/releases/download/v1.7.36/containerd-1.7.36-linux-amd64.tar.gz
-    dest: /tmp/containerd.tar.gz
+  ansible.builtin.command:
+    cmd: >-
+      curl -fsSL
+      -o /tmp/containerd.tar.gz
+      https://github.com/containerd/containerd/releases/download/v1.7.36/containerd-1.7.36-linux-amd64.tar.gz
+    creates: /tmp/containerd.tar.gz
   delegate_to: localhost
   run_once: true
   become: false
   environment:
-    http_proxy: http://192.168.1.1:7897
     https_proxy: http://192.168.1.1:7897
 
 - name: 解压 containerd 到 /cluster/containerd
@@ -24,14 +26,16 @@
     creates: /cluster/containerd/bin/containerd
 
 - name: 下载 runc
-  ansible.builtin.get_url:
-    url: https://github.com/opencontainers/runc/releases/download/v1.4.3/runc.amd64
-    dest: /tmp/runc
+  ansible.builtin.command:
+    cmd: >-
+      curl -fsSL
+      -o /tmp/runc
+      https://github.com/opencontainers/runc/releases/download/v1.4.3/runc.amd64
+    creates: /tmp/runc
   delegate_to: localhost
   run_once: true
   become: false
   environment:
-    http_proxy: http://192.168.1.1:7897
     https_proxy: http://192.168.1.1:7897
 
 - name: 分发 runc 并赋予执行权限
