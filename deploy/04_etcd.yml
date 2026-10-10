@@ -3,6 +3,11 @@
     path: "/cluster/etcd"
     state: directory
 
+- name: 创建组件数据目录
+  ansible.builtin.file:
+    path: "/data/etcd"
+    state: directory
+
 - name: 下载 etcd
   ansible.builtin.command:
     cmd: >-
