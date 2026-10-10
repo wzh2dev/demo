@@ -1,17 +1,18 @@
 - name: 创建组件安装目录
   ansible.builtin.file:
-    path: "/cluster/containerd"
+    path: "{{ item }}"
     state: directory
-
-- name: 创建组件安装目录
-  ansible.builtin.file:
-    path: "/cluster/runc"
-    state: directory
+  loop:
+    - "/cluster/containerd"
+    - "/cluster/runc"
 
 - name: 下载 containerd 压缩包
   ansible.builtin.get_url:
     url: https://github.com/containerd/containerd/releases/download/v1.7.36/containerd-1.7.36-linux-amd64.tar.gz
     dest: /tmp/containerd.tar.gz
+  delegate_to: localhost
+  run_once: true
+  become: false
   environment:
     http_proxy: http://192.168.1.1:7897
     https_proxy: http://192.168.1.1:7897
@@ -20,17 +21,24 @@
   ansible.builtin.unarchive:
     src: /tmp/containerd.tar.gz
     dest: /cluster/containerd
-    remote_src: true
     creates: /cluster/containerd/bin/containerd
 
-- name: 下载 runc 并赋予执行权限
+- name: 下载 runc
   ansible.builtin.get_url:
     url: https://github.com/opencontainers/runc/releases/download/v1.4.3/runc.amd64
-    dest: /cluster/runc/runc
-    mode: "0755"
+    dest: /tmp/runc
+  delegate_to: localhost
+  run_once: true
+  become: false
   environment:
     http_proxy: http://192.168.1.1:7897
     https_proxy: http://192.168.1.1:7897
+
+- name: 分发 runc 并赋予执行权限
+  ansible.builtin.copy:
+    src: /tmp/runc
+    dest: /cluster/runc/runc
+    mode: "0755"
 
 - name: 检查 containerd tmux 会话是否存在
   ansible.builtin.command: tmux has-session -t containerd
