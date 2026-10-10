@@ -3,8 +3,8 @@
     path: "{{ item }}"
     state: directory
   loop:
-    - "/cluster/containerd"
-    - "/cluster/runc"
+    - /cluster/containerd
+    - /cluster/runc
 
 - name: 下载 containerd 压缩包
   ansible.builtin.command:

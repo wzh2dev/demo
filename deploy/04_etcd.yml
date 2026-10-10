@@ -30,15 +30,10 @@
       - --strip-components=1
     creates: /cluster/etcd/etcd
 
-- name: 创建 etcd 配置与数据目录
-  ansible.builtin.file:
-    path: /data/etcd
-    state: directory
-
 - name: 从 CA 主机取回各成员的 server / peer 证书
   ansible.builtin.fetch:
     src: "/cluster/pki/etcd/{{ item.0 }}-{{ inventory_hostname }}.{{ item.1 }}"
-    dest: "/tmp/"
+    dest: /tmp/
     flat: true
   loop: "{{ ['server', 'peer'] | product(['crt', 'key']) | list }}"
   delegate_to: "{{ groups['ca'] | first }}"
@@ -46,7 +41,7 @@
 - name: 分发各成员的 server / peer 证书
   ansible.builtin.copy:
     src: "/tmp/{{ item.0 }}-{{ inventory_hostname }}.{{ item.1 }}"
-    dest: "/cluster/pki/etcd/"
+    dest: /cluster/pki/etcd/
   loop: "{{ ['server', 'peer'] | product(['crt', 'key']) | list }}"
 
 - name: 计算 etcd 初始集群成员列表
@@ -84,12 +79,9 @@
   failed_when: false
 
 - name: 使用 tmux 后台启动 etcd
-  ansible.builtin.command: >
-    tmux new-session
-    -d
-    -s etcd
-    /cluster/etcd/etcd
-    --config-file /cluster/etcd/etcd.config.yml
+  ansible.builtin.command: >-
+    tmux new-session -d -s etcd
+    "/cluster/etcd/etcd --config-file /cluster/etcd/etcd.config.yml"
   when: etcd_tmux_session.rc != 0
 
 - name: 等待 etcd 接口就绪

@@ -87,18 +87,18 @@
         dest: /cluster/pki/k8s/k8s.crt
       when: inventory_hostname not in groups['ca']
 
-- name: 安装更新 containerd
+- name: 安装启动 containerd
   hosts: nodes
   become: true
   tasks:
-    - name: 安装或更新 containerd
+    - name: 安装启动 containerd
       ansible.builtin.import_tasks: 03_containerd.yml
       tags: [containerd]
 
-- name: 安装更新 etcd
+- name: 安装启动 etcd
   hosts: etcd
   become: true
   tasks:
-    - name: 安装或更新 etcd
+    - name: 安装启动 etcd
       ansible.builtin.import_tasks: 04_etcd.yml
       tags: [etcd]

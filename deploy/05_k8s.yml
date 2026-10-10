@@ -1,6 +1,6 @@
 - name: 创建组件安装目录
   ansible.builtin.file:
-    path: "/cluster/k8s"
+    path: /cluster/k8s
     state: directory
 
 - name: 下载 Kubernetes 节点和服务端安装包
@@ -10,7 +10,7 @@
       -o /tmp/kubernetes-node-1.27.16-amd64.tar.gz
       https://dl.k8s.io/v1.27.16/kubernetes-node-linux-amd64.tar.gz
     creates: /tmp/kubernetes-node-1.27.16-amd64.tar.gz
-  delegate_to: localhost # ← 补这三行
+  delegate_to: localhost
   run_once: true
   become: false
   environment:
@@ -31,14 +31,14 @@
 
 - name: 解压 Kubernetes 节点和服务端二进制文件
   ansible.builtin.unarchive:
-    src: "/tmp/kubernetes-node-1.27.16-amd64.tar.gz"
-    dest: "/cluster/k8s"
+    src: /tmp/kubernetes-node-1.27.16-amd64.tar.gz
+    dest: /cluster/k8s
     extra_opts:
       - --strip-components=1
 
 - name: 解压 Kubernetes 节点和服务端二进制文件
   ansible.builtin.unarchive:
-    src: "/tmp/kubernetes-server-1.27.16-amd64.tar.gz"
-    dest: "/cluster/k8s"
+    src: /tmp/kubernetes-server-1.27.16-amd64.tar.gz
+    dest: /cluster/k8s
     extra_opts:
       - --strip-components=1
