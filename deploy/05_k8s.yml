@@ -1,0 +1,5 @@
+- name: 创建组件安装目录
+  ansible.builtin.file:
+    path: "/cluster/kubernetes"
+    state: directory
+

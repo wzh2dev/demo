@@ -1,0 +1,33 @@
+- name: 创建组件安装目录
+  ansible.builtin.file:
+    path: "/cluster/containerd"
+    state: directory
+
+- name: 创建组件安装目录
+  ansible.builtin.file:
+    path: "/cluster/runc"
+    state: directory
+
+- name: 下载 containerd 压缩包
+  ansible.builtin.get_url:
+    url: https://github.com/containerd/containerd/releases/download/v1.7.36/containerd-1.7.36-linux-amd64.tar.gz
+    dest: /tmp/containerd.tar.gz
+  environment:
+    http_proxy: http://10.0.0.1:7897
+    https_proxy: http://10.0.0.1:7897
+
+- name: 解压 containerd 到 /cluster/containerd
+  ansible.builtin.unarchive:
+    src: /tmp/containerd.tar.gz
+    dest: /cluster/containerd
+    remote_src: true
+    creates: /cluster/containerd/bin/containerd
+
+- name: 下载 runc 并赋予执行权限
+  ansible.builtin.get_url:
+    url: https://github.com/opencontainers/runc/releases/download/v1.4.3/runc.amd64
+    dest: /cluster/runc/runc
+    mode: "0755"
+  environment:
+    http_proxy: http://10.0.0.1:7897
+    https_proxy: http://10.0.0.1:7897

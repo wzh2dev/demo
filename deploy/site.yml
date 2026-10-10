@@ -1,0 +1,100 @@
+- name: 节点基础配置
+  hosts: nodes
+  become: true
+  pre_tasks:
+    - name: 创建安装目录
+      ansible.builtin.file:
+        path: "/cluster"
+        state: directory
+
+    - name: 创建数据目录
+      ansible.builtin.file:
+        path: "/data"
+        state: directory
+  tasks:
+    - name: 配置基础系统
+      ansible.builtin.import_tasks: 01_base.yml
+      tags: [base]
+
+  handlers:
+    - name: 重载 SSH 服务
+      ansible.builtin.service:
+        name: sshd
+        state: reloaded
+
+- name: 初始化 CA 和节点证书
+  hosts: ca
+  become: true
+  tasks:
+    - name: 初始化 CA 和节点证书
+      ansible.builtin.import_tasks: 02_pki.yml
+      tags: [pki]
+      run_once: true
+
+    - name: 取回 root CA 证书到控制端
+      ansible.builtin.fetch:
+        src: /cluster/pki/root.crt
+        dest: /tmp/
+        flat: true
+      tags: [pki]
+      run_once: true
+
+    - name: 取回 etcd 中间 CA 证书到控制端
+      ansible.builtin.fetch:
+        src: /cluster/pki/etcd/etcd.crt
+        dest: /tmp
+        flat: true
+      tags: [pki]
+      run_once: true
+
+    - name: 取回 k8s 中间 CA 证书到控制端
+      ansible.builtin.fetch:
+        src: /cluster/pki/k8s/k8s.crt
+        dest: /tmp
+        flat: true
+      tags: [pki]
+      run_once: true
+
+- name: 分发 CA 文件证书
+  hosts: nodes
+  become: true
+  tasks:
+    - name: 创建仅限 root 访问的 CA 目录
+      ansible.builtin.file:
+        path: /cluster/pki
+        state: directory
+      when: inventory_hostname not in groups['ca']
+
+    - name: 分发 root CA 证书到其余节点
+      ansible.builtin.copy:
+        src: /tmp/root.crt
+        dest: /cluster/pki/root.crt
+      when: inventory_hostname not in groups['ca']
+
+    - name: 分发 etcd 中间 CA 证书到其余节点
+      ansible.builtin.copy:
+        src: /tmp/etcd.crt
+        dest: /cluster/pki/etcd/etcd.crt
+      when: inventory_hostname not in groups['ca']
+
+    - name: 分发 k8s 中间 CA 证书到其余节点
+      ansible.builtin.copy:
+        src: /tmp/k8s.crt
+        dest: /cluster/pki/k8s/k8s.crt
+      when: inventory_hostname not in groups['ca']
+
+- name: 安装更新 containerd
+  hosts: nodes
+  become: true
+  tasks:
+    - name: 安装或更新 containerd
+      ansible.builtin.import_tasks: 03_containerd.yml
+      tags: [containerd]
+
+- name: 安装更新 etcd
+  hosts: etcd
+  become: true
+  tasks:
+    - name: 安装或更新 etcd
+      ansible.builtin.import_tasks: 04_etcd.yml
+      tags: [etcd]

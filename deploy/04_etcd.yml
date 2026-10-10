@@ -1,0 +1,109 @@
+- name: 下载 etcd
+  ansible.builtin.get_url:
+    url: https://github.com/etcd-io/etcd/releases/download/v3.5.13/etcd-v3.5.13-linux-amd64.tar.gz
+    dest: /tmp/etcd.tar.gz
+  environment:
+    http_proxy: http://10.0.0.1:7897
+    https_proxy: http://10.0.0.1:7897
+
+- name: 解压 etcd
+  ansible.builtin.unarchive:
+    src: /tmp/etcd.tar.gz
+    dest: /cluster/etcd
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+    creates: /cluster/etcd/etcd
+
+- name: 创建 etcd 配置与数据目录
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /etc/etcd/pki
+    - /data/etcd
+
+- name: 从 CA 主机取回 etcd 中间 CA 证书
+  ansible.builtin.fetch:
+    src: /cluster/pki/etcd/etcd.crt
+    dest: /tmp/etcd-pki/etcd-ca.crt
+    flat: true
+  run_once: true
+  delegate_to: "{{ groups['ca'] | first }}"
+
+- name: 从 CA 主机取回各成员的 server / peer 证书
+  ansible.builtin.fetch:
+    src: "/cluster/pki/etcd/{{ item.0 }}-{{ inventory_hostname }}.{{ item.1 }}"
+    dest: "/tmp/etcd-pki/{{ inventory_hostname }}-{{ item.0 }}.{{ item.1 }}"
+    flat: true
+  loop: "{{ ['server', 'peer'] | product(['crt', 'key']) | list }}"
+  delegate_to: "{{ groups['ca'] | first }}"
+
+- name: 分发 etcd 中间 CA 证书到各成员
+  ansible.builtin.copy:
+    src: /tmp/etcd-pki/etcd-ca.crt
+    dest: /etc/etcd/pki/etcd-ca.crt
+    mode: "0644"
+
+- name: 分发各成员的 server / peer 证书
+  ansible.builtin.copy:
+    src: "/tmp/etcd-pki/{{ inventory_hostname }}-{{ item.0 }}.{{ item.1 }}"
+    dest: "/etc/etcd/pki/{{ item.0 }}.{{ item.1 }}"
+    mode: "{{ '0600' if item.1 == 'key' else '0644' }}"
+  loop: "{{ ['server', 'peer'] | product(['crt', 'key']) | list }}"
+
+- name: 计算 etcd 初始集群成员列表
+  ansible.builtin.set_fact:
+    etcd_initial_cluster: "{% for host in groups['etcd'] %}{{ host }}=https://{{ hostvars[host].ansible_host }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
+
+- name: 生成 etcd 配置文件
+  ansible.builtin.copy:
+    dest: /etc/etcd/etcd.config.yml
+    content: |
+      name: {{ inventory_hostname }}
+      data-dir: /data/etcd
+      listen-peer-urls: https://{{ ansible_host }}:2380
+      listen-client-urls: https://{{ ansible_host }}:2379,https://127.0.0.1:2379
+      advertise-client-urls: https://{{ ansible_host }}:2379
+      initial-advertise-peer-urls: https://{{ ansible_host }}:2380
+      initial-cluster: {{ etcd_initial_cluster }}
+      initial-cluster-token: etcd-cluster-wuzhenhua
+      initial-cluster-state: new
+      client-transport-security:
+        cert-file: /etc/etcd/pki/server.crt
+        key-file: /etc/etcd/pki/server.key
+        trusted-ca-file: /etc/etcd/pki/etcd-ca.crt
+        client-cert-auth: false
+      peer-transport-security:
+        cert-file: /etc/etcd/pki/peer.crt
+        key-file: /etc/etcd/pki/peer.key
+        trusted-ca-file: /etc/etcd/pki/etcd-ca.crt
+        peer-client-cert-auth: true
+
+- name: 检查 etcd tmux 会话是否存在
+  ansible.builtin.command: tmux has-session -t etcd
+  register: etcd_tmux_session
+  changed_when: false
+  failed_when: false
+
+- name: 使用 tmux 后台启动 etcd
+  ansible.builtin.command: tmux new-session -d -s etcd "/cluster/etcd/etcd --config-file /etc/etcd/etcd.config.yml"
+  when: etcd_tmux_session.rc != 0
+
+- name: 等待 etcd 接口就绪
+  ansible.builtin.command: >
+    /cluster/etcd/etcdctl endpoint health
+    --endpoints=https://{{ ansible_host }}:2379
+    --cacert=/etc/etcd/pki/etcd-ca.crt
+  register: etcd_health
+  until: etcd_health.rc == 0
+  retries: 20
+  delay: 3
+  changed_when: false
+
+- name: 查看 etcd 集群成员
+  ansible.builtin.command: >
+    /cluster/etcd/etcdctl member list
+    --endpoints=https://{{ ansible_host }}:2379
+    --cacert=/etc/etcd/pki/etcd-ca.crt
+  changed_when: false

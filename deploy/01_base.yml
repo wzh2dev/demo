@@ -1,0 +1,88 @@
+- name: 写入集群主机名映射
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} ANSIBLE MANAGED CLUSTER HOSTS"
+    block: |
+      {% for host in groups['nodes'] %}
+      {{ hostvars[host].ansible_host }} {{ host }}.wuzhenhua.com {{ host }}
+      {% endfor %}
+
+- name: 关闭当前启用的 swap
+  ansible.builtin.command: swapoff -a
+  when: ansible_swaptotal_mb | int > 0
+
+- name: 注释 fstab 中启用的 swap 条目
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: "^([^#].*swap.*)"
+    replace: '#\1'
+
+- name: 临时关闭 SELinux
+  ansible.builtin.command: setenforce 0
+  when:
+    - ansible_selinux.status | default('disabled') == 'enabled'
+    - ansible_selinux.mode | default('permissive') == 'enforcing'
+
+- name: 永久关闭 SELinux
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: "^SELINUX="
+    line: SELINUX=disabled
+
+- name: 设置 root 密码
+  ansible.builtin.user:
+    name: root
+    password: "{{ 'root' | password_hash('sha512') }}"
+    update_password: on_create
+
+- name: 允许 root 远程登录
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^[ \t#]*PermitRootLogin'
+    line: "PermitRootLogin yes"
+    validate: /usr/sbin/sshd -t -f %s
+  notify: 重载 SSH 服务
+
+- name: 允许密码认证
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^[ \t#]*PasswordAuthentication'
+    line: "PasswordAuthentication yes"
+    validate: /usr/sbin/sshd -t -f %s
+  notify: 重载 SSH 服务
+
+- name: 应用 SSH 配置变更
+  ansible.builtin.meta: flush_handlers
+
+- name: 仅在 SELinux 启用时重启
+  ansible.builtin.reboot:
+    reboot_timeout: 600
+  when: ansible_selinux.status | default('disabled') != 'disabled'
+
+- name: 配置阿里云 yum 源
+  block:
+    - name: 删除原有 CentOS 源文件
+      ansible.builtin.file:
+        path: /etc/yum.repos.d/CentOS-Base.repo
+        state: absent
+
+    - name: 配置阿里云 base 源
+      ansible.builtin.yum_repository:
+        name: base
+        description: CentOS-7 - Base - Aliyun
+        baseurl: https://mirrors.aliyun.com/centos-vault/7.9.2009/os/$basearch/
+        gpgcheck: false
+        enabled: true
+
+    - name: 清理 yum 缓存
+      ansible.builtin.command: yum clean all
+      changed_when: false
+
+    - name: 重建 yum 缓存
+      ansible.builtin.command: yum makecache
+      changed_when: false
+
+    - name: 安装 tmux
+      ansible.builtin.yum:
+        name: tmux
+        state: present
