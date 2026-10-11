@@ -1,0 +1,7 @@
+- name: 安装启动 containerd
+  hosts: nodes
+  become: true
+  tasks:
+    - name: 安装启动 containerd
+      ansible.builtin.import_tasks: ../tasks/containerd.yml
+      tags: [containerd]

@@ -1,0 +1,69 @@
+- name: 签发并校验 kube-controller-manager 客户端证书
+  block:
+    - name: 生成 kube-controller-manager 客户端证书私钥
+      ansible.builtin.command: openssl genrsa -out /cluster/pki/k8s/controller-manager-client.key 4096
+      args:
+        creates: /cluster/pki/k8s/controller-manager-client.key
+
+    - name: 写入 kube-controller-manager 客户端证书签名请求配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/k8s/controller-manager-client.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = Wuzhenhua
+          OU = K8S
+          CN = system:kube-controller-manager
+
+    - name: 生成 kube-controller-manager 客户端证书签名请求
+      ansible.builtin.command: >
+        openssl req -new
+        -config /cluster/pki/k8s/controller-manager-client.cnf
+        -key /cluster/pki/k8s/controller-manager-client.key
+        -out /cluster/pki/k8s/controller-manager-client.csr
+        -sha256
+      args:
+        creates: /cluster/pki/k8s/controller-manager-client.csr
+
+    - name: 写入 kube-controller-manager 客户端证书扩展配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/k8s/controller-manager-client.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = clientAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
+
+    - name: 使用 k8s 中间 CA 签发 kube-controller-manager 客户端证书
+      ansible.builtin.command: >
+        openssl ca
+        -config /cluster/pki/k8s/k8s_ca.cnf
+        -extfile /cluster/pki/k8s/controller-manager-client.ext
+        -extensions v3_req
+        -cert /cluster/pki/k8s/k8s.crt
+        -keyfile /cluster/pki/k8s/k8s.key
+        -in /cluster/pki/k8s/controller-manager-client.csr
+        -out /cluster/pki/k8s/controller-manager-client.crt
+        -days 365
+        -md sha256
+        -batch
+        -notext
+      args:
+        creates: /cluster/pki/k8s/controller-manager-client.crt
+
+    - name: 校验 kube-controller-manager 客户端证书
+      ansible.builtin.command: >
+        openssl verify
+        -purpose sslclient
+        -CAfile /cluster/pki/root.crt
+        -untrusted /cluster/pki/k8s/k8s.crt
+        /cluster/pki/k8s/controller-manager-client.crt
+      changed_when: false

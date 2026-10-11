@@ -1,0 +1,50 @@
+- name: 创建 Kubernetes 安装目录
+  ansible.builtin.file:
+    path: /cluster/k8s
+    state: directory
+
+- name: 安装 Kubernetes 节点二进制文件
+  block:
+    - name: 下载 Kubernetes 节点安装包
+      ansible.builtin.command:
+        cmd: >-
+          curl -fsSL
+          -o /tmp/kubernetes-node-1.27.16-amd64.tar.gz
+          https://dl.k8s.io/v1.27.16/kubernetes-node-linux-amd64.tar.gz
+        creates: /tmp/kubernetes-node-1.27.16-amd64.tar.gz
+      delegate_to: localhost
+      run_once: true
+      become: false
+      environment:
+        https_proxy: http://192.168.1.1:7897
+
+    - name: 解压 Kubernetes 节点安装包
+      ansible.builtin.unarchive:
+        src: /tmp/kubernetes-node-1.27.16-amd64.tar.gz
+        dest: /cluster/k8s
+        extra_opts:
+          - --strip-components=1
+        creates: /cluster/k8s/node/bin/kubelet
+
+- name: 安装 Kubernetes 服务端二进制文件
+  block:
+    - name: 下载 Kubernetes 服务端安装包
+      ansible.builtin.command:
+        cmd: >-
+          curl -fsSL
+          -o /tmp/kubernetes-server-1.27.16-amd64.tar.gz
+          https://dl.k8s.io/v1.27.16/kubernetes-server-linux-amd64.tar.gz
+        creates: /tmp/kubernetes-server-1.27.16-amd64.tar.gz
+      delegate_to: localhost
+      run_once: true
+      become: false
+      environment:
+        https_proxy: http://192.168.1.1:7897
+
+    - name: 解压 Kubernetes 服务端安装包
+      ansible.builtin.unarchive:
+        src: /tmp/kubernetes-server-1.27.16-amd64.tar.gz
+        dest: /cluster/k8s
+        extra_opts:
+          - --strip-components=1
+        creates: /cluster/k8s/server/bin/kube-apiserver

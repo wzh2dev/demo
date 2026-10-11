@@ -1,0 +1,307 @@
+- name: 签发并校验 etcd server 证书
+  block:
+    - name: 生成各 etcd 成员的 server 证书私钥
+      ansible.builtin.command: openssl genrsa -out /cluster/pki/etcd/server-{{ item }}.key 4096
+      args:
+        creates: /cluster/pki/etcd/server-{{ item }}.key
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 生成各 etcd 成员的 server 证书签名请求配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/etcd/server-{{ item }}.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = Wuzhenhua
+          OU = ETCD
+          CN = etcd-server-{{ item }}
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 生成各 etcd 成员的 server 证书签名请求
+      ansible.builtin.command: >
+        openssl req -new
+        -config /cluster/pki/etcd/server-{{ item }}.cnf
+        -key /cluster/pki/etcd/server-{{ item }}.key
+        -out /cluster/pki/etcd/server-{{ item }}.csr
+        -sha256
+      args:
+        creates: /cluster/pki/etcd/server-{{ item }}.csr
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 生成各 etcd 成员的 server 证书扩展配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/etcd/server-{{ item }}.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = serverAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
+          subjectAltName         = @alt_names
+
+          [ alt_names ]
+          DNS.1 = localhost
+          DNS.2 = {{ item }}
+          IP.1  = 127.0.0.1
+          IP.2  = {{ hostvars[item].ansible_host }}
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 使用 etcd 中间 CA 签发各成员的 server 证书
+      ansible.builtin.command: >
+        openssl ca
+        -config /cluster/pki/etcd/etcd_ca.cnf
+        -extfile /cluster/pki/etcd/server-{{ item }}.ext
+        -extensions v3_req
+        -cert /cluster/pki/etcd/etcd.crt
+        -keyfile /cluster/pki/etcd/etcd.key
+        -passin pass:etcd
+        -in /cluster/pki/etcd/server-{{ item }}.csr
+        -out /cluster/pki/etcd/server-{{ item }}.crt
+        -days 365
+        -md sha256
+        -batch
+        -notext
+      args:
+        creates: /cluster/pki/etcd/server-{{ item }}.crt
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 校验各 etcd 成员的 server 证书
+      ansible.builtin.command: >
+        openssl verify
+        -CAfile /cluster/pki/root.crt
+        -untrusted /cluster/pki/etcd/etcd.crt
+        /cluster/pki/etcd/server-{{ item }}.crt
+      changed_when: false
+      loop: "{{ groups['etcd'] }}"
+
+- name: 签发并校验 etcd peer 证书
+  block:
+    - name: 生成各 etcd 成员的 peer 证书私钥
+      ansible.builtin.command: openssl genrsa -out /cluster/pki/etcd/peer-{{ item }}.key 4096
+      args:
+        creates: /cluster/pki/etcd/peer-{{ item }}.key
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 生成各 etcd 成员的 peer 证书签名请求配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/etcd/peer-{{ item }}.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = Wuzhenhua
+          OU = ETCD
+          CN = etcd-peer-{{ item }}
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 生成各 etcd 成员的 peer 证书签名请求
+      ansible.builtin.command: >
+        openssl req -new
+        -config /cluster/pki/etcd/peer-{{ item }}.cnf
+        -key /cluster/pki/etcd/peer-{{ item }}.key
+        -out /cluster/pki/etcd/peer-{{ item }}.csr
+        -sha256
+      args:
+        creates: /cluster/pki/etcd/peer-{{ item }}.csr
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 生成各 etcd 成员的 peer 证书扩展配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/etcd/peer-{{ item }}.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = serverAuth, clientAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
+          subjectAltName         = @alt_names
+
+          [ alt_names ]
+          DNS.1 = localhost
+          DNS.2 = {{ item }}
+          IP.1  = 127.0.0.1
+          IP.2  = {{ hostvars[item].ansible_host }}
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 使用 etcd 中间 CA 签发各成员的 peer 证书
+      ansible.builtin.command: >
+        openssl ca
+        -config /cluster/pki/etcd/etcd_ca.cnf
+        -extfile /cluster/pki/etcd/peer-{{ item }}.ext
+        -extensions v3_req
+        -cert /cluster/pki/etcd/etcd.crt
+        -keyfile /cluster/pki/etcd/etcd.key
+        -passin pass:etcd
+        -in /cluster/pki/etcd/peer-{{ item }}.csr
+        -out /cluster/pki/etcd/peer-{{ item }}.crt
+        -days 365
+        -md sha256
+        -batch
+        -notext
+      args:
+        creates: /cluster/pki/etcd/peer-{{ item }}.crt
+      loop: "{{ groups['etcd'] }}"
+
+    - name: 校验各 etcd 成员的 peer 证书
+      ansible.builtin.command: >
+        openssl verify
+        -CAfile /cluster/pki/root.crt
+        -untrusted /cluster/pki/etcd/etcd.crt
+        /cluster/pki/etcd/peer-{{ item }}.crt
+      changed_when: false
+      loop: "{{ groups['etcd'] }}"
+
+- name: 签发并校验 etcd 共享客户端证书
+  block:
+    - name: 生成 etcd 共享客户端证书私钥
+      ansible.builtin.command: openssl genrsa -out /cluster/pki/etcd/client.key 4096
+      args:
+        creates: /cluster/pki/etcd/client.key
+
+    - name: 写入 etcd 共享客户端证书签名请求配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/etcd/client.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = Wuzhenhua
+          OU = ETCD
+          CN = etcd-client
+
+    - name: 生成 etcd 共享客户端证书签名请求
+      ansible.builtin.command: >
+        openssl req -new
+        -config /cluster/pki/etcd/client.cnf
+        -key /cluster/pki/etcd/client.key
+        -out /cluster/pki/etcd/client.csr
+        -sha256
+      args:
+        creates: /cluster/pki/etcd/client.csr
+
+    - name: 写入 etcd 共享客户端证书扩展配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/etcd/client.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = clientAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
+
+    - name: 使用 etcd 中间 CA 签发etcd 共享客户端证书
+      ansible.builtin.command: >
+        openssl ca
+        -config /cluster/pki/etcd/etcd_ca.cnf
+        -extfile /cluster/pki/etcd/client.ext
+        -extensions v3_req
+        -cert /cluster/pki/etcd/etcd.crt
+        -keyfile /cluster/pki/etcd/etcd.key
+        -passin pass:etcd
+        -in /cluster/pki/etcd/client.csr
+        -out /cluster/pki/etcd/client.crt
+        -days 365
+        -md sha256
+        -batch
+        -notext
+      args:
+        creates: /cluster/pki/etcd/client.crt
+
+    - name: 校验 etcd 共享客户端证书
+      ansible.builtin.command: >
+        openssl verify
+        -purpose sslclient
+        -CAfile /cluster/pki/root.crt
+        -untrusted /cluster/pki/etcd/etcd.crt
+        /cluster/pki/etcd/client.crt
+      changed_when: false
+
+- name: 签发并校验 kube-apiserver 访问 etcd 的客户端证书
+  block:
+    - name: 生成 kube-apiserver 访问 etcd 的客户端证书私钥
+      ansible.builtin.command: openssl genrsa -out /cluster/pki/etcd/apiserver-etcd-client.key 4096
+      args:
+        creates: /cluster/pki/etcd/apiserver-etcd-client.key
+
+    - name: 写入 kube-apiserver 访问 etcd 的客户端证书签名请求配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/etcd/apiserver-etcd-client.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = Wuzhenhua
+          OU = ETCD
+          CN = kube-apiserver-etcd-client
+
+    - name: 生成 kube-apiserver 访问 etcd 的客户端证书签名请求
+      ansible.builtin.command: >
+        openssl req -new
+        -config /cluster/pki/etcd/apiserver-etcd-client.cnf
+        -key /cluster/pki/etcd/apiserver-etcd-client.key
+        -out /cluster/pki/etcd/apiserver-etcd-client.csr
+        -sha256
+      args:
+        creates: /cluster/pki/etcd/apiserver-etcd-client.csr
+
+    - name: 写入 kube-apiserver 访问 etcd 的客户端证书扩展配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/etcd/apiserver-etcd-client.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = clientAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
+
+    - name: 使用 etcd 中间 CA 签发 kube-apiserver 访问 etcd 的客户端证书
+      ansible.builtin.command: >
+        openssl ca
+        -config /cluster/pki/etcd/etcd_ca.cnf
+        -extfile /cluster/pki/etcd/apiserver-etcd-client.ext
+        -extensions v3_req
+        -cert /cluster/pki/etcd/etcd.crt
+        -keyfile /cluster/pki/etcd/etcd.key
+        -passin pass:etcd
+        -in /cluster/pki/etcd/apiserver-etcd-client.csr
+        -out /cluster/pki/etcd/apiserver-etcd-client.crt
+        -days 365
+        -md sha256
+        -batch
+        -notext
+      args:
+        creates: /cluster/pki/etcd/apiserver-etcd-client.crt
+
+    - name: 校验 kube-apiserver 访问 etcd 的客户端证书
+      ansible.builtin.command: >
+        openssl verify
+        -purpose sslclient
+        -CAfile /cluster/pki/root.crt
+        -untrusted /cluster/pki/etcd/etcd.crt
+        /cluster/pki/etcd/apiserver-etcd-client.crt
+      changed_when: false

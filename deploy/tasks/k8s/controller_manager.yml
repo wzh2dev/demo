@@ -1,0 +1,92 @@
+- name: 分发 kube-controller-manager 证书及私钥
+  block:
+    - name: 从 CA 主机取回 kube-controller-manager 客户端证书及私钥
+      ansible.builtin.fetch:
+        src: /cluster/pki/k8s/controller-manager-client.{{ item }}
+        dest: /tmp/
+        flat: true
+      loop:
+        - crt
+        - key
+      run_once: true
+      delegate_to: "{{ groups['ca'] | first }}"
+
+    - name: 分发 kube-controller-manager 客户端证书及私钥
+      ansible.builtin.copy:
+        src: /tmp/controller-manager-client.{{ item }}
+        dest: /cluster/pki/k8s/
+      loop:
+        - crt
+        - key
+
+    - name: 从 CA 主机取回 Kubernetes 中间 CA 私钥
+      ansible.builtin.fetch:
+        src: /cluster/pki/k8s/k8s.key
+        dest: /tmp/
+        flat: true
+      run_once: true
+      delegate_to: "{{ groups['ca'] | first }}"
+
+    - name: 分发 Kubernetes 中间 CA 私钥
+      ansible.builtin.copy:
+        src: /tmp/k8s.key
+        dest: /cluster/pki/k8s/k8s.key
+
+- name: 部署 kube-controller-manager
+  block:
+    - name: 生成 kube-controller-manager kubeconfig
+      ansible.builtin.copy:
+        dest: /cluster/k8s/controller-manager.kubeconfig
+        content: |
+          apiVersion: v1
+          kind: Config
+          clusters:
+            - name: kubernetes
+              cluster:
+                server: https://127.0.0.1:6443
+                certificate-authority: /cluster/pki/k8s/k8s.crt
+          users:
+            - name: system:kube-controller-manager
+              user:
+                client-certificate: /cluster/pki/k8s/controller-manager-client.crt
+                client-key: /cluster/pki/k8s/controller-manager-client.key
+          contexts:
+            - name: system:kube-controller-manager@kubernetes
+              context:
+                cluster: kubernetes
+                user: system:kube-controller-manager
+          current-context: system:kube-controller-manager@kubernetes
+
+    - name: 检查 kube-controller-manager 的 tmux 会话是否存在
+      ansible.builtin.command: tmux has-session -t controller-manager
+      register: controller_manager_tmux_session
+      changed_when: false
+      failed_when: false
+
+    - name: 使用 tmux 后台启动 kube-controller-manager
+      ansible.builtin.command: >-
+        tmux new-session -d -s controller-manager
+        "/cluster/k8s/server/bin/kube-controller-manager
+        --kubeconfig=/cluster/k8s/controller-manager.kubeconfig
+        --root-ca-file=/cluster/pki/k8s/k8s.crt
+        --service-account-private-key-file=/cluster/pki/k8s/sa.key
+        --service-cluster-ip-range=10.96.0.0/12
+        --cluster-signing-cert-file=/cluster/pki/k8s/k8s.crt
+        --cluster-signing-key-file=/cluster/pki/k8s/k8s.key
+        --leader-elect=true
+        --use-service-account-credentials=true
+        --controllers=*,-bootstrapsigner,-tokencleaner
+        --v=2"
+      when: controller_manager_tmux_session.rc != 0
+
+    - name: 等待 kube-controller-manager 选主 Lease 可读取
+      ansible.builtin.command: >
+        curl -fsS --cacert /cluster/pki/k8s/k8s.crt
+        --cert /cluster/pki/k8s/controller-manager-client.crt
+        --key /cluster/pki/k8s/controller-manager-client.key
+        https://127.0.0.1:6443/apis/coordination.k8s.io/v1/namespaces/kube-system/leases/kube-controller-manager
+      register: controller_manager_ready
+      until: controller_manager_ready.rc == 0
+      retries: 30
+      delay: 3
+      changed_when: false

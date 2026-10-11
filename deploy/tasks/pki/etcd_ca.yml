@@ -1,0 +1,123 @@
+- name: 创建 etcd 中间 CA 工作目录
+  ansible.builtin.file:
+    path: /cluster/pki/etcd
+    state: directory
+
+- name: 生成 etcd 中间 CA 私钥
+  ansible.builtin.command: openssl genrsa -aes256 -out /cluster/pki/etcd/etcd.key -passout pass:etcd 4096
+  args:
+    creates: /cluster/pki/etcd/etcd.key
+
+- name: 写入 etcd 中间 CA 证书签名请求配置
+  ansible.builtin.copy:
+    dest: /cluster/pki/etcd/etcd.cnf
+    content: |
+      [ req ]
+      prompt             = no
+      distinguished_name = req_distinguished_name
+
+      [ req_distinguished_name ]
+      C  = CN
+      ST = Jiangsu
+      L  = Nanjing
+      O  = Wuzhenhua
+      OU = ETCD
+      CN = ETCD CA
+
+- name: 生成 etcd 中间 CA 证书签名请求
+  ansible.builtin.command: >
+    openssl req -new
+    -config /cluster/pki/etcd/etcd.cnf
+    -key /cluster/pki/etcd/etcd.key
+    -passin pass:etcd
+    -out /cluster/pki/etcd/etcd.csr
+    -sha256
+  args:
+    creates: /cluster/pki/etcd/etcd.csr
+
+- name: 写入 etcd 中间 CA 证书扩展配置
+  ansible.builtin.copy:
+    dest: /cluster/pki/etcd/etcd.ext
+    content: |
+      [ v3_ca ]
+      basicConstraints       = critical, CA:true, pathlen:0
+      keyUsage               = critical, keyCertSign, cRLSign
+      subjectKeyIdentifier   = hash
+      authorityKeyIdentifier = keyid:always
+
+- name: 使用根 CA 签发 etcd 中间 CA 证书
+  ansible.builtin.command: >
+    openssl ca
+    -config /cluster/pki/root_ca.cnf
+    -extfile /cluster/pki/etcd/etcd.ext
+    -extensions v3_ca
+    -cert /cluster/pki/root.crt
+    -keyfile /cluster/pki/root.key
+    -passin pass:root
+    -in /cluster/pki/etcd/etcd.csr
+    -out /cluster/pki/etcd/etcd.crt
+    -days 1825
+    -md sha256
+    -batch
+    -notext
+  args:
+    creates: /cluster/pki/etcd/etcd.crt
+
+- name: 校验 etcd 中间 CA 证书
+  ansible.builtin.command: openssl verify -CAfile /cluster/pki/root.crt /cluster/pki/etcd/etcd.crt
+  changed_when: false
+
+- name: 创建 etcd 中间 CA 的 newcerts / crl 目录
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /cluster/pki/etcd/newcerts
+    - /cluster/pki/etcd/crl
+
+- name: 初始化 etcd 中间 CA 证书数据库 index.txt
+  ansible.builtin.file:
+    path: /cluster/pki/etcd/index.txt
+    state: touch
+    mode: "0600"
+    modification_time: preserve
+    access_time: preserve
+
+- name: 初始化 etcd 中间 CA 的 serial / crlnumber
+  ansible.builtin.copy:
+    content: "1000"
+    dest: "{{ item }}"
+    mode: "0600"
+    force: false
+  loop:
+    - /cluster/pki/etcd/serial
+    - /cluster/pki/etcd/crlnumber
+
+- name: 写入 etcd 中间 CA 签发配置
+  ansible.builtin.copy:
+    dest: /cluster/pki/etcd/etcd_ca.cnf
+    content: |
+      [ ca ]
+      default_ca = ca_default
+
+      [ ca_default ]
+      dir               = /cluster/pki/etcd
+      crl_dir           = $dir/crl
+      new_certs_dir     = $dir/newcerts
+      database          = $dir/index.txt
+      serial            = $dir/serial
+      crlnumber         = $dir/crlnumber
+
+      policy            = policy_strict
+
+      unique_subject    = yes
+      copy_extensions   = none
+
+      [ policy_strict ]
+      countryName             = match
+      stateOrProvinceName     = match
+      localityName            = match
+      organizationName        = match
+      organizationalUnitName  = match
+      commonName              = supplied
+      emailAddress            = optional

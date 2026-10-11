@@ -1,0 +1,106 @@
+- name: 创建 PKI 工作目录并限制为 root 访问
+  ansible.builtin.file:
+    path: /cluster/pki
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: 生成根 CA 私钥
+  ansible.builtin.command: openssl genrsa -aes256 -out /cluster/pki/root.key -passout pass:root 4096
+  args:
+    creates: /cluster/pki/root.key
+
+- name: 写入根 CA 自签名证书配置
+  ansible.builtin.copy:
+    dest: /cluster/pki/root.cnf
+    content: |
+      [ req ]
+      prompt             = no
+      distinguished_name = req_distinguished_name
+
+      [ req_distinguished_name ]
+      C  = CN
+      ST = Jiangsu
+      L  = Nanjing
+      O  = Wuzhenhua
+      OU = IT
+      CN = Root CA
+
+      [ v3_ca ]
+      basicConstraints       = critical, CA:true, pathlen:1
+      keyUsage               = critical, keyCertSign, cRLSign
+      subjectKeyIdentifier   = hash
+      authorityKeyIdentifier = keyid:always
+
+- name: 生成根 CA 自签名证书
+  ansible.builtin.command: >
+    openssl req -x509 -new
+    -config /cluster/pki/root.cnf
+    -extensions v3_ca
+    -key /cluster/pki/root.key
+    -passin pass:root
+    -out /cluster/pki/root.crt
+    -days 3650
+    -sha256
+  args:
+    creates: /cluster/pki/root.crt
+
+- name: 校验根 CA 证书
+  ansible.builtin.command: openssl verify -CAfile /cluster/pki/root.crt /cluster/pki/root.crt
+  changed_when: false
+
+- name: 创建根 CA 的 newcerts / crl 目录
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /cluster/pki/newcerts
+    - /cluster/pki/crl
+
+- name: 初始化根 CA 的证书数据库 index.txt
+  ansible.builtin.file:
+    path: /cluster/pki/index.txt
+    state: touch
+    mode: "0600"
+    modification_time: preserve
+    access_time: preserve
+
+- name: 初始化根 CA 的 serial / crlnumber
+  ansible.builtin.copy:
+    content: "1000"
+    dest: "{{ item }}"
+    mode: "0600"
+    force: false
+  loop:
+    - /cluster/pki/serial
+    - /cluster/pki/crlnumber
+
+- name: 写入根 CA 签发配置
+  ansible.builtin.copy:
+    dest: /cluster/pki/root_ca.cnf
+    content: |
+      [ ca ]
+      default_ca = ca_default
+
+      [ ca_default ]
+      dir               = /cluster/pki
+      crl_dir           = $dir/crl
+      new_certs_dir     = $dir/newcerts
+      database          = $dir/index.txt
+      serial            = $dir/serial
+      crlnumber         = $dir/crlnumber
+
+      policy            = policy_strict
+
+      unique_subject    = yes
+      copy_extensions   = none
+
+      [ policy_strict ]
+      countryName             = match
+      stateOrProvinceName     = match
+      localityName            = match
+      organizationName        = match
+      organizationalUnitName  = supplied
+      commonName              = supplied
+      emailAddress            = optional

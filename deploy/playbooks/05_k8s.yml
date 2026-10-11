@@ -1,0 +1,31 @@
+- name: 安装 Kubernetes 二进制文件
+  hosts: nodes
+  become: true
+  tasks:
+    - name: 安装 Kubernetes 二进制文件
+      ansible.builtin.import_tasks: ../tasks/k8s/install_binaries.yml
+      tags: [k8s]
+
+- name: 部署 kube-apiserver
+  hosts: apiserver
+  become: true
+  tasks:
+    - name: 部署 kube-apiserver
+      ansible.builtin.import_tasks: ../tasks/k8s/apiserver.yml
+      tags: [k8s]
+
+- name: 部署 kube-controller-manager
+  hosts: controller-manager
+  become: true
+  tasks:
+    - name: 部署 kube-controller-manager
+      ansible.builtin.import_tasks: ../tasks/k8s/controller_manager.yml
+      tags: [k8s]
+
+- name: 部署 kube-scheduler
+  hosts: scheduler
+  become: true
+  tasks:
+    - name: 部署 kube-scheduler
+      ansible.builtin.import_tasks: ../tasks/k8s/scheduler.yml
+      tags: [k8s]

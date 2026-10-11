@@ -1,0 +1,130 @@
+- name: 创建 k8s 中间 CA 工作目录
+  ansible.builtin.file:
+    path: /cluster/pki/k8s
+    state: directory
+
+- name: 生成 k8s 中间 CA 私钥
+  ansible.builtin.command: openssl genrsa -out /cluster/pki/k8s/k8s.key 4096
+  args:
+    creates: /cluster/pki/k8s/k8s.key
+
+- name: 写入 k8s 中间 CA 证书签名请求配置
+  ansible.builtin.copy:
+    dest: /cluster/pki/k8s/k8s.cnf
+    content: |
+      [ req ]
+      prompt             = no
+      distinguished_name = req_distinguished_name
+
+      [ req_distinguished_name ]
+      C  = CN
+      ST = Jiangsu
+      L  = Nanjing
+      O  = Wuzhenhua
+      OU = K8S
+      CN = K8S CA
+
+      [ v3_ca ]
+      basicConstraints       = critical, CA:true, pathlen:0
+      keyUsage               = critical, keyCertSign, cRLSign
+      subjectKeyIdentifier   = hash
+      authorityKeyIdentifier = keyid:always
+
+- name: 生成 k8s 中间 CA 证书签名请求
+  ansible.builtin.command: >
+    openssl req -new
+    -config /cluster/pki/k8s/k8s.cnf
+    -key /cluster/pki/k8s/k8s.key
+    -out /cluster/pki/k8s/k8s.csr
+    -sha256
+  args:
+    creates: /cluster/pki/k8s/k8s.csr
+
+- name: 写入 k8s 中间 CA 证书扩展配置
+  ansible.builtin.copy:
+    dest: /cluster/pki/k8s/k8s.ext
+    content: |
+      [ v3_ca ]
+      basicConstraints       = critical, CA:true, pathlen:0
+      keyUsage               = critical, keyCertSign, cRLSign
+      subjectKeyIdentifier   = hash
+      authorityKeyIdentifier = keyid:always
+
+- name: 使用根 CA 签发 k8s 中间 CA 证书
+  ansible.builtin.command: >
+    openssl ca
+    -config /cluster/pki/root_ca.cnf
+    -extfile /cluster/pki/k8s/k8s.ext
+    -extensions v3_ca
+    -cert /cluster/pki/root.crt
+    -keyfile /cluster/pki/root.key
+    -passin pass:root
+    -in /cluster/pki/k8s/k8s.csr
+    -out /cluster/pki/k8s/k8s.crt
+    -days 1825
+    -md sha256
+    -batch
+    -notext
+  args:
+    creates: /cluster/pki/k8s/k8s.crt
+
+- name: 校验 k8s 中间 CA 证书
+  ansible.builtin.command: openssl verify -CAfile /cluster/pki/root.crt /cluster/pki/k8s/k8s.crt
+  changed_when: false
+
+- name: 创建 k8s 中间 CA 的 newcerts / crl 目录
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /cluster/pki/k8s/newcerts
+    - /cluster/pki/k8s/crl
+
+- name: 初始化 k8s 中间 CA 证书数据库 index.txt
+  ansible.builtin.file:
+    path: /cluster/pki/k8s/index.txt
+    state: touch
+    mode: "0600"
+    modification_time: preserve
+    access_time: preserve
+
+- name: 初始化 k8s 中间 CA 的 serial / crlnumber
+  ansible.builtin.copy:
+    content: "1000"
+    dest: "{{ item }}"
+    force: false
+    owner: root
+    group: root
+    mode: "0600"
+  loop:
+    - /cluster/pki/k8s/serial
+    - /cluster/pki/k8s/crlnumber
+
+- name: 写入 k8s 中间 CA 签发配置
+  ansible.builtin.copy:
+    dest: /cluster/pki/k8s/k8s_ca.cnf
+    content: |
+      [ ca ]
+      default_ca = ca_default
+
+      [ ca_default ]
+      dir               = /cluster/pki/k8s
+      crl_dir           = $dir/crl
+      new_certs_dir     = $dir/newcerts
+      database          = $dir/index.txt
+      serial            = $dir/serial
+      crlnumber         = $dir/crlnumber
+
+      policy            = policy_strict
+
+      unique_subject    = yes
+      copy_extensions   = none
+
+      [ policy_strict ]
+      countryName             = match
+      stateOrProvinceName     = match
+      localityName            = match
+      organizationName        = supplied
+      organizationalUnitName  = match
+      commonName              = supplied
+      emailAddress            = optional

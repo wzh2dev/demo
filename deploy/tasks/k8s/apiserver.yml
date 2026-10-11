@@ -1,54 +1,6 @@
-- name: 创建组件安装目录
-  ansible.builtin.file:
-    path: /cluster/k8s
-    state: directory
-
-- name: 下载 Kubernetes 节点安装包
-  ansible.builtin.command:
-    cmd: >-
-      curl -fsSL
-      -o /tmp/kubernetes-node-1.27.16-amd64.tar.gz
-      https://dl.k8s.io/v1.27.16/kubernetes-node-linux-amd64.tar.gz
-    creates: /tmp/kubernetes-node-1.27.16-amd64.tar.gz
-  delegate_to: localhost
-  run_once: true
-  become: false
-  environment:
-    https_proxy: http://192.168.1.1:7897
-
-- name: 下载 Kubernetes 服务端安装包
-  ansible.builtin.command:
-    cmd: >-
-      curl -fsSL
-      -o /tmp/kubernetes-server-1.27.16-amd64.tar.gz
-      https://dl.k8s.io/v1.27.16/kubernetes-server-linux-amd64.tar.gz
-    creates: /tmp/kubernetes-server-1.27.16-amd64.tar.gz
-  delegate_to: localhost
-  run_once: true
-  become: false
-  environment:
-    https_proxy: http://192.168.1.1:7897
-
-- name: 解压 Kubernetes 节点二进制文件
-  ansible.builtin.unarchive:
-    src: /tmp/kubernetes-node-1.27.16-amd64.tar.gz
-    dest: /cluster/k8s
-    extra_opts:
-      - --strip-components=1
-    creates: /cluster/k8s/node/bin/kubelet
-
-- name: 解压 Kubernetes 服务端二进制文件
-  ansible.builtin.unarchive:
-    src: /tmp/kubernetes-server-1.27.16-amd64.tar.gz
-    dest: /cluster/k8s
-    extra_opts:
-      - --strip-components=1
-    creates: /cluster/k8s/server/bin/kube-apiserver
-
-- name: 部署 kube-apiserver
-  when: inventory_hostname in groups['apiserver']
+- name: 分发 kube-apiserver 证书及私钥
   block:
-    - name: 从 CA 主机取回 apiserver etcd client 证书
+    - name: 从 CA 主机取回 kube-apiserver 访问 etcd 的客户端证书及私钥
       ansible.builtin.fetch:
         src: /cluster/pki/etcd/apiserver-etcd-client.{{ item }}
         dest: /tmp/
@@ -59,7 +11,7 @@
       run_once: true
       delegate_to: "{{ groups['ca'] | first }}"
 
-    - name: 分发 apiserver etcd client 证书
+    - name: 分发 kube-apiserver 访问 etcd 的客户端证书及私钥
       ansible.builtin.copy:
         src: /tmp/apiserver-etcd-client.{{ item }}
         dest: /cluster/pki/etcd/
@@ -67,7 +19,7 @@
         - crt
         - key
 
-    - name: 从 CA 主机取回各成员的 apiserver server 证书
+    - name: 从 CA 主机取回当前节点的 kube-apiserver 服务端证书及私钥
       ansible.builtin.fetch:
         src: "/cluster/pki/k8s/apiserver-{{ inventory_hostname }}.{{ item }}"
         dest: /tmp/
@@ -77,7 +29,7 @@
         - key
       delegate_to: "{{ groups['ca'] | first }}"
 
-    - name: 分发各成员的 apiserver server 证书
+    - name: 分发当前节点的 kube-apiserver 服务端证书及私钥
       ansible.builtin.copy:
         src: "/tmp/apiserver-{{ inventory_hostname }}.{{ item }}"
         dest: /cluster/pki/k8s/
@@ -85,7 +37,7 @@
         - crt
         - key
 
-    - name: 从 CA 主机取回共享的 kubelet client 证书和 service account 密钥
+    - name: 从 CA 主机取回共享的 kube-apiserver 访问 kubelet 的客户端证书及私钥、ServiceAccount 密钥对
       ansible.builtin.fetch:
         src: /cluster/pki/k8s/{{ item }}
         dest: /tmp/
@@ -98,7 +50,7 @@
       run_once: true
       delegate_to: "{{ groups['ca'] | first }}"
 
-    - name: 分发 kubelet client 证书和 service account 密钥
+    - name: 分发共享的 kube-apiserver 访问 kubelet 的客户端证书及私钥、ServiceAccount 密钥对
       ansible.builtin.copy:
         src: /tmp/{{ item }}
         dest: /cluster/pki/k8s/
@@ -108,11 +60,13 @@
         - sa.key
         - sa.pub
 
-    - name: 计算 etcd endpoints 列表
+- name: 部署 kube-apiserver
+  block:
+    - name: 构建 kube-apiserver 使用的 etcd 端点列表
       ansible.builtin.set_fact:
         apiserver_etcd_servers: "{% for host in groups['etcd'] %}https://{{ hostvars[host].ansible_host }}:2379{% if not loop.last %},{% endif %}{% endfor %}"
 
-    - name: 检查 apiserver tmux 会话是否存在
+    - name: 检查 kube-apiserver 的 tmux 会话是否存在
       ansible.builtin.command: tmux has-session -t apiserver
       register: apiserver_tmux_session
       changed_when: false
@@ -145,7 +99,7 @@
         --v=2"
       when: apiserver_tmux_session.rc != 0
 
-    - name: 等待 kube-apiserver 接口就绪
+    - name: 等待 kube-apiserver 健康检查通过
       ansible.builtin.command: >
         curl -fsS --cacert /cluster/pki/k8s/k8s.crt
         https://127.0.0.1:6443/healthz

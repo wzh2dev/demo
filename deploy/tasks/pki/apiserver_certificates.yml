@@ -1,0 +1,158 @@
+- name: 签发并校验 kube-apiserver server 证书
+  block:
+    - name: 生成各 kube-apiserver 成员的 server 证书私钥
+      ansible.builtin.command: openssl genrsa -out /cluster/pki/k8s/apiserver-{{ item }}.key 4096
+      args:
+        creates: /cluster/pki/k8s/apiserver-{{ item }}.key
+      loop: "{{ groups['apiserver'] }}"
+
+    - name: 生成各 kube-apiserver 成员的 server 证书签名请求配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/k8s/apiserver-{{ item }}.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = Wuzhenhua
+          OU = K8S
+          CN = kube-apiserver-{{ item }}
+      loop: "{{ groups['apiserver'] }}"
+
+    - name: 生成各 kube-apiserver 成员的 server 证书签名请求
+      ansible.builtin.command: >
+        openssl req -new
+        -config /cluster/pki/k8s/apiserver-{{ item }}.cnf
+        -key /cluster/pki/k8s/apiserver-{{ item }}.key
+        -out /cluster/pki/k8s/apiserver-{{ item }}.csr
+        -sha256
+      args:
+        creates: /cluster/pki/k8s/apiserver-{{ item }}.csr
+      loop: "{{ groups['apiserver'] }}"
+
+    - name: 生成各 kube-apiserver 成员的 server 证书扩展配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/k8s/apiserver-{{ item }}.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = serverAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
+          subjectAltName         = @alt_names
+
+          [ alt_names ]
+          DNS.1  = localhost
+          DNS.2  = {{ item }}
+          DNS.3  = {{ item }}.wuzhenhua.com
+          DNS.4  = kubernetes
+          DNS.5  = kubernetes.default
+          DNS.6  = kubernetes.default.svc
+          DNS.7  = kubernetes.default.svc.cluster.local
+          IP.1   = 127.0.0.1
+          IP.2   = {{ hostvars[item].ansible_host }}
+          IP.3   = 10.96.0.1
+      loop: "{{ groups['apiserver'] }}"
+
+    - name: 使用 k8s 中间 CA 签发各 kube-apiserver 成员的 server 证书
+      ansible.builtin.command: >
+        openssl ca
+        -config /cluster/pki/k8s/k8s_ca.cnf
+        -extfile /cluster/pki/k8s/apiserver-{{ item }}.ext
+        -extensions v3_req
+        -cert /cluster/pki/k8s/k8s.crt
+        -keyfile /cluster/pki/k8s/k8s.key
+        -in /cluster/pki/k8s/apiserver-{{ item }}.csr
+        -out /cluster/pki/k8s/apiserver-{{ item }}.crt
+        -days 365
+        -md sha256
+        -batch
+        -notext
+      args:
+        creates: /cluster/pki/k8s/apiserver-{{ item }}.crt
+      loop: "{{ groups['apiserver'] }}"
+
+    - name: 校验各 kube-apiserver 成员的 server 证书
+      ansible.builtin.command: >
+        openssl verify
+        -CAfile /cluster/pki/root.crt
+        -untrusted /cluster/pki/k8s/k8s.crt
+        /cluster/pki/k8s/apiserver-{{ item }}.crt
+      changed_when: false
+      loop: "{{ groups['apiserver'] }}"
+
+- name: 签发并校验 kube-apiserver 访问 kubelet 的客户端证书
+  block:
+    - name: 生成 kube-apiserver 访问 kubelet 的客户端证书私钥
+      ansible.builtin.command: openssl genrsa -out /cluster/pki/k8s/apiserver-kubelet-client.key 4096
+      args:
+        creates: /cluster/pki/k8s/apiserver-kubelet-client.key
+
+    - name: 写入 kube-apiserver 访问 kubelet 的客户端证书签名请求配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/k8s/apiserver-kubelet-client.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = system:masters
+          OU = K8S
+          CN = kube-apiserver-kubelet-client
+
+    - name: 生成 kube-apiserver 访问 kubelet 的客户端证书签名请求
+      ansible.builtin.command: >
+        openssl req -new
+        -config /cluster/pki/k8s/apiserver-kubelet-client.cnf
+        -key /cluster/pki/k8s/apiserver-kubelet-client.key
+        -out /cluster/pki/k8s/apiserver-kubelet-client.csr
+        -sha256
+      args:
+        creates: /cluster/pki/k8s/apiserver-kubelet-client.csr
+
+    - name: 写入 kube-apiserver 访问 kubelet 的客户端证书扩展配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/k8s/apiserver-kubelet-client.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = clientAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
+
+    - name: 使用 k8s 中间 CA 签发 kube-apiserver 访问 kubelet 的客户端证书
+      ansible.builtin.command: >
+        openssl ca
+        -config /cluster/pki/k8s/k8s_ca.cnf
+        -extfile /cluster/pki/k8s/apiserver-kubelet-client.ext
+        -extensions v3_req
+        -cert /cluster/pki/k8s/k8s.crt
+        -keyfile /cluster/pki/k8s/k8s.key
+        -in /cluster/pki/k8s/apiserver-kubelet-client.csr
+        -out /cluster/pki/k8s/apiserver-kubelet-client.crt
+        -days 365
+        -md sha256
+        -batch
+        -notext
+      args:
+        creates: /cluster/pki/k8s/apiserver-kubelet-client.crt
+
+    - name: 校验 kube-apiserver 访问 kubelet 的客户端证书
+      ansible.builtin.command: >
+        openssl verify
+        -purpose sslclient
+        -CAfile /cluster/pki/root.crt
+        -untrusted /cluster/pki/k8s/k8s.crt
+        /cluster/pki/k8s/apiserver-kubelet-client.crt
+      changed_when: false
+

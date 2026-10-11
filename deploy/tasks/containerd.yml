@@ -1,0 +1,76 @@
+- name: 创建组件安装目录
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /cluster/containerd
+    - /cluster/runc
+
+- name: 安装 containerd
+  block:
+    - name: 下载 containerd 压缩包
+      ansible.builtin.command:
+        cmd: >-
+          curl -fsSL
+          -o /tmp/containerd.tar.gz
+          https://github.com/containerd/containerd/releases/download/v1.7.36/containerd-1.7.36-linux-amd64.tar.gz
+        creates: /tmp/containerd.tar.gz
+      delegate_to: localhost
+      run_once: true
+      become: false
+      environment:
+        https_proxy: http://192.168.1.1:7897
+
+    - name: 解压 containerd 到 /cluster/containerd
+      ansible.builtin.unarchive:
+        src: /tmp/containerd.tar.gz
+        dest: /cluster/containerd
+        creates: /cluster/containerd/bin/containerd
+
+- name: 安装 runc
+  block:
+    - name: 下载 runc
+      ansible.builtin.command:
+        cmd: >-
+          curl -fsSL
+          -o /tmp/runc
+          https://github.com/opencontainers/runc/releases/download/v1.4.3/runc.amd64
+        creates: /tmp/runc
+      delegate_to: localhost
+      run_once: true
+      become: false
+      environment:
+        https_proxy: http://192.168.1.1:7897
+
+    - name: 分发 runc 并赋予执行权限
+      ansible.builtin.copy:
+        src: /tmp/runc
+        dest: /cluster/runc/runc
+        mode: "0755"
+
+- name: 启动并验证 containerd
+  block:
+    - name: 检查 containerd tmux 会话是否存在
+      ansible.builtin.command: tmux has-session -t containerd
+      register: containerd_tmux_session
+      changed_when: false
+      failed_when: false
+
+    - name: 使用 tmux 后台启动 containerd
+      ansible.builtin.command: >
+        tmux new-session
+        -d
+        -s containerd
+        /cluster/containerd/bin/containerd
+      when: containerd_tmux_session.rc != 0
+
+    - name: 等待 containerd 接口就绪
+      ansible.builtin.command: >
+        /cluster/containerd/bin/ctr
+        --address /run/containerd/containerd.sock
+        version
+      register: containerd_health
+      until: containerd_health.rc == 0
+      retries: 20
+      delay: 3
+      changed_when: false
