@@ -3,7 +3,7 @@
     path: /cluster/k8s
     state: directory
 
-- name: 下载 Kubernetes 节点和服务端安装包
+- name: 下载 Kubernetes 节点安装包
   ansible.builtin.command:
     cmd: >-
       curl -fsSL
@@ -16,7 +16,7 @@
   environment:
     https_proxy: http://192.168.1.1:7897
 
-- name: 下载 Kubernetes 节点和服务端安装包
+- name: 下载 Kubernetes 服务端安装包
   ansible.builtin.command:
     cmd: >-
       curl -fsSL
@@ -29,16 +29,134 @@
   environment:
     https_proxy: http://192.168.1.1:7897
 
-- name: 解压 Kubernetes 节点和服务端二进制文件
+- name: 解压 Kubernetes 节点二进制文件
   ansible.builtin.unarchive:
     src: /tmp/kubernetes-node-1.27.16-amd64.tar.gz
     dest: /cluster/k8s
     extra_opts:
       - --strip-components=1
+    creates: /cluster/k8s/node/bin/kubelet
 
-- name: 解压 Kubernetes 节点和服务端二进制文件
+- name: 解压 Kubernetes 服务端二进制文件
   ansible.builtin.unarchive:
     src: /tmp/kubernetes-server-1.27.16-amd64.tar.gz
     dest: /cluster/k8s
     extra_opts:
       - --strip-components=1
+    creates: /cluster/k8s/server/bin/kube-apiserver
+
+- name: 部署 kube-apiserver
+  when: inventory_hostname in groups['apiserver']
+  block:
+    - name: 从 CA 主机取回 apiserver etcd client 证书
+      ansible.builtin.fetch:
+        src: /cluster/pki/etcd/apiserver-etcd-client.{{ item }}
+        dest: /tmp/
+        flat: true
+      loop:
+        - crt
+        - key
+      run_once: true
+      delegate_to: "{{ groups['ca'] | first }}"
+
+    - name: 分发 apiserver etcd client 证书
+      ansible.builtin.copy:
+        src: /tmp/apiserver-etcd-client.{{ item }}
+        dest: /cluster/pki/etcd/
+      loop:
+        - crt
+        - key
+
+    - name: 从 CA 主机取回各成员的 apiserver server 证书
+      ansible.builtin.fetch:
+        src: "/cluster/pki/k8s/apiserver-{{ inventory_hostname }}.{{ item }}"
+        dest: /tmp/
+        flat: true
+      loop:
+        - crt
+        - key
+      delegate_to: "{{ groups['ca'] | first }}"
+
+    - name: 分发各成员的 apiserver server 证书
+      ansible.builtin.copy:
+        src: "/tmp/apiserver-{{ inventory_hostname }}.{{ item }}"
+        dest: /cluster/pki/k8s/
+      loop:
+        - crt
+        - key
+
+    - name: 从 CA 主机取回共享的 kubelet client 证书和 service account 密钥
+      ansible.builtin.fetch:
+        src: /cluster/pki/k8s/{{ item }}
+        dest: /tmp/
+        flat: true
+      loop:
+        - apiserver-kubelet-client.crt
+        - apiserver-kubelet-client.key
+        - sa.key
+        - sa.pub
+      run_once: true
+      delegate_to: "{{ groups['ca'] | first }}"
+
+    - name: 分发 kubelet client 证书和 service account 密钥
+      ansible.builtin.copy:
+        src: /tmp/{{ item }}
+        dest: /cluster/pki/k8s/
+      loop:
+        - apiserver-kubelet-client.crt
+        - apiserver-kubelet-client.key
+        - sa.key
+        - sa.pub
+
+    - name: 计算 etcd endpoints 列表
+      ansible.builtin.set_fact:
+        apiserver_etcd_servers: "{% for host in groups['etcd'] %}https://{{ hostvars[host].ansible_host }}:2379{% if not loop.last %},{% endif %}{% endfor %}"
+
+    - name: 检查 apiserver tmux 会话是否存在
+      ansible.builtin.command: tmux has-session -t apiserver
+      register: apiserver_tmux_session
+      changed_when: false
+      failed_when: false
+
+    - name: 使用 tmux 后台启动 kube-apiserver
+      ansible.builtin.command: >-
+        tmux new-session -d -s apiserver
+        "/cluster/k8s/server/bin/kube-apiserver
+        --advertise-address={{ ansible_host }}
+        --bind-address={{ ansible_host }}
+        --secure-port=6443
+        --etcd-servers={{ apiserver_etcd_servers }}
+        --etcd-cafile=/cluster/pki/etcd/etcd.crt
+        --etcd-certfile=/cluster/pki/etcd/apiserver-etcd-client.crt
+        --etcd-keyfile=/cluster/pki/etcd/apiserver-etcd-client.key
+        --client-ca-file=/cluster/pki/k8s/k8s.crt
+        --tls-cert-file=/cluster/pki/k8s/apiserver-{{ inventory_hostname }}.crt
+        --tls-private-key-file=/cluster/pki/k8s/apiserver-{{ inventory_hostname }}.key
+        --kubelet-client-certificate=/cluster/pki/k8s/apiserver-kubelet-client.crt
+        --kubelet-client-key=/cluster/pki/k8s/apiserver-kubelet-client.key
+        --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP
+        --service-account-key-file=/cluster/pki/k8s/sa.pub
+        --service-account-signing-key-file=/cluster/pki/k8s/sa.key
+        --service-account-issuer=https://kubernetes.default.svc.cluster.local
+        --service-cluster-ip-range=10.96.0.0/12
+        --authorization-mode=Node,RBAC
+        --enable-admission-plugins=NodeRestriction
+        --allow-privileged=true
+        --v=2"
+      when: apiserver_tmux_session.rc != 0
+
+    - name: 等待 kube-apiserver 接口就绪
+      ansible.builtin.command: >
+        curl -fsS --cacert /cluster/pki/k8s/k8s.crt
+        https://127.0.0.1:6443/healthz
+      register: apiserver_health
+      until: apiserver_health.rc == 0
+      retries: 30
+      delay: 3
+      changed_when: false
+
+    - name: 查看 kube-apiserver 版本
+      ansible.builtin.command: >
+        curl -fsS --cacert /cluster/pki/k8s/k8s.crt
+        https://127.0.0.1:6443/version
+      changed_when: false
