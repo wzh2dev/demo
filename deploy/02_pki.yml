@@ -534,3 +534,74 @@
             /cluster/pki/etcd/peer-{{ item }}.crt
           changed_when: false
           loop: "{{ groups['etcd'] }}"
+
+    - name: 初始化验证 etcd client 证书
+      block:
+        - name: 生成 etcd client 证书私钥
+          ansible.builtin.command: openssl genrsa -out /cluster/pki/etcd/client.key 4096
+          args:
+            creates: /cluster/pki/etcd/client.key
+
+        - name: 生成 etcd client 证书签名请求配置
+          ansible.builtin.copy:
+            dest: /cluster/pki/etcd/client.cnf
+            content: |
+              [ req ]
+              prompt             = no
+              distinguished_name = req_distinguished_name
+
+              [ req_distinguished_name ]
+              C  = CN
+              ST = Jiangsu
+              L  = Nanjing
+              O  = Wuzhenhua
+              OU = ETCD
+              CN = etcd-client
+
+        - name: 生成 etcd client 证书签名请求
+          ansible.builtin.command: >
+            openssl req -new
+            -config /cluster/pki/etcd/client.cnf
+            -key /cluster/pki/etcd/client.key
+            -out /cluster/pki/etcd/client.csr
+            -sha256
+          args:
+            creates: /cluster/pki/etcd/client.csr
+
+        - name: 生成 etcd client 证书扩展配置
+          ansible.builtin.copy:
+            dest: /cluster/pki/etcd/client.ext
+            content: |
+              [ v3_req ]
+              basicConstraints       = critical, CA:FALSE
+              keyUsage               = critical, digitalSignature, keyEncipherment
+              extendedKeyUsage       = clientAuth
+              subjectKeyIdentifier   = hash
+              authorityKeyIdentifier = keyid,issuer
+
+        - name: 用 etcd 中间 CA 签发共享 client 证书
+          ansible.builtin.command: >
+            openssl ca
+            -config /cluster/pki/etcd/etcd_ca.cnf
+            -extfile /cluster/pki/etcd/client.ext
+            -extensions v3_req
+            -cert /cluster/pki/etcd/etcd.crt
+            -keyfile /cluster/pki/etcd/etcd.key
+            -passin pass:etcd
+            -in /cluster/pki/etcd/client.csr
+            -out /cluster/pki/etcd/client.crt
+            -days 365
+            -md sha256
+            -batch
+            -notext
+          args:
+            creates: /cluster/pki/etcd/client.crt
+
+        - name: 校验 etcd client 证书
+          ansible.builtin.command: >
+            openssl verify
+            -purpose sslclient
+            -CAfile /cluster/pki/root.crt
+            -untrusted /cluster/pki/etcd/etcd.crt
+            /cluster/pki/etcd/client.crt
+          changed_when: false

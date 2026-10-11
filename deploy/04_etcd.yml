@@ -1,7 +1,10 @@
-- name: 创建组件安装目录
+- name: 创建组件安装和数据目录
   ansible.builtin.file:
-    path: "/cluster/etcd"
+    path: "{{ item }}"
     state: directory
+  loop:
+    - "/cluster/etcd"
+    - "/data/etcd"
 
 - name: 创建组件数据目录
   ansible.builtin.file:
@@ -44,6 +47,25 @@
     dest: /cluster/pki/etcd/
   loop: "{{ ['server', 'peer'] | product(['crt', 'key']) | list }}"
 
+- name: 从 CA 主机取回共享 client 证书
+  ansible.builtin.fetch:
+    src: /cluster/pki/etcd/{{ item }}
+    dest: /tmp/
+    flat: true
+  loop:
+    - client.crt
+    - client.key
+  run_once: true
+  delegate_to: "{{ groups['ca'] | first }}"
+
+- name: 分发 etcd client 证书
+  ansible.builtin.copy:
+    src: /tmp/{{ item }}
+    dest: /cluster/pki/etcd/
+  loop:
+    - client.crt
+    - client.key
+
 - name: 计算 etcd 初始集群成员列表
   ansible.builtin.set_fact:
     etcd_initial_cluster: "{% for host in groups['etcd'] %}{{ host }}=https://{{ hostvars[host].ansible_host }}:2380{% if not loop.last %},{% endif %}{% endfor %}"
@@ -65,12 +87,12 @@
         cert-file: /cluster/pki/etcd/server-{{ inventory_hostname }}.crt
         key-file: /cluster/pki/etcd/server-{{ inventory_hostname }}.key
         trusted-ca-file: /cluster/pki/etcd/etcd.crt
-        client-cert-auth: false
+        client-cert-auth: true
       peer-transport-security:
         cert-file: /cluster/pki/etcd/peer-{{ inventory_hostname }}.crt
         key-file: /cluster/pki/etcd/peer-{{ inventory_hostname }}.key
         trusted-ca-file: /cluster/pki/etcd/etcd.crt
-        peer-client-cert-auth: true
+        client-cert-auth: true
 
 - name: 检查 etcd tmux 会话是否存在
   ansible.builtin.command: tmux has-session -t etcd
@@ -89,6 +111,8 @@
     /cluster/etcd/etcdctl endpoint health
     --endpoints=https://{{ ansible_host }}:2379
     --cacert=/cluster/pki/etcd/etcd.crt
+    --cert=/cluster/pki/etcd/client.crt
+    --key=/cluster/pki/etcd/client.key
   register: etcd_health
   until: etcd_health.rc == 0
   retries: 20
@@ -100,4 +124,7 @@
     /cluster/etcd/etcdctl member list
     --endpoints=https://{{ ansible_host }}:2379
     --cacert=/cluster/pki/etcd/etcd.crt
+    --cert=/cluster/pki/etcd/client.crt
+    --key=/cluster/pki/etcd/client.key
+
   changed_when: false

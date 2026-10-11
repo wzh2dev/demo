@@ -58,6 +58,7 @@
 - name: 分发 CA 文件证书
   hosts: nodes
   become: true
+  tags: [pki]
   tasks:
     - name: 创建仅限 root 访问的 CA 目录
       ansible.builtin.file:
