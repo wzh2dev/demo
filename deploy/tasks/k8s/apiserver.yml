@@ -86,13 +86,14 @@
         --client-ca-file=/cluster/pki/k8s/k8s.crt
         --tls-cert-file=/cluster/pki/k8s/apiserver-{{ inventory_hostname }}.crt
         --tls-private-key-file=/cluster/pki/k8s/apiserver-{{ inventory_hostname }}.key
+        --kubelet-certificate-authority=/cluster/pki/k8s/k8s.crt
         --kubelet-client-certificate=/cluster/pki/k8s/apiserver-kubelet-client.crt
         --kubelet-client-key=/cluster/pki/k8s/apiserver-kubelet-client.key
         --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP
         --service-account-key-file=/cluster/pki/k8s/sa.pub
         --service-account-signing-key-file=/cluster/pki/k8s/sa.key
         --service-account-issuer=https://kubernetes.default.svc.cluster.local
-        --service-cluster-ip-range=10.96.0.0/12
+        --service-cluster-ip-range=192.168.3.0/24
         --authorization-mode=Node,RBAC
         --enable-admission-plugins=NodeRestriction
         --allow-privileged=true
@@ -105,8 +106,8 @@
         https://127.0.0.1:6443/healthz
       register: apiserver_health
       until: apiserver_health.rc == 0
-      retries: 30
-      delay: 3
+      retries: 10
+      delay: 5
       changed_when: false
 
     - name: 查看 kube-apiserver 版本

@@ -56,7 +56,7 @@
           DNS.7  = kubernetes.default.svc.cluster.local
           IP.1   = 127.0.0.1
           IP.2   = {{ hostvars[item].ansible_host }}
-          IP.3   = 10.96.0.1
+          IP.3   = 192.168.3.1
       loop: "{{ groups['apiserver'] }}"
 
     - name: 使用 k8s 中间 CA 签发各 kube-apiserver 成员的 server 证书
@@ -155,4 +155,3 @@
         -untrusted /cluster/pki/k8s/k8s.crt
         /cluster/pki/k8s/apiserver-kubelet-client.crt
       changed_when: false
-
