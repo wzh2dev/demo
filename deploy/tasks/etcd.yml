@@ -32,12 +32,12 @@
 
 - name: 分发 etcd 证书
   block:
-    - name: 从 CA 主机取回各成员的 server / peer / client 证书
+    - name: 从 CA 主机取回各成员的 server / peer 证书
       ansible.builtin.fetch:
         src: "/cluster/pki/etcd/{{ item.0 }}-{{ inventory_hostname }}.{{ item.1 }}"
         dest: /tmp/
         flat: true
-      loop: "{{ ['server', 'peer', 'client'] | product(['crt', 'key']) | list }}"
+      loop: "{{ ['server', 'peer'] | product(['crt', 'key']) | list }}"
       delegate_to: "{{ groups['ca'] | first }}"
 
     - name: 分发各成员的 server / peer 证书
@@ -48,7 +48,7 @@
 
     - name: 从 CA 主机取回的 client 证书
       ansible.builtin.fetch:
-        src: "/cluster/pki/etcd/client.{{ item.0 }}"
+        src: "/cluster/pki/etcd/client.{{ item }}"
         dest: /tmp/
         flat: true
       loop:
