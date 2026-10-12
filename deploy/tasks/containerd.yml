@@ -5,6 +5,7 @@
   loop:
     - /cluster/containerd
     - /cluster/runc
+    - /etc/containerd
 
 - name: 安装 containerd
   block:
