@@ -5,3 +5,11 @@
     - name: 安装启动 containerd
       ansible.builtin.import_tasks: ../tasks/containerd.yml
       tags: [containerd]
+
+- name: 安装 crictl
+  hosts: nodes
+  become: true
+  tasks:
+    - name: 安装 crictl
+      ansible.builtin.import_tasks: ../tasks/crictl.yml
+      tags: [crictl]

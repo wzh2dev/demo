@@ -28,6 +28,9 @@
 
         - name: 签发并校验 kube-scheduler 客户端证书
           ansible.builtin.import_tasks: ../tasks/pki/scheduler_certificates.yml
+
+        - name: 签发并校验 admin 客户端证书
+          ansible.builtin.import_tasks: ../tasks/pki/admin_certificate.yml
       run_once: true
 
 - name: 分发公共 CA 证书
