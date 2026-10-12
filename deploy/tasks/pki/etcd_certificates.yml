@@ -49,6 +49,7 @@
           [ alt_names ]
           DNS.1 = localhost
           DNS.2 = {{ item }}
+          DNS.3 = {{ item }}.wuzhenhua.com
           IP.1  = 127.0.0.1
           IP.2  = {{ hostvars[item].ansible_host }}
       loop: "{{ groups['etcd'] }}"
