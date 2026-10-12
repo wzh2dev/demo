@@ -94,6 +94,7 @@
         --service-account-signing-key-file=/cluster/pki/k8s/sa.key
         --service-account-issuer=https://kubernetes.default.svc.cluster.local
         --service-cluster-ip-range=192.168.3.0/24
+        --enable-bootstrap-token-auth=true
         --authorization-mode=Node,RBAC
         --enable-admission-plugins=NodeRestriction
         --allow-privileged=true
