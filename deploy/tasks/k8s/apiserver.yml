@@ -92,7 +92,7 @@
         --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP
         --service-account-key-file=/cluster/pki/k8s/sa.pub
         --service-account-signing-key-file=/cluster/pki/k8s/sa.key
-        --service-account-issuer=https://kubernetes.default.svc.cluster.local
+        --service-account-issuer=https://kubernetes.default.svc.wuzhenhua.com
         --service-cluster-ip-range=192.168.3.0/24
         --enable-bootstrap-token-auth=true
         --authorization-mode=Node,RBAC

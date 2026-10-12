@@ -74,7 +74,7 @@
         --kubeconfig=/cluster/k8s/controller-manager.kubeconfig
         --root-ca-file=/cluster/pki/k8s/k8s.crt
         --service-account-private-key-file=/cluster/pki/k8s/sa.key
-        --service-account-issuer=https://kubernetes.default.svc.cluster.local
+        --service-account-issuer=https://kubernetes.default.svc.wuzhenhua.com
         --service-cluster-ip-range=192.168.3.0/24
         --allocate-node-cidrs=true
         --cluster-cidr=192.168.2.0/24

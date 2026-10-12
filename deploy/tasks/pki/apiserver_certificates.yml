@@ -53,7 +53,7 @@
           DNS.4  = kubernetes
           DNS.5  = kubernetes.default
           DNS.6  = kubernetes.default.svc
-          DNS.7  = kubernetes.default.svc.cluster.local
+          DNS.7  = kubernetes.default.svc.wuzhenhua.com
           IP.1   = 127.0.0.1
           IP.2   = {{ hostvars[item].ansible_host }}
           IP.3   = 192.168.3.1
