@@ -58,7 +58,7 @@
 
     - name: 分发 etcd client 证书
       ansible.builtin.copy:
-        src: /tmp/client.{{ item }
+        src: "/tmp/client.{{ item }}"
         dest: /cluster/pki/etcd/
       loop:
         - crt
