@@ -73,8 +73,7 @@
         tmux new-session
         -d
         -s containerd
-        /cluster/containerd/bin/containerd
-        --config /etc/containerd/config.toml
+        "/cluster/containerd/bin/containerd --config /etc/containerd/config.toml"
       when: containerd_tmux_session.rc != 0
 
     - name: 等待 containerd 接口就绪
