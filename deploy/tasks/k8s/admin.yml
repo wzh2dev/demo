@@ -1,0 +1,47 @@
+- name: 生成 admin kubeconfig
+  block:
+    - name: 从 CA 主机取回 admin 客户端证书及私钥
+      ansible.builtin.fetch:
+        src: /cluster/pki/k8s/admin-client.{{ item }}
+        dest: /tmp/
+        flat: true
+      loop:
+        - crt
+        - key
+      run_once: true
+      delegate_to: "{{ groups['ca'] | first }}"
+
+    - name: 分发 admin 客户端证书及私钥
+      ansible.builtin.copy:
+        src: /tmp/admin-client.{{ item }}
+        dest: /cluster/pki/k8s/
+      loop:
+        - crt
+        - key
+
+    - name: 构建 kube-apiserver 访问地址
+      ansible.builtin.set_fact:
+        apiserver_endpoint: "https://{{ hostvars[groups['apiserver'] | first].ansible_host }}:6443"
+
+    - name: 生成 admin kubeconfig
+      ansible.builtin.copy:
+        dest: /cluster/k8s/admin.kubeconfig
+        content: |
+          apiVersion: v1
+          kind: Config
+          clusters:
+            - name: local
+              cluster:
+                server: {{ apiserver_endpoint }}
+                certificate-authority: /cluster/pki/k8s/k8s.crt
+          users:
+            - name: admin
+              user:
+                client-certificate: /cluster/pki/k8s/admin-client.crt
+                client-key: /cluster/pki/k8s/admin-client.key
+          contexts:
+            - name: admin@local
+              context:
+                cluster: local
+                user: admin
+          current-context: admin@local
