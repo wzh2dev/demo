@@ -1,0 +1,47 @@
+- name: 审批 kubelet serving 证书 CSR
+  block:
+    - name: 等待所有 kubelet 节点提交 serving CSR
+      ansible.builtin.command:
+        cmd: >-
+          /cluster/k8s/server/bin/kubectl
+          --kubeconfig=/cluster/k8s/admin.kubeconfig
+          get csr -o json
+      register: serving_csr_query
+      until: >-
+        serving_csr_query.rc == 0
+        and ((serving_csr_query.stdout | from_json).items
+        | selectattr('spec.signerName', 'equalto', 'kubernetes.io/kubelet-serving')
+        | list | length >= (groups['kubelet'] | length))
+      retries: 36
+      delay: 5
+      changed_when: false
+
+    - name: 审批 Pending 状态的 serving CSR
+      ansible.builtin.command:
+        cmd: >-
+          /cluster/k8s/server/bin/kubectl
+          --kubeconfig=/cluster/k8s/admin.kubeconfig
+          certificate approve {{ item }}
+      loop: >-
+        {{ (serving_csr_query.stdout | from_json).items
+        | selectattr('spec.signerName', 'equalto', 'kubernetes.io/kubelet-serving')
+        | rejectattr('status.conditions', 'defined')
+        | map(attribute='metadata.name')
+        | list }}
+
+    - name: 等待 serving 证书全部签发完成
+      ansible.builtin.command:
+        cmd: >-
+          /cluster/k8s/server/bin/kubectl
+          --kubeconfig=/cluster/k8s/admin.kubeconfig
+          get csr -o json
+      register: issued_csr_query
+      until: >-
+        issued_csr_query.rc == 0
+        and ((issued_csr_query.stdout | from_json).items
+        | selectattr('spec.signerName', 'equalto', 'kubernetes.io/kubelet-serving')
+        | selectattr('status.certificate', 'defined')
+        | list | length >= (groups['kubelet'] | length))
+      retries: 24
+      delay: 5
+      changed_when: false

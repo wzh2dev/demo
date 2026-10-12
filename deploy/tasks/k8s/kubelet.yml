@@ -1,0 +1,80 @@
+- name: 配置并启动 kubelet
+  block:
+    - name: 设置 apiserver 端点
+      ansible.builtin.set_fact:
+        apiserver_endpoint: "https://{{ hostvars[groups['apiserver'] | first].ansible_host }}:6443"
+
+    - name: 生成 kubelet bootstrap kubeconfig
+      ansible.builtin.copy:
+        dest: /cluster/k8s/kubelet-bootstrap.kubeconfig
+        content: |
+          apiVersion: v1
+          kind: Config
+          clusters:
+            - name: local
+              cluster:
+                server: {{ apiserver_endpoint }}
+                certificate-authority: /cluster/pki/k8s/k8s.crt
+          users:
+            - name: kubelet-bootstrap
+              user:
+                token: 000001.0000000000000001
+          contexts:
+            - name: kubelet-bootstrap@local
+              context:
+                cluster: local
+                user: kubelet-bootstrap
+          current-context: kubelet-bootstrap@local
+
+    - name: 生成 kubelet 配置文件
+      ansible.builtin.copy:
+        dest: /cluster/k8s/kubelet-config.yaml
+        content: |
+          apiVersion: kubelet.config.k8s.io/v1beta1
+          kind: KubeletConfiguration
+          containerRuntimeEndpoint: unix:///run/containerd/containerd.sock
+          rotateCertificates: true
+          serverTLSBootstrap: true
+          authentication:
+            anonymous:
+              enabled: false
+            x509:
+              clientCAFile: /cluster/pki/k8s/k8s.crt
+          authorization:
+            mode: Webhook
+          clusterDomain: wuzhenhua.com
+          clusterDNS:
+            - 192.168.3.10
+
+    - name: 检查 kubelet 的 tmux 会话是否存在
+      ansible.builtin.command: tmux has-session -t kubelet
+      register: kubelet_tmux_session
+      changed_when: false
+      failed_when: false
+
+    - name: 使用 tmux 后台启动 kubelet
+      ansible.builtin.command: >-
+        tmux new-session -d -s kubelet
+        "/cluster/k8s/node/bin/kubelet
+        --config=/cluster/k8s/kubelet-config.yaml
+        --bootstrap-kubeconfig=/cluster/k8s/kubelet-bootstrap.kubeconfig
+        --kubeconfig=/cluster/k8s/kubelet.kubeconfig
+        --hostname-override={{ inventory_hostname }}
+        --node-ip={{ ansible_host }}
+        --v=2"
+      when: kubelet_tmux_session.rc != 0
+
+- name: 验证 kubelet 完成引导并注册节点
+  run_once: true
+  block:
+    - name: 等待节点完成注册（NotReady 属预期，待 CNI 部署后转为 Ready）
+      ansible.builtin.command: >-
+        /cluster/k8s/server/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
+        get node {{ item }} -o jsonpath={.metadata.name}
+      register: node_registered
+      until: node_registered.stdout | trim == item
+      retries: 30
+      delay: 5
+      changed_when: false
+      loop: "{{ groups['kubelet'] }}"
+      delegate_to: "{{ groups['admin_host'] | default([]) }}"
