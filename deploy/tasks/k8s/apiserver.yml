@@ -77,7 +77,7 @@
         tmux new-session -d -s apiserver
         "/cluster/k8s/server/bin/kube-apiserver
         --advertise-address={{ ansible_host }}
-        --bind-address={{ ansible_host }}
+        --bind-address=0.0.0.0
         --secure-port=6443
         --etcd-servers={{ apiserver_etcd_servers }}
         --etcd-cafile=/cluster/pki/etcd/etcd.crt
