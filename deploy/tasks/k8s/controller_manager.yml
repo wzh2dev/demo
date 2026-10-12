@@ -34,6 +34,10 @@
 
 - name: 部署 kube-controller-manager
   block:
+    - name: 构建 kube-apiserver 访问地址
+      ansible.builtin.set_fact:
+        apiserver_endpoint: "https://{{ hostvars[groups['apiserver'] | first].ansible_host }}:6443"
+
     - name: 生成 kube-controller-manager kubeconfig
       ansible.builtin.copy:
         dest: /cluster/k8s/controller-manager.kubeconfig
@@ -41,21 +45,21 @@
           apiVersion: v1
           kind: Config
           clusters:
-            - name: kubernetes
+            - name: local
               cluster:
-                server: https://127.0.0.1:6443
+                server: {{ apiserver_endpoint }}
                 certificate-authority: /cluster/pki/k8s/k8s.crt
           users:
-            - name: system:kube-controller-manager
+            - name: cm
               user:
                 client-certificate: /cluster/pki/k8s/controller-manager-client.crt
                 client-key: /cluster/pki/k8s/controller-manager-client.key
           contexts:
-            - name: system:kube-controller-manager@kubernetes
+            - name: cm@local
               context:
-                cluster: kubernetes
-                user: system:kube-controller-manager
-          current-context: system:kube-controller-manager@kubernetes
+                cluster: local
+                user: cm
+          current-context: cm@local
 
     - name: 检查 kube-controller-manager 的 tmux 会话是否存在
       ansible.builtin.command: tmux has-session -t controller-manager
@@ -84,7 +88,7 @@
         curl -fsS --cacert /cluster/pki/k8s/k8s.crt
         --cert /cluster/pki/k8s/controller-manager-client.crt
         --key /cluster/pki/k8s/controller-manager-client.key
-        https://127.0.0.1:6443/apis/coordination.k8s.io/v1/namespaces/kube-system/leases/kube-controller-manager
+        {{ apiserver_endpoint }}/apis/coordination.k8s.io/v1/namespaces/kube-system/leases/kube-controller-manager
       register: controller_manager_ready
       until: controller_manager_ready.rc == 0
       retries: 30
