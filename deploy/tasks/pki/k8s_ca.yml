@@ -53,11 +53,11 @@
 - name: 使用根 CA 签发 k8s 中间 CA 证书
   ansible.builtin.command: >
     openssl ca
-    -config /cluster/pki/root_ca.cnf
+    -config /cluster/pki/root/root_ca.cnf
     -extfile /cluster/pki/k8s/k8s.ext
     -extensions v3_ca
-    -cert /cluster/pki/root.crt
-    -keyfile /cluster/pki/root.key
+    -cert /cluster/pki/root/root.crt
+    -keyfile /cluster/pki/root/root.key
     -passin pass:root
     -in /cluster/pki/k8s/k8s.csr
     -out /cluster/pki/k8s/k8s.crt
@@ -69,7 +69,7 @@
     creates: /cluster/pki/k8s/k8s.crt
 
 - name: 校验 k8s 中间 CA 证书
-  ansible.builtin.command: openssl verify -CAfile /cluster/pki/root.crt /cluster/pki/k8s/k8s.crt
+  ansible.builtin.command: openssl verify -CAfile /cluster/pki/root/root.crt /cluster/pki/k8s/k8s.crt
   changed_when: false
 
 - name: 创建 k8s 中间 CA 的 newcerts / crl 目录
@@ -84,7 +84,6 @@
   ansible.builtin.file:
     path: /cluster/pki/k8s/index.txt
     state: touch
-    mode: "0600"
     modification_time: preserve
     access_time: preserve
 
@@ -93,9 +92,6 @@
     content: "1000"
     dest: "{{ item }}"
     force: false
-    owner: root
-    group: root
-    mode: "0600"
   loop:
     - /cluster/pki/k8s/serial
     - /cluster/pki/k8s/crlnumber

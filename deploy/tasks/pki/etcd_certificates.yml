@@ -76,7 +76,7 @@
     - name: 校验各 etcd 成员的 server 证书
       ansible.builtin.command: >
         openssl verify
-        -CAfile /cluster/pki/root.crt
+        -CAfile /cluster/pki/root/root.crt
         -untrusted /cluster/pki/etcd/etcd.crt
         /cluster/pki/etcd/server-{{ item }}.crt
       changed_when: false
@@ -159,7 +159,7 @@
     - name: 校验各 etcd 成员的 peer 证书
       ansible.builtin.command: >
         openssl verify
-        -CAfile /cluster/pki/root.crt
+        -CAfile /cluster/pki/root/root.crt
         -untrusted /cluster/pki/etcd/etcd.crt
         /cluster/pki/etcd/peer-{{ item }}.crt
       changed_when: false
@@ -231,7 +231,7 @@
       ansible.builtin.command: >
         openssl verify
         -purpose sslclient
-        -CAfile /cluster/pki/root.crt
+        -CAfile /cluster/pki/root/root.crt
         -untrusted /cluster/pki/etcd/etcd.crt
         /cluster/pki/etcd/client.crt
       changed_when: false
@@ -302,7 +302,7 @@
       ansible.builtin.command: >
         openssl verify
         -purpose sslclient
-        -CAfile /cluster/pki/root.crt
+        -CAfile /cluster/pki/root/root.crt
         -untrusted /cluster/pki/etcd/etcd.crt
         /cluster/pki/etcd/apiserver-etcd-client.crt
       changed_when: false

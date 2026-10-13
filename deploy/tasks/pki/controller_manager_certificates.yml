@@ -63,7 +63,7 @@
       ansible.builtin.command: >
         openssl verify
         -purpose sslclient
-        -CAfile /cluster/pki/root.crt
+        -CAfile /cluster/pki/root/root.crt
         -untrusted /cluster/pki/k8s/k8s.crt
         /cluster/pki/k8s/controller-manager-client.crt
       changed_when: false

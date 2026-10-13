@@ -19,7 +19,7 @@
     - name: 创建 bootstrap token Secret
       ansible.builtin.command:
         cmd: >-
-          /cluster/k8s/server/bin/kubectl
+          /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
           apply -f /cluster/k8s/bootstrap-token-secret.yaml
 
@@ -72,6 +72,6 @@
     - name: 创建 bootstrap 授权及 CSR 自动审批绑定
       ansible.builtin.command:
         cmd: >-
-          /cluster/k8s/server/bin/kubectl
+          /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
           apply -f /cluster/k8s/bootstrap-rbac.yaml

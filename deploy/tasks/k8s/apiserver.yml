@@ -1,58 +1,24 @@
 - name: 分发 kube-apiserver 证书及私钥
   block:
-    - name: 从 CA 主机取回 kube-apiserver 访问 etcd 的客户端证书及私钥
-      ansible.builtin.fetch:
-        src: /cluster/pki/etcd/apiserver-etcd-client.{{ item }}
-        dest: /tmp/
-        flat: true
-      loop:
-        - crt
-        - key
-      run_once: true
-      delegate_to: "{{ groups['ca'] | first }}"
-
     - name: 分发 kube-apiserver 访问 etcd 的客户端证书及私钥
       ansible.builtin.copy:
-        src: /tmp/apiserver-etcd-client.{{ item }}
+        src: /cluster/pki/etcd/apiserver-etcd-client.{{ item }}
         dest: /cluster/pki/etcd/
       loop:
         - crt
         - key
 
-    - name: 从 CA 主机取回当前节点的 kube-apiserver 服务端证书及私钥
-      ansible.builtin.fetch:
-        src: "/cluster/pki/k8s/apiserver-{{ inventory_hostname }}.{{ item }}"
-        dest: /tmp/
-        flat: true
-      loop:
-        - crt
-        - key
-      delegate_to: "{{ groups['ca'] | first }}"
-
     - name: 分发当前节点的 kube-apiserver 服务端证书及私钥
       ansible.builtin.copy:
-        src: "/tmp/apiserver-{{ inventory_hostname }}.{{ item }}"
+        src: /cluster/pki/k8s/apiserver-{{ inventory_hostname }}.{{ item }}
         dest: /cluster/pki/k8s/
       loop:
         - crt
         - key
 
-    - name: 从 CA 主机取回共享的 kube-apiserver 访问 kubelet 的客户端证书及私钥、ServiceAccount 密钥对
-      ansible.builtin.fetch:
-        src: /cluster/pki/k8s/{{ item }}
-        dest: /tmp/
-        flat: true
-      loop:
-        - apiserver-kubelet-client.crt
-        - apiserver-kubelet-client.key
-        - sa.key
-        - sa.pub
-      run_once: true
-      delegate_to: "{{ groups['ca'] | first }}"
-
     - name: 分发共享的 kube-apiserver 访问 kubelet 的客户端证书及私钥、ServiceAccount 密钥对
       ansible.builtin.copy:
-        src: /tmp/{{ item }}
+        src: /cluster/pki/k8s/{{ item }}
         dest: /cluster/pki/k8s/
       loop:
         - apiserver-kubelet-client.crt

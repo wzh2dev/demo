@@ -1,48 +1,25 @@
-- name: 取回 CA 证书到控制端
-  delegate_to: "{{ groups['ca'] | first }}"
-  run_once: true
-  block:
-    - name: 取回 root CA 证书到控制端
-      ansible.builtin.fetch:
-        src: /cluster/pki/root.crt
-        dest: /tmp/
-        flat: true
-
-    - name: 取回 etcd 中间 CA 证书到控制端
-      ansible.builtin.fetch:
-        src: /cluster/pki/etcd/etcd.crt
-        dest: /tmp/
-        flat: true
-
-    - name: 取回 k8s 中间 CA 证书到控制端
-      ansible.builtin.fetch:
-        src: /cluster/pki/k8s/k8s.crt
-        dest: /tmp/
-        flat: true
-
 - name: 分发 CA 证书到节点
-  when: inventory_hostname not in groups['ca']
   block:
-    - name: 创建仅限 root 访问的 CA 目录
+    - name: 创建 CA 目录
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       loop:
-        - /cluster/pki
+        - /cluster/pki/root
         - /cluster/pki/etcd
         - /cluster/pki/k8s
 
     - name: 分发 root CA 证书到其余节点
       ansible.builtin.copy:
-        src: /tmp/root.crt
-        dest: /cluster/pki/root.crt
+        src: /cluster/pki/root/root.crt
+        dest: /cluster/pki/root/root.crt
 
     - name: 分发 etcd 中间 CA 证书到其余节点
       ansible.builtin.copy:
-        src: /tmp/etcd.crt
+        src: /cluster/pki/etcd/etcd.crt
         dest: /cluster/pki/etcd/etcd.crt
 
     - name: 分发 k8s 中间 CA 证书到其余节点
       ansible.builtin.copy:
-        src: /tmp/k8s.crt
+        src: /cluster/pki/k8s/k8s.crt
         dest: /cluster/pki/k8s/k8s.crt

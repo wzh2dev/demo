@@ -3,7 +3,7 @@
     - name: 等待所有 kubelet 节点提交 serving CSR
       ansible.builtin.command:
         cmd: >-
-          /cluster/k8s/server/bin/kubectl
+          /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
           get csr -o json
       register: serving_csr_query
@@ -19,7 +19,7 @@
     - name: 审批 Pending 状态的 serving CSR
       ansible.builtin.command:
         cmd: >-
-          /cluster/k8s/server/bin/kubectl
+          /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
           certificate approve {{ item }}
       loop: >-
@@ -32,7 +32,7 @@
     - name: 等待 serving 证书全部签发完成
       ansible.builtin.command:
         cmd: >-
-          /cluster/k8s/server/bin/kubectl
+          /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
           get csr -o json
       register: issued_csr_query

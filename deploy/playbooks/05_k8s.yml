@@ -31,22 +31,14 @@
       tags: [k8s]
 
 - name: 生成 admin kubeconfig
-  hosts: "{{ groups['apiserver'] | random }}"
-  become: true
+  hosts: localhost
   tasks:
-    - name: 登记 admin 主机
-      ansible.builtin.add_host:
-        name: "{{ inventory_hostname }}"
-        groups: admin_host
-      tags: [k8s]
-
     - name: 生成 admin kubeconfig
       ansible.builtin.import_tasks: ../tasks/k8s/admin.yml
       tags: [k8s]
 
 - name: 准备 kubelet TLS Bootstrap 集群资源
-  hosts: "{{ groups['admin_host'] | default([]) }}"
-  become: true
+  hosts: localhost
   tasks:
     - name: 准备 kubelet TLS Bootstrap 集群资源
       ansible.builtin.import_tasks: ../tasks/k8s/bootstrap_auth.yml
@@ -61,8 +53,7 @@
       tags: [kubelet]
 
 - name: 审批 kubelet serving 证书 CSR
-  hosts: "{{ groups['admin_host'] | default([]) }}"
-  become: true
+  hosts: localhost
   tasks:
     - name: 审批 kubelet serving 证书 CSR
       ansible.builtin.import_tasks: ../tasks/k8s/approve_serving_csr.yml

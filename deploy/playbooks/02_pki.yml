@@ -1,7 +1,12 @@
 - name: 初始化 CA 和节点证书
-  hosts: ca
-  become: true
+  hosts: localhost
   tags: [pki]
+  pre_tasks:
+    - name: 创建 PKI 工作目录
+      ansible.builtin.file:
+        path: /cluster/pki
+        state: directory
+
   tasks:
     - name: 初始化 CA 和节点证书
       block:
@@ -37,6 +42,11 @@
   hosts: nodes
   become: true
   tags: [pki]
+  pre_tasks:
+    - name: 创建 PKI 工作目录
+      ansible.builtin.file:
+        path: /cluster/pki
+        state: directory
   tasks:
     - name: 取回并分发 CA 证书
       ansible.builtin.import_tasks: ../tasks/ca.yml

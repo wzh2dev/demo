@@ -1,19 +1,8 @@
 - name: 分发 kube-scheduler 证书及私钥
   block:
-    - name: 从 CA 主机取回 kube-scheduler 客户端证书及私钥
-      ansible.builtin.fetch:
-        src: /cluster/pki/k8s/scheduler-client.{{ item }}
-        dest: /tmp/
-        flat: true
-      loop:
-        - crt
-        - key
-      run_once: true
-      delegate_to: "{{ groups['ca'] | first }}"
-
     - name: 分发 kube-scheduler 客户端证书及私钥
       ansible.builtin.copy:
-        src: /tmp/scheduler-client.{{ item }}
+        src: /cluster/pki/k8s/scheduler-client.{{ item }}
         dest: /cluster/pki/k8s/
       loop:
         - crt

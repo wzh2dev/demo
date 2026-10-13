@@ -48,11 +48,11 @@
 - name: 使用根 CA 签发 etcd 中间 CA 证书
   ansible.builtin.command: >
     openssl ca
-    -config /cluster/pki/root_ca.cnf
+    -config /cluster/pki/root/root_ca.cnf
     -extfile /cluster/pki/etcd/etcd.ext
     -extensions v3_ca
-    -cert /cluster/pki/root.crt
-    -keyfile /cluster/pki/root.key
+    -cert /cluster/pki/root/root.crt
+    -keyfile /cluster/pki/root/root.key
     -passin pass:root
     -in /cluster/pki/etcd/etcd.csr
     -out /cluster/pki/etcd/etcd.crt
@@ -64,7 +64,7 @@
     creates: /cluster/pki/etcd/etcd.crt
 
 - name: 校验 etcd 中间 CA 证书
-  ansible.builtin.command: openssl verify -CAfile /cluster/pki/root.crt /cluster/pki/etcd/etcd.crt
+  ansible.builtin.command: openssl verify -CAfile /cluster/pki/root/root.crt /cluster/pki/etcd/etcd.crt
   changed_when: false
 
 - name: 创建 etcd 中间 CA 的 newcerts / crl 目录
@@ -79,7 +79,6 @@
   ansible.builtin.file:
     path: /cluster/pki/etcd/index.txt
     state: touch
-    mode: "0600"
     modification_time: preserve
     access_time: preserve
 
@@ -87,7 +86,6 @@
   ansible.builtin.copy:
     content: "1000"
     dest: "{{ item }}"
-    mode: "0600"
     force: false
   loop:
     - /cluster/pki/etcd/serial

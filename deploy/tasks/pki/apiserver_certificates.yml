@@ -80,7 +80,7 @@
     - name: 校验各 kube-apiserver 成员的 server 证书
       ansible.builtin.command: >
         openssl verify
-        -CAfile /cluster/pki/root.crt
+        -CAfile /cluster/pki/root/root.crt
         -untrusted /cluster/pki/k8s/k8s.crt
         /cluster/pki/k8s/apiserver-{{ item }}.crt
       changed_when: false
@@ -151,7 +151,7 @@
       ansible.builtin.command: >
         openssl verify
         -purpose sslclient
-        -CAfile /cluster/pki/root.crt
+        -CAfile /cluster/pki/root/root.crt
         -untrusted /cluster/pki/k8s/k8s.crt
         /cluster/pki/k8s/apiserver-kubelet-client.crt
       changed_when: false
