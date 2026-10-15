@@ -28,10 +28,6 @@
 
 - name: 部署 kube-apiserver
   block:
-    - name: 构建 kube-apiserver 使用的 etcd 端点列表
-      ansible.builtin.set_fact:
-        apiserver_etcd_servers: "{% for host in groups['etcd'] %}https://{{ hostvars[host].ansible_host }}:2379{% if not loop.last %},{% endif %}{% endfor %}"
-
     - name: 检查 kube-apiserver 的 tmux 会话是否存在
       ansible.builtin.command: tmux has-session -t apiserver
       register: apiserver_tmux_session
@@ -45,7 +41,7 @@
         --advertise-address={{ ansible_host }}
         --bind-address=0.0.0.0
         --secure-port=6443
-        --etcd-servers={{ apiserver_etcd_servers }}
+        --etcd-servers={{ etcd_servers }}
         --etcd-cafile=/cluster/pki/etcd/etcd.crt
         --etcd-certfile=/cluster/pki/etcd/apiserver-etcd-client.crt
         --etcd-keyfile=/cluster/pki/etcd/apiserver-etcd-client.key

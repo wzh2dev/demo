@@ -14,7 +14,7 @@
           curl
           -fsSL
           -o /tmp/etcd.tar.gz
-          https://github.com/etcd-io/etcd/releases/download/v3.5.13/etcd-v3.5.13-linux-amd64.tar.gz
+          https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-{{ arch }}.tar.gz
         creates: /tmp/etcd.tar.gz
       delegate_to: localhost
       run_once: true

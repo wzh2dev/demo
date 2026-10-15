@@ -14,7 +14,7 @@
         cmd: >-
           curl -fsSL
           -o /tmp/containerd.tar.gz
-          https://github.com/containerd/containerd/releases/download/v1.7.36/containerd-1.7.36-linux-amd64.tar.gz
+          https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-{{ arch }}.tar.gz
         creates: /tmp/containerd.tar.gz
       delegate_to: localhost
       run_once: true
@@ -45,9 +45,9 @@
       ansible.builtin.command:
         cmd: >-
           curl -fsSL
-          -o /tmp/runc
-          https://github.com/opencontainers/runc/releases/download/v1.4.3/runc.amd64
-        creates: /tmp/runc
+          -o /tmp/runc.{{ arch }}
+          https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.{{ arch }}
+        creates: /tmp/runc.{{ arch }}
       delegate_to: localhost
       run_once: true
       become: false
@@ -56,7 +56,7 @@
 
     - name: 分发 runc 并赋予执行权限
       ansible.builtin.copy:
-        src: /tmp/runc
+        src: /tmp/runc.{{ arch }}
         dest: /cluster/runc/runc
         mode: "0755"
 

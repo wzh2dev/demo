@@ -9,9 +9,9 @@
       ansible.builtin.command:
         cmd: >-
           curl -fsSL
-          -o /tmp/kubernetes-node-1.27.16-amd64.tar.gz
-          https://dl.k8s.io/v1.27.16/kubernetes-node-linux-amd64.tar.gz
-        creates: /tmp/kubernetes-node-1.27.16-amd64.tar.gz
+          -o /tmp/kubernetes-node-{{ k8s_version }}-{{ arch }}.tar.gz
+          https://dl.k8s.io/v{{ k8s_version }}/kubernetes-node-linux-{{ arch }}.tar.gz
+        creates: /tmp/kubernetes-node-{{ k8s_version }}-{{ arch }}.tar.gz
       delegate_to: localhost
       run_once: true
       become: false
@@ -20,7 +20,7 @@
 
     - name: 解压 Kubernetes 节点安装包
       ansible.builtin.unarchive:
-        src: /tmp/kubernetes-node-1.27.16-amd64.tar.gz
+        src: /tmp/kubernetes-node-{{ k8s_version }}-{{ arch }}.tar.gz
         dest: /cluster/k8s
         extra_opts:
           - --strip-components=1
@@ -32,9 +32,9 @@
       ansible.builtin.command:
         cmd: >-
           curl -fsSL
-          -o /tmp/kubernetes-server-1.27.16-amd64.tar.gz
-          https://dl.k8s.io/v1.27.16/kubernetes-server-linux-amd64.tar.gz
-        creates: /tmp/kubernetes-server-1.27.16-amd64.tar.gz
+          -o /tmp/kubernetes-server-{{ k8s_version }}-{{ arch }}.tar.gz
+          https://dl.k8s.io/v{{ k8s_version }}/kubernetes-server-linux-{{ arch }}.tar.gz
+        creates: /tmp/kubernetes-server-{{ k8s_version }}-{{ arch }}.tar.gz
       delegate_to: localhost
       run_once: true
       become: false
@@ -43,7 +43,7 @@
 
     - name: 解压 Kubernetes 服务端安装包
       ansible.builtin.unarchive:
-        src: /tmp/kubernetes-server-1.27.16-amd64.tar.gz
+        src: /tmp/kubernetes-server-{{ k8s_version }}-{{ arch }}.tar.gz
         dest: /cluster/k8s
         extra_opts:
           - --strip-components=1

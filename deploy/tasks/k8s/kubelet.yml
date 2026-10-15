@@ -77,4 +77,3 @@
       delay: 5
       changed_when: false
       loop: "{{ groups['kubelet'] }}"
-      delegate_to: "{{ groups['admin_host'] | default([]) | first }}"

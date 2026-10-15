@@ -48,5 +48,5 @@
         path: /cluster/pki
         state: directory
   tasks:
-    - name: 取回并分发 CA 证书
+    - name: 分发 CA 证书
       ansible.builtin.import_tasks: ../tasks/ca.yml

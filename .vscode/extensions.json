@@ -25,6 +25,7 @@
     "ReneSaarsoo.sql-formatter-vsc",
     "usernamehw.errorlens",
     "tamasfe.even-better-toml",
-    "qwtel.sqlite-viewer"
+    "qwtel.sqlite-viewer",
+    "redhat.vscode-community-server-connector"
   ]
 }
