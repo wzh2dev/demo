@@ -1,0 +1,74 @@
+- name: 分发 kube-proxy 证书及私钥
+  block:
+    - name: 分发 kube-proxy 客户端证书及私钥
+      ansible.builtin.copy:
+        src: /cluster/pki/k8s/kube-proxy-client.{{ item }}
+        dest: /cluster/pki/k8s/
+      loop:
+        - crt
+        - key
+
+- name: 部署 kube-proxy
+  block:
+    - name: 构建 kube-apiserver 访问地址
+      ansible.builtin.set_fact:
+        apiserver_endpoint: "https://{{ hostvars[groups['apiserver'] | first].ansible_host }}:6443"
+
+    - name: 生成 kube-proxy kubeconfig
+      ansible.builtin.copy:
+        dest: /cluster/k8s/kube-proxy.kubeconfig
+        content: |
+          apiVersion: v1
+          kind: Config
+          clusters:
+            - name: local
+              cluster:
+                server: {{ apiserver_endpoint }}
+                certificate-authority: /cluster/pki/k8s/k8s.crt
+          users:
+            - name: kube-proxy
+              user:
+                client-certificate: /cluster/pki/k8s/kube-proxy-client.crt
+                client-key: /cluster/pki/k8s/kube-proxy-client.key
+          contexts:
+            - name: kube-proxy@local
+              context:
+                cluster: local
+                user: kube-proxy
+          current-context: kube-proxy@local
+
+    - name: 生成 kube-proxy 配置文件
+      ansible.builtin.copy:
+        dest: /cluster/k8s/kube-proxy-config.yaml
+        content: |
+          apiVersion: kubeproxy.config.k8s.io/v1alpha1
+          kind: KubeProxyConfiguration
+          bindAddress: 0.0.0.0
+          hostnameOverride: {{ inventory_hostname }}
+          clusterCIDR: 192.168.2.0/24
+          mode: iptables
+          clientConnection:
+            kubeconfig: /cluster/k8s/kube-proxy.kubeconfig
+
+    - name: 检查 kube-proxy 的 tmux 会话是否存在
+      ansible.builtin.command: tmux has-session -t kube-proxy
+      register: kube_proxy_tmux_session
+      changed_when: false
+      failed_when: false
+
+    - name: 使用 tmux 后台启动 kube-proxy
+      ansible.builtin.command: >-
+        tmux new-session -d -s kube-proxy
+        "/cluster/k8s/node/bin/kube-proxy
+        --config=/cluster/k8s/kube-proxy-config.yaml
+        --v=2"
+      when: kube_proxy_tmux_session.rc != 0
+
+    - name: 等待 kube-proxy 健康检查通过
+      ansible.builtin.command: >
+        curl -fsS http://127.0.0.1:10256/healthz
+      register: kube_proxy_health
+      until: kube_proxy_health.rc == 0
+      retries: 10
+      delay: 5
+      changed_when: false
