@@ -15,7 +15,7 @@
       tags: [k8s]
 
 - name: 部署 kube-controller-manager
-  hosts: controller-manager
+  hosts: controller_manager
   become: true
   tasks:
     - name: 部署 kube-controller-manager
@@ -60,9 +60,9 @@
       tags: [kubelet]
 
 - name: 部署 kube-proxy
-  hosts: kube-proxy
+  hosts: kube_proxy
   become: true
   tasks:
     - name: 部署 kube-proxy
-      ansible.builtin.import_tasks: ../tasks/k8s/kube-proxy.yml
+      ansible.builtin.import_tasks: ../tasks/k8s/kube_proxy.yml
       tags: [kube-proxy]
