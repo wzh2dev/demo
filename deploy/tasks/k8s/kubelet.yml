@@ -65,15 +65,17 @@
       when: kubelet_tmux_session.rc != 0
 
 - name: 验证 kubelet 完成引导并注册节点
-  run_once: true
   block:
     - name: 等待节点完成注册
       ansible.builtin.command: >-
-        /cluster/k8s/server/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
+        /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
         get node {{ item }} -o jsonpath={.metadata.name}
       register: node_registered
       until: node_registered.stdout | trim == item
       retries: 30
       delay: 5
       changed_when: false
+      delegate_to: "localhost"
+      run_once: true
+      become: false
       loop: "{{ groups['kubelet'] }}"

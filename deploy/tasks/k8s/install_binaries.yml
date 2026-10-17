@@ -3,6 +3,35 @@
     path: /cluster/k8s
     state: directory
 
+- name: 安装 kubernetes 客户端二进制文件
+  block:
+    - name: 创建 Kubernetes 管理目录
+      ansible.builtin.file:
+        path: /cluster/k8s
+        state: directory
+      delegate_to: localhost
+      run_once: true
+      become: false
+
+    - name: 下载 Kubernetes 客户端安装包
+      ansible.builtin.get_url:
+        url: https://dl.k8s.io/v{{ k8s_version }}/kubernetes-client-linux-{{ arch }}.tar.gz
+        dest: /tmp/kubernetes-client-{{ k8s_version }}-{{ arch }}.tar.gz
+      delegate_to: localhost
+      run_once: true
+      become: false
+
+    - name: 解压 Kubernetes 客户端安装包
+      ansible.builtin.unarchive:
+        src: /tmp/kubernetes-client-{{ k8s_version }}-{{ arch }}.tar.gz
+        dest: /cluster/k8s
+        extra_opts:
+          - --strip-components=1
+        creates: /cluster/k8s/client/bin/kubectl
+      delegate_to: localhost
+      run_once: true
+      become: false
+
 - name: 安装 Kubernetes 节点二进制文件
   block:
     - name: 下载 Kubernetes 节点安装包
