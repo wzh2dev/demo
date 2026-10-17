@@ -1,12 +1,6 @@
 - name: 初始化 CA 和节点证书
   hosts: localhost
   tags: [pki]
-  pre_tasks:
-    - name: 创建 PKI 工作目录
-      ansible.builtin.file:
-        path: /cluster/pki
-        state: directory
-
   tasks:
     - name: 初始化 CA 和节点证书
       block:
@@ -38,7 +32,7 @@
           ansible.builtin.import_tasks: ../tasks/pki/kube_proxy_certificates.yml
 
         - name: 签发并校验 admin 客户端证书
-          ansible.builtin.import_tasks: ../tasks/pki/admin_certificate.yml
+          ansible.builtin.import_tasks: ../tasks/pki/admin_certificates.yml
       run_once: true
 
 - name: 分发公共 CA 证书
@@ -46,10 +40,14 @@
   become: true
   tags: [pki]
   pre_tasks:
-    - name: 创建 PKI 工作目录
+    - name: 创建 CA 目录
       ansible.builtin.file:
-        path: /cluster/pki
+        path: "{{ item }}"
         state: directory
+      loop:
+        - /cluster/pki/root
+        - /cluster/pki/etcd
+        - /cluster/pki/k8s
   tasks:
     - name: 分发 CA 证书
-      ansible.builtin.import_tasks: ../tasks/ca.yml
+      ansible.builtin.import_tasks: ../tasks/pki/ca.yml

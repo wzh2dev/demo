@@ -2,67 +2,58 @@
   hosts: nodes
   become: true
   tasks:
-    - name: 安装 Kubernetes 二进制文件
-      ansible.builtin.import_tasks: ../tasks/k8s/install_binaries.yml
+    - ansible.builtin.import_tasks: ../tasks/k8s/install_binaries.yml
       tags: [k8s]
 
 - name: 部署 kube-apiserver
   hosts: apiserver
   become: true
   tasks:
-    - name: 部署 kube-apiserver
-      ansible.builtin.import_tasks: ../tasks/k8s/apiserver.yml
+    - ansible.builtin.import_tasks: ../tasks/k8s/apiserver.yml
       tags: [k8s]
 
 - name: 部署 kube-controller-manager
   hosts: controller_manager
   become: true
   tasks:
-    - name: 部署 kube-controller-manager
-      ansible.builtin.import_tasks: ../tasks/k8s/controller_manager.yml
+    - ansible.builtin.import_tasks: ../tasks/k8s/controller_manager.yml
       tags: [k8s]
 
 - name: 部署 kube-scheduler
   hosts: scheduler
   become: true
   tasks:
-    - name: 部署 kube-scheduler
-      ansible.builtin.import_tasks: ../tasks/k8s/scheduler.yml
+    - ansible.builtin.import_tasks: ../tasks/k8s/scheduler.yml
       tags: [k8s]
 
 - name: 生成 admin kubeconfig
   hosts: localhost
   tasks:
-    - name: 生成 admin kubeconfig
-      ansible.builtin.import_tasks: ../tasks/k8s/admin.yml
+    - ansible.builtin.import_tasks: ../tasks/k8s/admin.yml
       tags: [k8s]
 
 - name: 准备 kubelet TLS Bootstrap 集群资源
   hosts: localhost
   tasks:
-    - name: 准备 kubelet TLS Bootstrap 集群资源
-      ansible.builtin.import_tasks: ../tasks/k8s/bootstrap_auth.yml
+    - ansible.builtin.import_tasks: ../tasks/k8s/bootstrap_auth.yml
       tags: [k8s]
 
 - name: 部署 kubelet
   hosts: kubelet
   become: true
   tasks:
-    - name: 部署 kubelet
-      ansible.builtin.import_tasks: ../tasks/k8s/kubelet.yml
-      tags: [kubelet]
+    - ansible.builtin.import_tasks: ../tasks/k8s/kubelet.yml
+      tags: [k8s]
 
 - name: 审批 kubelet serving 证书 CSR
   hosts: localhost
   tasks:
-    - name: 审批 kubelet serving 证书 CSR
-      ansible.builtin.import_tasks: ../tasks/k8s/approve_serving_csr.yml
-      tags: [kubelet]
+    - ansible.builtin.import_tasks: ../tasks/k8s/approve_serving_csr.yml
+      tags: [k8s]
 
 - name: 部署 kube-proxy
   hosts: kube_proxy
   become: true
   tasks:
-    - name: 部署 kube-proxy
-      ansible.builtin.import_tasks: ../tasks/k8s/kube_proxy.yml
-      tags: [kube-proxy]
+    - ansible.builtin.import_tasks: ../tasks/k8s/kube_proxy.yml
+      tags: [k8s]
