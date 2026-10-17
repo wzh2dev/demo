@@ -44,7 +44,6 @@
       ansible.builtin.user:
         name: root
         password: "{{ 'root' | password_hash('sha512') }}"
-        update_password: on_create
 
     - name: 允许 root 远程登录
       ansible.builtin.lineinfile:
