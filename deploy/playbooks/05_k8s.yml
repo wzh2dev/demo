@@ -4,56 +4,58 @@
   tags: [k8s]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/install_binaries.yml
+  environment:
+    https_proxy: "http://10.0.0.1:7897"
 
 - name: 部署 kube-apiserver
   hosts: apiserver
   become: true
-  tags: [k8s]
+  tags: [k8s, apiserver]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/apiserver.yml
 
 - name: 部署 kube-controller-manager
   hosts: controller_manager
   become: true
-  tags: [k8s]
+  tags: [k8s, cm]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/controller_manager.yml
 
 - name: 部署 kube-scheduler
   hosts: scheduler
   become: true
-  tags: [k8s]
+  tags: [k8s, sc]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/scheduler.yml
 
 - name: 准备管理面
   hosts: localhost
-  tags: [k8s]
+  tags: [k8s, admin]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/admin.yml
 
 - name: 准备 kubelet TLS Bootstrap 集群资源
   hosts: localhost
-  tags: [k8s]
+  tags: [k8s, bootstrap]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/bootstrap_auth.yml
 
 - name: 部署 kubelet
   hosts: kubelet
   become: true
-  tags: [k8s]
+  tags: [k8s, kubelet]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/kubelet.yml
 
 - name: 审批 kubelet serving 证书 CSR
   hosts: localhost
-  tags: [k8s]
+  tags: [k8s, approve]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/approve_serving_csr.yml
 
 - name: 部署 kube-proxy
   hosts: kube_proxy
   become: true
-  tags: [k8s]
+  tags: [k8s, kube_proxy]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/kube_proxy.yml

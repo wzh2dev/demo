@@ -69,7 +69,7 @@
         get node {{ inventory_hostname }} -o name
       register: node_registered
       until: node_registered.rc == 0
-      retries: 30
+      retries: 10
       delay: 5
       changed_when: false
       delegate_to: localhost
