@@ -1,6 +1,7 @@
 - name: 节点基础配置
   hosts: nodes
   become: true
+  tags: [base]
   pre_tasks:
     - name: 创建安装目录
       ansible.builtin.file:
@@ -14,7 +15,6 @@
   tasks:
     - name: 配置基础系统
       ansible.builtin.import_tasks: ../tasks/base.yml
-      tags: [base]
 
   handlers:
     - name: 重载 SSH 服务

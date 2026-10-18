@@ -1,6 +1,6 @@
 - name: 安装启动 etcd
   hosts: etcd
   become: true
+  tags: [etcd]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/etcd.yml
-      tags: [etcd]

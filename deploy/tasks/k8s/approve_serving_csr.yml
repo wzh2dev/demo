@@ -1,17 +1,21 @@
 - name: 审批 kubelet serving 证书 CSR
+  vars:
+    kubelet_count: "{{ groups['kubelet'] | length }}"
   block:
     - name: 等待所有 kubelet 节点提交 serving CSR
       ansible.builtin.command:
         cmd: >-
           /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
-          get csr -o json
+          get csr
+          --field-selector=spec.signerName=kubernetes.io/kubelet-serving
+          -o json
       register: serving_csr_query
-      until: >-
-        serving_csr_query.rc == 0
-        and ((serving_csr_query.stdout | from_json).items
-        | selectattr('spec.signerName', 'equalto', 'kubernetes.io/kubelet-serving')
-        | list | length >= (groups['kubelet'] | length))
+      vars:
+        serving_csrs: "{{ (serving_csr_query.stdout | from_json)['items'] }}"
+      until:
+        - serving_csr_query.rc == 0
+        - serving_csrs | length >= (kubelet_count | int)
       retries: 36
       delay: 5
       changed_when: false
@@ -23,9 +27,8 @@
           --kubeconfig=/cluster/k8s/admin.kubeconfig
           certificate approve {{ item }}
       loop: >-
-        {{ (serving_csr_query.stdout | from_json).items
-        | selectattr('spec.signerName', 'equalto', 'kubernetes.io/kubelet-serving')
-        | rejectattr('status.conditions', 'defined')
+        {{ (serving_csr_query.stdout | from_json)['items']
+        | selectattr('status.conditions', 'undefined')
         | map(attribute='metadata.name')
         | list }}
 
@@ -34,14 +37,18 @@
         cmd: >-
           /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
-          get csr -o json
+          get csr
+          --field-selector=spec.signerName=kubernetes.io/kubelet-serving
+          -o json
       register: issued_csr_query
-      until: >-
-        issued_csr_query.rc == 0
-        and ((issued_csr_query.stdout | from_json).items
-        | selectattr('spec.signerName', 'equalto', 'kubernetes.io/kubelet-serving')
-        | selectattr('status.certificate', 'defined')
-        | list | length >= (groups['kubelet'] | length))
+      vars:
+        issued_csrs: >-
+          {{ (issued_csr_query.stdout | from_json)['items']
+          | selectattr('status.certificate', 'defined')
+          | list }}
+      until:
+        - issued_csr_query.rc == 0
+        - issued_csrs | length >= (kubelet_count | int)
       retries: 24
       delay: 5
       changed_when: false

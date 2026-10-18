@@ -18,7 +18,7 @@
           users:
             - name: kubelet-bootstrap
               user:
-                token: 000001.0000000000000001
+                token: "000001.0000000000000001"
           contexts:
             - name: kubelet-bootstrap@local
               context:
@@ -69,13 +69,12 @@
     - name: 等待节点完成注册
       ansible.builtin.command: >-
         /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
-        get node {{ item }} -o jsonpath={.metadata.name}
+        get nodes -o jsonpath={.items[*].metadata.name}
       register: node_registered
-      until: node_registered.stdout | trim == item
+      until: groups['kubelet'] | difference(node_registered.stdout.split()) | length == 0
       retries: 30
       delay: 5
       changed_when: false
       delegate_to: "localhost"
       run_once: true
       become: false
-      loop: "{{ groups['kubelet'] }}"
