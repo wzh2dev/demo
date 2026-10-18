@@ -10,10 +10,6 @@
 
 - name: 部署 kube-scheduler
   block:
-    - name: 构建 kube-apiserver 访问地址
-      ansible.builtin.set_fact:
-        apiserver_endpoint: "https://{{ hostvars[groups['apiserver'] | first].ansible_host }}:6443"
-
     - name: 生成 kube-scheduler kubeconfig
       ansible.builtin.copy:
         dest: /cluster/k8s/scheduler.kubeconfig
@@ -23,7 +19,7 @@
           clusters:
             - name: local
               cluster:
-                server: {{ apiserver_endpoint }}
+                server: {{ api_server }}
                 certificate-authority: /cluster/pki/k8s/k8s.crt
           users:
             - name: scheduler
@@ -52,12 +48,14 @@
         --v=2"
       when: scheduler_tmux_session.rc != 0
 
+- name: 验证 kube-scheduler 完成选主并注册节点
+  block:
     - name: 等待 kube-scheduler 选主 Lease 可读取
       ansible.builtin.command: >
         curl -fsS --cacert /cluster/pki/k8s/k8s.crt
         --cert /cluster/pki/k8s/scheduler-client.crt
         --key /cluster/pki/k8s/scheduler-client.key
-        {{ apiserver_endpoint }}/apis/coordination.k8s.io/v1/namespaces/kube-system/leases/kube-scheduler
+        {{ api_server }}/apis/coordination.k8s.io/v1/namespaces/kube-system/leases/kube-scheduler
       register: scheduler_ready
       until: scheduler_ready.rc == 0
       retries: 30

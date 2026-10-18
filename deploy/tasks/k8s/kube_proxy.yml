@@ -10,10 +10,6 @@
 
 - name: 部署 kube-proxy
   block:
-    - name: 构建 kube-apiserver 访问地址
-      ansible.builtin.set_fact:
-        apiserver_endpoint: "https://{{ hostvars[groups['apiserver'] | first].ansible_host }}:6443"
-
     - name: 生成 kube-proxy kubeconfig
       ansible.builtin.copy:
         dest: /cluster/k8s/kube-proxy.kubeconfig
@@ -23,7 +19,7 @@
           clusters:
             - name: local
               cluster:
-                server: {{ apiserver_endpoint }}
+                server: {{ api_server }}
                 certificate-authority: /cluster/pki/k8s/k8s.crt
           users:
             - name: kube-proxy
@@ -64,6 +60,8 @@
         --v=2"
       when: kube_proxy_tmux_session.rc != 0
 
+- name: 验证 kube-proxy 完成引导并注册节点
+  block:
     - name: 等待 kube-proxy 健康检查通过
       ansible.builtin.command: >
         curl -fsS http://127.0.0.1:10256/healthz

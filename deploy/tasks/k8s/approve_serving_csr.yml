@@ -1,6 +1,4 @@
 - name: 审批 kubelet serving 证书 CSR
-  vars:
-    kubelet_count: "{{ groups['kubelet'] | length }}"
   block:
     - name: 等待所有 kubelet 节点提交 serving CSR
       ansible.builtin.command:
@@ -15,7 +13,7 @@
         serving_csrs: "{{ (serving_csr_query.stdout | from_json)['items'] }}"
       until:
         - serving_csr_query.rc == 0
-        - serving_csrs | length >= (kubelet_count | int)
+        - serving_csrs | length >= (groups['kubelet'] | length)
       retries: 36
       delay: 5
       changed_when: false
@@ -48,7 +46,7 @@
           | list }}
       until:
         - issued_csr_query.rc == 0
-        - issued_csrs | length >= (kubelet_count | int)
+        - issued_csrs | length >= (groups['kubelet'] | length)
       retries: 24
       delay: 5
       changed_when: false

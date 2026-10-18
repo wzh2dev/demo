@@ -1,9 +1,5 @@
 - name: 配置并启动 kubelet
   block:
-    - name: 设置 apiserver 端点
-      ansible.builtin.set_fact:
-        apiserver_endpoint: "https://{{ hostvars[groups['apiserver'] | first].ansible_host }}:6443"
-
     - name: 生成 kubelet bootstrap kubeconfig
       ansible.builtin.copy:
         dest: /cluster/k8s/kubelet-bootstrap.kubeconfig
@@ -13,7 +9,7 @@
           clusters:
             - name: local
               cluster:
-                server: {{ apiserver_endpoint }}
+                server: {{ api_server }}
                 certificate-authority: /cluster/pki/k8s/k8s.crt
           users:
             - name: kubelet-bootstrap
@@ -33,6 +29,7 @@
           apiVersion: kubelet.config.k8s.io/v1beta1
           kind: KubeletConfiguration
           containerRuntimeEndpoint: unix:///run/containerd/containerd.sock
+          cgroupDriver: systemd
           rotateCertificates: true
           serverTLSBootstrap: true
           authentication:
@@ -69,12 +66,11 @@
     - name: 等待节点完成注册
       ansible.builtin.command: >-
         /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
-        get nodes -o jsonpath={.items[*].metadata.name}
+        get node {{ inventory_hostname }} -o name
       register: node_registered
-      until: groups['kubelet'] | difference(node_registered.stdout.split()) | length == 0
+      until: node_registered.rc == 0
       retries: 30
       delay: 5
       changed_when: false
-      delegate_to: "localhost"
-      run_once: true
+      delegate_to: localhost
       become: false

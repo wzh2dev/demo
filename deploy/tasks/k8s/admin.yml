@@ -1,9 +1,5 @@
 - name: 生成 admin kubeconfig
   block:
-    - name: 构建 kube-apiserver 访问地址
-      ansible.builtin.set_fact:
-        apiserver_endpoint: "https://{{ hostvars[groups['apiserver'] | first].ansible_host }}:6443"
-
     - name: 生成 admin kubeconfig
       ansible.builtin.copy:
         dest: /cluster/k8s/admin.kubeconfig
@@ -13,7 +9,7 @@
           clusters:
             - name: local
               cluster:
-                server: {{ apiserver_endpoint }}
+                server: {{ api_server }}
                 certificate-authority: /cluster/pki/k8s/k8s.crt
           users:
             - name: admin

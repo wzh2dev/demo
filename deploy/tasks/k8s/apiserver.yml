@@ -63,6 +63,8 @@
         --v=2"
       when: apiserver_tmux_session.rc != 0
 
+- name: 验证 kube-apiserver 完成引导并注册节点
+  block:
     - name: 等待 kube-apiserver 健康检查通过
       ansible.builtin.command: >
         curl -fsS --cacert /cluster/pki/k8s/k8s.crt
