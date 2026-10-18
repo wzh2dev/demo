@@ -1,0 +1,5 @@
+- name: 部署 Calico
+  hosts: localhost
+  tags: [calico]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/calico.yml

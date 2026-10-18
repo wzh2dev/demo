@@ -7,3 +7,5 @@
 - ansible.builtin.import_playbook: playbooks/04_etcd.yml
 
 - ansible.builtin.import_playbook: playbooks/05_k8s.yml
+
+- ansible.builtin.import_playbook: playbooks/06_calico.yml

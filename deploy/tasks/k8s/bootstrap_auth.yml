@@ -23,6 +23,20 @@
           --kubeconfig=/cluster/k8s/admin.kubeconfig
           apply -f /cluster/k8s/bootstrap-token-secret.yaml
 
+    - name: 查询 bootstrap token 列表
+      ansible.builtin.command:
+        cmd: >-
+          /cluster/k8s/client/bin/kubectl
+          --kubeconfig=/cluster/k8s/admin.kubeconfig
+          get secrets -n kube-system
+          --field-selector type=bootstrap.kubernetes.io/token
+      register: bootstrap_token_list
+      changed_when: false
+
+    - name: 显示 bootstrap token 列表
+      ansible.builtin.debug:
+        var: bootstrap_token_list.stdout_lines
+
     - name: 生成 bootstrap 授权及 CSR 自动审批清单文件
       ansible.builtin.copy:
         dest: /cluster/k8s/bootstrap-rbac.yaml
@@ -31,14 +45,14 @@
           apiVersion: rbac.authorization.k8s.io/v1
           kind: ClusterRoleBinding
           metadata:
-            name: kubelet-bootstrap
+            name: create-csrs-for-bootstrapping
           roleRef:
             apiGroup: rbac.authorization.k8s.io
             kind: ClusterRole
             name: system:node-bootstrapper
           subjects:
-            - apiGroup: rbac.authorization.k8s.io
-              kind: Group
+            - kind: Group
+              apiGroup: rbac.authorization.k8s.io
               name: system:bootstrappers
           ---
           # 2. 自动批准首次 node client 证书
@@ -51,22 +65,22 @@
             kind: ClusterRole
             name: system:certificates.k8s.io:certificatesigningrequests:nodeclient
           subjects:
-            - apiGroup: rbac.authorization.k8s.io
-              kind: Group
+            - kind: Group
+              apiGroup: rbac.authorization.k8s.io
               name: system:bootstrappers
           ---
           # 3. 自动批准客户端证书轮换
           apiVersion: rbac.authorization.k8s.io/v1
           kind: ClusterRoleBinding
           metadata:
-            name: auto-approve-csrs-selfnodeclient
+            name: auto-approve-renewals-for-nodes
           roleRef:
             apiGroup: rbac.authorization.k8s.io
             kind: ClusterRole
             name: system:certificates.k8s.io:certificatesigningrequests:selfnodeclient
           subjects:
-            - apiGroup: rbac.authorization.k8s.io
-              kind: Group
+            - kind: Group
+              apiGroup: rbac.authorization.k8s.io
               name: system:nodes
 
     - name: 创建 bootstrap 授权及 CSR 自动审批绑定
@@ -75,3 +89,16 @@
           /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
           apply -f /cluster/k8s/bootstrap-rbac.yaml
+
+    - name: 查询 ClusterRoleBinding 列表
+      ansible.builtin.command:
+        cmd: >-
+          /cluster/k8s/client/bin/kubectl
+          --kubeconfig=/cluster/k8s/admin.kubeconfig
+          get clusterrolebinding
+      register: clusterrolebinding_list
+      changed_when: false
+
+    - name: 显示 ClusterRoleBinding 列表
+      ansible.builtin.debug:
+        var: clusterrolebinding_list.stdout_lines
