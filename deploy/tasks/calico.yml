@@ -4,28 +4,31 @@
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/tigera-operator.yaml
         dest: /cluster/k8s/tigera-operator.yaml
+      environment:
+        https_proxy: "http://10.0.0.1:7897"
 
     - name: 部署 Tigera Operator
       ansible.builtin.command:
         cmd: >-
           /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
-          apply -f /cluster/k8s/tigera-operator.yaml
+          apply --server-side -f /cluster/k8s/tigera-operator.yaml
+      register: tigera_operator_result
+      changed_when: "'unchanged' not in tigera_operator_result.stdout"
 
     - name: 等待 tigera-operator 就绪
       ansible.builtin.command: >-
         /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
-        get pods -n tigera-operator -l name=tigera-operator
-        -o jsonpath={.items[*].status.containerStatuses[*].ready}
+        rollout status deployment/tigera-operator -n tigera-operator --timeout=60s
       register: tigera_operator_ready
-      until: tigera_operator_ready.stdout.split() | length == 1 and 'false' not in tigera_operator_ready.stdout.split()
+      until: tigera_operator_ready.rc == 0
       retries: 30
-      delay: 5
+      delay: 10
       changed_when: false
 
 - name: 部署 Calico
   block:
-    # Pod 网段与 kube-proxy 的 clusterCIDR 保持一致
+    # Pod 网段与 kube-proxy 的 clusterCIDR、controller-manager 的 --cluster-cidr 保持一致
     - name: 生成 Installation 自定义资源清单
       ansible.builtin.copy:
         dest: /cluster/k8s/calico-installation.yaml
@@ -37,8 +40,9 @@
           spec:
             calicoNetwork:
               ipPools:
-                - blockSize: 26
-                  cidr: 192.168.2.0/24
+                - name: default-ipv4-ippool
+                  blockSize: {{ pod_cidr_mask_size }}
+                  cidr: {{ pod_cidr }}
                   encapsulation: VXLANCrossSubnet
                   natOutgoing: Enabled
                   nodeSelector: all()
@@ -54,25 +58,27 @@
       until: calico_installation_result.rc == 0
       retries: 10
       delay: 3
+      changed_when: >-
+        'created' in calico_installation_result.stdout
+        or 'configured' in calico_installation_result.stdout
 
+    # Operator 自 v3.20 起将 Calico 组件部署在 calico-system 命名空间
     - name: 等待 calico-node 就绪
       ansible.builtin.command: >-
         /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
-        get pods -n kube-system -l k8s-app=calico-node
-        -o jsonpath={.items[*].status.containerStatuses[*].ready}
+        rollout status daemonset/calico-node -n calico-system --timeout=60s
       register: calico_node_ready
-      until: calico_node_ready.stdout.split() | length == groups['kubelet'] | length and 'false' not in calico_node_ready.stdout.split()
+      until: calico_node_ready.rc == 0
       retries: 30
-      delay: 5
+      delay: 10
       changed_when: false
 
     - name: 等待 calico-kube-controllers 就绪
       ansible.builtin.command: >-
         /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
-        get pods -n kube-system -l k8s-app=calico-kube-controllers
-        -o jsonpath={.items[*].status.containerStatuses[*].ready}
+        rollout status deployment/calico-kube-controllers -n calico-system --timeout=60s
       register: calico_controllers_ready
-      until: calico_controllers_ready.stdout.split() | length == 1 and 'false' not in calico_controllers_ready.stdout.split()
+      until: calico_controllers_ready.rc == 0
       retries: 30
-      delay: 5
+      delay: 10
       changed_when: false
