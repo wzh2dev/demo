@@ -47,12 +47,6 @@
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/kubelet.yml
 
-- name: 审批 kubelet serving 证书 CSR
-  hosts: localhost
-  tags: [k8s, approve]
-  tasks:
-    - ansible.builtin.import_tasks: ../tasks/k8s/approve_serving_csr.yml
-
 - name: 部署 kube-proxy
   hosts: kube_proxy
   become: true
