@@ -32,3 +32,5 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 ```bash
 ansible kubelet -b -m shell -a "rm -f /var/lib/kubelet/pki/kubelet.crt /var/lib/kubelet/pki/kubelet.key; tmux kill-session -t kubelet"
 ```
+
+Warning  FailedCreatePodSandBox  78s (x188 over 41m)  kubelet  Failed to create pod sandbox: rpc error: code = InvalidArgument desc = failed to create containerd container: create container failed validation: container.Runtime.Name must be set: invalid argument
