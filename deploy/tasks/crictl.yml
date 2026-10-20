@@ -12,6 +12,8 @@
       delegate_to: localhost
       run_once: true
       become: false
+      environment:
+        https_proxy: "http://10.0.0.1:7897"
 
     - name: 解压 crictl 到 /cluster/crictl
       ansible.builtin.unarchive:
