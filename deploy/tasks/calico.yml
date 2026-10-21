@@ -52,12 +52,9 @@
           --kubeconfig=/cluster/k8s/admin.kubeconfig
           apply -f /cluster/k8s/calico-installation.yaml
       register: calico_installation_result
-      until: calico_installation_result.rc == 0
       retries: 10
       delay: 3
-      changed_when: >-
-        'created' in calico_installation_result.stdout
-        or 'configured' in calico_installation_result.stdout
+      changed_when: "'unchanged' not in calico_installation_result.stdout"
 
     # Operator 自 v3.20 起将 Calico 组件部署在 calico-system 命名空间
     - name: 等待 calico-node 就绪

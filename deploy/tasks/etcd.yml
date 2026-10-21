@@ -106,5 +106,4 @@
         --cacert=/cluster/pki/etcd/etcd.crt
         --cert=/cluster/pki/etcd/client.crt
         --key=/cluster/pki/etcd/client.key
-
       changed_when: false

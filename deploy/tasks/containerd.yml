@@ -78,9 +78,7 @@
 
     - name: 等待 containerd 接口就绪
       ansible.builtin.command: >
-        /cluster/containerd/bin/ctr
-        --address /run/containerd/containerd.sock
-        version
+        /cluster/containerd/bin/ctr version
       register: containerd_health
       until: containerd_health.rc == 0
       retries: 20
