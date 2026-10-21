@@ -47,16 +47,17 @@
           subjectAltName         = @alt_names
 
           [ alt_names ]
-          DNS.1  = localhost
-          DNS.2  = {{ item }}
-          DNS.3  = {{ item }}.wuzhenhua.com
-          DNS.4  = kubernetes
-          DNS.5  = kubernetes.default
-          DNS.6  = kubernetes.default.svc
-          DNS.7  = kubernetes.default.svc.wuzhenhua.com
-          IP.1   = 127.0.0.1
-          IP.2   = {{ hostvars[item].ansible_host }}
-          IP.3   = 192.168.3.1
+          DNS.1 = localhost
+          DNS.2 = wuzhenhua.com
+          DNS.3 = {{ item }}
+          DNS.4 = {{ item }}.wuzhenhua.com
+          DNS.6 = kubernetes
+          DNS.7 = kubernetes.default
+          DNS.8 = kubernetes.default.svc
+          DNS.9 = kubernetes.default.svc.wuzhenhua.com
+          IP.1  = 127.0.0.1
+          IP.2  = {{ hostvars[item].ansible_host }}
+          IP.3  = 192.168.3.1
       loop: "{{ groups['apiserver'] }}"
 
     - name: 使用 k8s 中间 CA 签发各 kube-apiserver 成员的 server 证书
