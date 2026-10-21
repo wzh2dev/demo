@@ -41,7 +41,7 @@
     }
   ],
   "maven.view": "hierarchical",
-  "python.defaultInterpreterPath": "E:\\python-3.8.9\\python",
+  "python.defaultInterpreterPath": "/cluster/uv/uvx python",
   "extensions": {
     "ignoreRecommendations": true,
     "showRecommendationsOnlyOnDemand": false
@@ -95,5 +95,6 @@
       "username": "root",
       "password": "root"
     }
-  ]
+  ],
+  "ansible.ansibleNavigator.path": "/cluster/uv/uvx ansible-navigator"
 }
