@@ -49,8 +49,9 @@
           [ alt_names ]
           DNS.1 = localhost
           DNS.2 = wuzhenhua.com
-          DNS.3 = {{ item }}
-          DNS.4 = {{ item }}.wuzhenhua.com
+          DNS.3 = xueyingying.com
+          DNS.4 = {{ item }}
+          DNS.5 = {{ item }}.wuzhenhua.com
           DNS.6 = kubernetes
           DNS.7 = kubernetes.default
           DNS.8 = kubernetes.default.svc
