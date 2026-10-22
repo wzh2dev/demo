@@ -58,7 +58,7 @@
           DNS.9 = kubernetes.default.svc.wuzhenhua.com
           IP.1  = 127.0.0.1
           IP.2  = {{ hostvars[item].ansible_host }}
-          IP.3  = 192.168.3.1
+          IP.3  = {{ kubernetes_service_ip }}
       loop: "{{ groups['apiserver'] }}"
 
     - name: 使用 k8s 中间 CA 签发各 kube-apiserver 成员的 server 证书

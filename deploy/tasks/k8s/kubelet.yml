@@ -41,7 +41,7 @@
             mode: Webhook
           clusterDomain: wuzhenhua.com
           clusterDNS:
-            - 192.168.3.10
+            - {{ cluster_dns }}
 
     - name: 检查 kubelet 的 tmux 会话是否存在
       ansible.builtin.command: tmux has-session -t kubelet

@@ -1,0 +1,5 @@
+- name: 部署 CoreDNS
+  hosts: localhost
+  tags: [coredns]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/coredns.yml
