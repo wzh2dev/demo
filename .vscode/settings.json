@@ -96,5 +96,6 @@
       "password": "root"
     }
   ],
-  "ansible.ansibleNavigator.path": "/cluster/uv/uvx ansible-navigator"
+  "ansible.ansibleNavigator.path": "/cluster/uv/uvx ansible-navigator",
+  "ansible.validation.lint.enabled": false
 }

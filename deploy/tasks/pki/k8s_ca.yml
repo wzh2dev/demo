@@ -104,23 +104,23 @@
       default_ca = ca_default
 
       [ ca_default ]
-      dir               = /cluster/pki/k8s
-      crl_dir           = $dir/crl
-      new_certs_dir     = $dir/newcerts
-      database          = $dir/index.txt
-      serial            = $dir/serial
-      crlnumber         = $dir/crlnumber
+      dir             = /cluster/pki/k8s
+      crl_dir         = $dir/crl
+      new_certs_dir   = $dir/newcerts
+      database        = $dir/index.txt
+      serial          = $dir/serial
+      crlnumber       = $dir/crlnumber
 
-      policy            = policy_strict
+      policy          = policy_strict
 
-      unique_subject    = yes
-      copy_extensions   = none
+      unique_subject  = yes
+      copy_extensions = none
 
       [ policy_strict ]
-      countryName             = match
-      stateOrProvinceName     = match
-      localityName            = match
-      organizationName        = supplied
-      organizationalUnitName  = match
-      commonName              = supplied
-      emailAddress            = optional
+      countryName            = match
+      stateOrProvinceName    = match
+      localityName           = match
+      organizationName       = supplied
+      organizationalUnitName = match
+      commonName             = supplied
+      emailAddress           = optional
