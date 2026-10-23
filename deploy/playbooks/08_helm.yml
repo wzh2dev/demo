@@ -1,0 +1,5 @@
+- name: 安装 helm
+  hosts: localhost
+  tags: [helm]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/helm.yml

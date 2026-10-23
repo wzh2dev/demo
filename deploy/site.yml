@@ -11,3 +11,5 @@
 - ansible.builtin.import_playbook: playbooks/06_calico.yml
 
 - ansible.builtin.import_playbook: playbooks/07_coredns.yml
+
+- ansible.builtin.import_playbook: playbooks/08_helm.yml
