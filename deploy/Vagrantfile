@@ -28,4 +28,28 @@ Vagrant.configure("2") do |config|
       node.vm.network "private_network", ip: ip
     end
   end
+
+  config.vm.define "client" do |client|
+    client.vm.hostname = "client"
+    client.vm.network "private_network", ip: "10.0.0.100"
+
+    client.vm.provision "ansible_local" do |ansible|
+      ansible.playbook = "site.yml"
+      ansible.host_vars = {
+        "node1" => { "ansible_host" => "10.0.0.101" },
+        "node2" => { "ansible_host" => "10.0.0.102" },
+        "node3" => { "ansible_host" => "10.0.0.103" }
+      }
+      ansible.limit = "all"
+      ansible.groups = {
+        "nodes"              => ["node1", "node2", "node3"],
+        "etcd"               => ["node1", "node2", "node3"],
+        "apiserver"          => ["node1", "node2"],
+        "controller_manager" => ["node1", "node2"],
+        "scheduler"          => ["node1", "node2"],
+        "kubelet"            => ["node1", "node2", "node3"],
+        "kube_proxy"         => ["node1", "node2", "node3"]
+      }
+    end
+  end
 end
