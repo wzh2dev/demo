@@ -1,0 +1,12 @@
+- name: 安装启动 keepalived
+  hosts: apiserver
+  become: true
+  tags: [keepalived]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/keepalived.yml
+
+  handlers:
+    - name: 重启 keepalived
+      ansible.builtin.service:
+        name: keepalived
+        state: restarted
