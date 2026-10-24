@@ -7,12 +7,12 @@
           apiVersion: v1
           kind: Secret
           metadata:
-            name: bootstrap-token-000001
+            name: bootstrap-token-abcdef
             namespace: kube-system
           type: bootstrap.kubernetes.io/token
           stringData:
-            token-id: "000001"
-            token-secret: "0000000000000001"
+            token-id: "abcdef"
+            token-secret: "abcdef.0123456789abcdef"
             usage-bootstrap-authentication: "true"
             usage-bootstrap-signing: "false"
 

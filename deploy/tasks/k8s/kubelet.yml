@@ -14,7 +14,7 @@
           users:
             - name: kubelet-bootstrap
               user:
-                token: "000001.0000000000000001"
+                token: "abcdef.0123456789abcdef"
           contexts:
             - name: kubelet-bootstrap@local
               context:
