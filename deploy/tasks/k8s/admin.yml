@@ -3,6 +3,7 @@
     - name: 生成 admin kubeconfig
       ansible.builtin.copy:
         dest: /cluster/k8s/admin.kubeconfig
+        mode: "0600"
         content: |
           apiVersion: v1
           kind: Config
