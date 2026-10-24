@@ -59,6 +59,7 @@
           IP.1  = 127.0.0.1
           IP.2  = {{ hostvars[item].ansible_host }}
           IP.3  = {{ kubernetes_service_ip }}
+          IP.4  = {{ keepalived_vip }}
       loop: "{{ groups['apiserver'] }}"
 
     - name: 使用 k8s 中间 CA 签发各 kube-apiserver 成员的 server 证书
