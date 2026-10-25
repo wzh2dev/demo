@@ -59,7 +59,6 @@
   ansible.builtin.file:
     path: /cluster/pki/root/index.txt
     state: touch
-    mode: "0600"
     modification_time: preserve
     access_time: preserve
 
@@ -67,7 +66,6 @@
   ansible.builtin.copy:
     content: "1000"
     dest: "{{ item }}"
-    mode: "0600"
     force: false
   loop:
     - /cluster/pki/root/serial
