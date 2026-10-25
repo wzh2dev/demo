@@ -1,0 +1,36 @@
+- name: 结束 tmux 中的 k8s 常驻进程
+  ansible.builtin.command: tmux kill-session -t {{ item }}
+  loop:
+    - kubelet
+    - kube-proxy
+    - apiserver
+    - controller-manager
+    - scheduler
+    - etcd
+  failed_when: false
+
+- name: 清理 containerd 中旧集群的容器与沙箱
+  ansible.builtin.shell: |
+    /cluster/crictl/crictl ps -a -q | xargs -r /cluster/crictl/crictl rm -f
+    /cluster/crictl/crictl pods -q | xargs -r /cluster/crictl/crictl rmp -f
+  failed_when: false
+
+- name: 移除 k8s 相关目录
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /cluster/k8s
+    - /cluster/helm
+    - /cluster/pki
+    - /data/etcd
+    - /var/lib/kubelet
+    - /etc/cni
+    - /var/lib/cni
+    - /var/lib/calico
+    - /var/run/calico
+
+- name: 移除 etcd 部署时生成的配置文件（保留 etcd / etcdctl 安装文件）
+  ansible.builtin.file:
+    path: /cluster/etcd/etcd.config.yml
+    state: absent

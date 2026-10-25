@@ -1,45 +1,33 @@
 - name: 卸载 keepalived
   hosts: apiserver
   become: true
-  tags: [reset, stop, keepalived]
+  tags: [reset, keepalived]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/reset/keepalived.yml
 
-- name: 停止 k8s 常驻进程
+- name: 重置节点
   hosts: nodes
   become: true
-  tags: [reset, stop]
+  tags: [reset, nodes]
   tasks:
-    - ansible.builtin.import_tasks: ../tasks/reset/stop_components.yml
-
-- name: 清理节点上的 k8s 数据、二进制与证书
-  hosts: nodes
-  become: true
-  tags: [reset, cleanup]
-  tasks:
-    - ansible.builtin.import_tasks: ../tasks/reset/cleanup_nodes.yml
+    - ansible.builtin.import_tasks: ../tasks/reset/reset_nodes.yml
 
 - name: 清理控制机本地残留
   hosts: localhost
   become: true
-  tags: [reset, cleanup, control]
+  tags: [reset, control]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/reset/cleanup_control.yml
 
-- name: 重启节点以清除内核态残留
+- name: 重启节点并验证
   hosts: nodes
   become: true
-  tags: [reset, reboot]
+  tags: [reset, reboot, verify]
   tasks:
     - name: 重启节点
       ansible.builtin.reboot:
         reboot_timeout: 600
 
-- name: 验证重置结果
-  hosts: nodes
-  become: true
-  tags: [reset, verify]
-  tasks:
     - name: 检查 tmux 会话、剩余目录与 keepalived 状态
       ansible.builtin.shell: |
         tmux ls 2>/dev/null || echo "无 tmux 会话"
