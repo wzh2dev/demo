@@ -30,12 +30,14 @@
 
 - name: 准备管理面
   hosts: localhost
+  become: true
   tags: [k8s, admin]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/admin.yml
 
 - name: 准备 kubelet TLS Bootstrap 集群资源
   hosts: localhost
+  become: true
   tags: [k8s, bootstrap]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/k8s/bootstrap_auth.yml

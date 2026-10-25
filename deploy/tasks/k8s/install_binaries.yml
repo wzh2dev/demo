@@ -11,7 +11,6 @@
         state: directory
       delegate_to: localhost
       run_once: true
-      become: false
 
     - name: 下载 Kubernetes 客户端安装包
       ansible.builtin.get_url:
@@ -30,7 +29,6 @@
         creates: /cluster/k8s/client/bin/kubectl
       delegate_to: localhost
       run_once: true
-      become: false
 
 - name: 安装 Kubernetes 节点二进制文件
   block:

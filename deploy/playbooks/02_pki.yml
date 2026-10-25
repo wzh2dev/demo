@@ -1,5 +1,6 @@
 - name: 初始化 CA 和节点证书
   hosts: localhost
+  become: true
   tags: [pki]
   tasks:
     - name: 初始化并校验根 CA
