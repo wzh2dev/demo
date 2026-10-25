@@ -42,6 +42,10 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull docker.io/calico/kube-controllers:v3.27.5'
 ```
 
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/coredns/coredns:v1.10.1'
+```
+
 ## 手动签发 kubelet serving 证书
 
 ### 1. 查看待审批的 serving CSR
@@ -62,16 +66,10 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 - 需要强制重新走一遍签发流程时（例如证书丢失或想验证首次部署路径），先删掉 kubelet 本地的 serving 证书并重启 kubelet：
 
 ```bash
-ansible kubelet -b -m shell -a "rm -f /var/lib/kubelet/pki/kubelet.crt /var/lib/kubelet/pki/kubelet.key; tmux kill-session -t kubelet"
+ansible kubelet -b -m shell -a "rm -f /data/kubelet/pki/kubelet.crt /data/kubelet/pki/kubelet.key; tmux kill-session -t kubelet"
 ```
 
 ## 验证 CoreDNS
-
-### 1. 拉取 coredns 镜像
-
-```bash
-ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/coredns/coredns:v1.10.1'
-```
 
 ### 1. 查看 coredns pod 与 kube-dns Service
 
@@ -148,3 +146,62 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 ```bash
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get events -n calico-system --field-selector reason=Unhealthy | tail -n 10
 ```
+
+## 清理 k8s
+
+### 1. 停止并禁用 keepalived
+
+```bash
+ansible apiserver -b -m shell -a 'systemctl disable --now keepalived'
+ansible apiserver -b -m file -a 'path=/etc/keepalived/keepalived.conf state=absent'
+```
+
+### 2. 清理 containerd 中旧集群的容器与沙箱
+
+```bash
+ansible nodes -b -m shell -a '/cluster/crictl/crictl ps -a -q | xargs -r /cluster/crictl/crictl rm -f; /cluster/crictl/crictl pods -q | xargs -r /cluster/crictl/crictl rmp -f; true'
+```
+
+### 3. 停止所有 tmux 会话
+
+```bash
+ansible nodes -b -m shell -a 'tmux kill-server 2>/dev/null; true'
+```
+
+### 4. 删除节点上的 k8s 二进制、证书、数据与配置
+
+```bash
+ansible nodes -b -m shell -a 'rm -rf /cluster/k8s /cluster/helm /cluster/pki /data/etcd /data/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
+```
+
+### 5. 删除控制机上的 kubectl、证书签发源与 helm
+
+```bash
+ansible localhost -b -m shell -a 'rm -rf /cluster/pki'
+```
+
+### 6. 重启节点，清除 containerd-shim、netns、iptables 等内核态残留
+
+```bash
+ansible nodes -b -m reboot
+```
+
+### 7. 验证
+
+```bash
+ansible nodes -b -m shell -a 'tmux ls || true; ls -d /cluster/* /data/*; systemctl is-enabled keepalived 2>&1; true'
+```
+
+预期：`/cluster` 下只剩 `containerd`、`crictl`、`etcd`、`runc`；`/data` 下只剩 `containerd`；keepalived 为 `disabled`。
+
+### 说明
+
+- 保留：`/cluster/containerd`、`/cluster/runc`、`/cluster/crictl`、`/etc/containerd/config.toml`、`/data/containerd`（含镜像）、`/cluster/etcd/{etcd,etcdctl}`。
+- 清除：`/cluster/k8s` 全部二进制与 kubeconfig、`/cluster/pki` 证书、etcd 数据 `/data/etcd` 与配置、kubelet 数据 `/data/kubelet`、CNI 与 Calico 残留、`/etc/crictl.yaml`。
+- 重启后 containerd 与 etcd 保持停止（均由 tmux 启动，无 systemd 单元），需要时重新部署：
+
+```bash
+ansible-playbook site.yml
+```
+
+- `/etc/hosts` 里的集群主机名映射、swap、SELinux、yum 源等系统级变更由 base 角色写入，不在清理范围内。
