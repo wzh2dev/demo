@@ -2,6 +2,23 @@
 
 ## 快捷命令
 
+### 同步 PKI 产物到客户机（在 Windows 宿主机执行）
+```bash
+vagrant rsync client
+```
+
+### 重新配置客户机（在 Windows 宿主机执行）
+```bash
+vagrant provision client
+```
+
+### 拉取 PKI 产物到宿主机（在 Windows 宿主机执行）
+```cmd
+vagrant ssh client -c "sudo cat /cluster/pki/k8s/k8s.crt" > k8s.crt
+vagrant ssh client -c "sudo cat /cluster/pki/k8s/admin-client.crt" > admin-client.crt
+vagrant ssh client -c "sudo cat /cluster/pki/k8s/admin-client.key" > admin-client.key
+```
+
 ### 查询节点镜像
 
 ```bash
@@ -44,6 +61,14 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 
 ```bash
 ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/coredns/coredns:v1.10.1'
+```
+
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull docker.io/kubernetesui/dashboard:v2.7.0'
+```
+
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull docker.io/kubernetesui/metrics-scraper:v1.0.8'
 ```
 
 ## 手动签发 kubelet serving 证书
@@ -97,25 +122,43 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig logs -n kube-system -l k8s-app=kube-dns --tail=50
 ```
 
+## 访问 Kubernetes Dashboard
+
+### 1. 在 client 机上启动 kubectl proxy
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig proxy --address=0.0.0.0 --port=8001 --accept-hosts='.*'
+```
+
+### 2. 获取 admin-user 登录 token
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig create token admin-user -n kubernetes-dashboard
+```
+
+默认有效期 1 小时，可用 `--duration=24h` 延长（上限受 kube-apiserver 配置约束）。
+
+### 3. 在 Windows 宿主机浏览器打开
+
+```text
+http://10.0.0.99:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+```
+
+粘贴上一步的 token 登录。
+
+### 4. 验证 Dashboard 与 metrics-scraper
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n kubernetes-dashboard -o wide
+```
+
+### 5. 单独重新部署
+
+```bash
+ansible-playbook playbooks/10_dashboard.yml
+```
+
 ## k8s 学习
-
-### 1. 清理 calico-system 命名空间下的所有 pod
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig delete pod --all -n calico-system
-```
-
-### 2. 查看 calico-system 命名空间下的所有 pod
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n calico-system -o wide
-```
-
-### 3. 查看 calico-system 命名空间下的 calico-typha pod 详情
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig describe pod -l k8s-app=calico-typha -n calico-system
-```
 
 ### 4. 查看 calico-system 命名空间下的 calico-node pod 详情
 

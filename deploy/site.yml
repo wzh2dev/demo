@@ -15,3 +15,5 @@
 - ansible.builtin.import_playbook: playbooks/08_coredns.yml
 
 - ansible.builtin.import_playbook: playbooks/09_helm.yml
+
+- ansible.builtin.import_playbook: playbooks/10_dashboard.yml

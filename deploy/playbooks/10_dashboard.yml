@@ -1,0 +1,6 @@
+- name: 部署 Kubernetes Dashboard
+  hosts: localhost
+  become: true
+  tags: [dashboard]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/dashboard.yml
