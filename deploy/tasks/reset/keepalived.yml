@@ -1,0 +1,12 @@
+# keepalived 由 yum 安装且 enabled=true，重启后会自动启动并抢占 VIP，必须先禁用
+- name: 停止并禁用 keepalived
+  ansible.builtin.service:
+    name: keepalived
+    state: stopped
+    enabled: false
+  failed_when: false
+
+- name: 移除 keepalived 配置
+  ansible.builtin.file:
+    path: /etc/keepalived
+    state: absent

@@ -1,0 +1,8 @@
+- name: 移除控制机上的 k8s 客户端、证书与 helm
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /cluster/k8s
+    - /cluster/pki
+    - /cluster/helm

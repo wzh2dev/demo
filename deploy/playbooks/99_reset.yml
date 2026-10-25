@@ -1,0 +1,56 @@
+- name: 卸载 keepalived
+  hosts: apiserver
+  become: true
+  tags: [reset, stop, keepalived]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/reset/keepalived.yml
+
+- name: 停止 k8s 常驻进程
+  hosts: nodes
+  become: true
+  tags: [reset, stop]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/reset/stop_components.yml
+
+- name: 清理节点上的 k8s 数据、二进制与证书
+  hosts: nodes
+  become: true
+  tags: [reset, cleanup]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/reset/cleanup_nodes.yml
+
+- name: 清理控制机本地残留
+  hosts: localhost
+  become: true
+  tags: [reset, cleanup, control]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/reset/cleanup_control.yml
+
+- name: 重启节点以清除内核态残留
+  hosts: nodes
+  become: true
+  tags: [reset, reboot]
+  tasks:
+    - name: 重启节点
+      ansible.builtin.reboot:
+        reboot_timeout: 600
+
+- name: 验证重置结果
+  hosts: nodes
+  become: true
+  tags: [reset, verify]
+  tasks:
+    - name: 检查 tmux 会话、剩余目录与 keepalived 状态
+      ansible.builtin.shell: |
+        tmux ls 2>/dev/null || echo "无 tmux 会话"
+        ls -d /cluster/* 2>/dev/null || true
+        ls -d /data/* 2>/dev/null || true
+        test -d /cluster/k8s && echo "/cluster/k8s 仍存在" || echo "/cluster/k8s 已删除"
+        test -d /cluster/pki && echo "/cluster/pki 仍存在" || echo "/cluster/pki 已删除"
+        systemctl is-enabled keepalived 2>&1 | tail -n 1
+      register: reset_verify
+      changed_when: false
+
+    - name: 显示重置结果
+      ansible.builtin.debug:
+        var: reset_verify.stdout_lines
