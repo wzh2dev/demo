@@ -12,7 +12,7 @@
           type: bootstrap.kubernetes.io/token
           stringData:
             token-id: "abcdef"
-            token-secret: "abcdef.0123456789abcdef"
+            token-secret: "0123456789abcdef"
             usage-bootstrap-authentication: "true"
             usage-bootstrap-signing: "false"
 

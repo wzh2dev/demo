@@ -1,5 +1,10 @@
 - name: 配置并启动 kubelet
   block:
+    - name: 创建 kubelet 数据目录
+      ansible.builtin.file:
+        path: /data/kubelet
+        state: directory
+
     - name: 生成 kubelet bootstrap kubeconfig
       ansible.builtin.copy:
         dest: /cluster/k8s/kubelet-bootstrap.kubeconfig
@@ -28,6 +33,7 @@
         content: |
           apiVersion: kubelet.config.k8s.io/v1beta1
           kind: KubeletConfiguration
+          rootDir: /data/kubelet
           containerRuntimeEndpoint: unix:///run/containerd/containerd.sock
           cgroupDriver: systemd
           rotateCertificates: true
