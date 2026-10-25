@@ -20,9 +20,6 @@ etcd_servers: "https://node1:2379,https://node2:2379,https://node3:2379"
 api_server: "https://{{ keepalived_vip }}:6443"
 
 keepalived_vip: "10.0.0.100"
-keepalived_interface: "eth1"
-keepalived_router_id: "51"
-keepalived_auth_pass: "wuzhenhua"
 keepalived_priority:
   node1: "100"
   node2: "90"

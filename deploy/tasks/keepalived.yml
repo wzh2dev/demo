@@ -11,16 +11,24 @@
           router_id {{ inventory_hostname }}
       }
 
+      vrrp_script check_apiserver {
+          script "/bin/bash -c 'curl -sfk https://127.0.0.1:6443/healthz -o /dev/null'"
+          interval 2
+          fall 3
+          rise 2
+      }
+
       vrrp_instance VI_1 {
           state BACKUP
-          interface {{ keepalived_interface }}
-          virtual_router_id {{ keepalived_router_id }}
+          interface eth1
+          virtual_router_id 51
           priority {{ keepalived_priority[inventory_hostname] }}
           advert_int 1
+          nopreempt
 
           authentication {
               auth_type PASS
-              auth_pass {{ keepalived_auth_pass }}
+              auth_pass 1111
           }
 
           virtual_ipaddress {
@@ -32,6 +40,10 @@
       {% for host in groups['apiserver'] if host != inventory_hostname %}
               {{ hostvars[host].ansible_host }}
       {% endfor %}
+          }
+
+          track_script {
+              check_apiserver
           }
       }
   notify: 重启 keepalived
