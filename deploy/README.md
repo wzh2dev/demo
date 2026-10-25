@@ -191,17 +191,3 @@ ansible nodes -b -m reboot
 ```bash
 ansible nodes -b -m shell -a 'tmux ls || true; ls -d /cluster/* /data/*; systemctl is-enabled keepalived 2>&1; true'
 ```
-
-预期：`/cluster` 下只剩 `containerd`、`crictl`、`etcd`、`runc`；`/data` 下只剩 `containerd`；keepalived 为 `disabled`。
-
-### 说明
-
-- 保留：`/cluster/containerd`、`/cluster/runc`、`/cluster/crictl`、`/etc/containerd/config.toml`、`/data/containerd`（含镜像）、`/cluster/etcd/{etcd,etcdctl}`。
-- 清除：`/cluster/k8s` 全部二进制与 kubeconfig、`/cluster/pki` 证书、etcd 数据 `/data/etcd` 与配置、kubelet 数据 `/data/kubelet`、CNI 与 Calico 残留、`/etc/crictl.yaml`。
-- 重启后 containerd 与 etcd 保持停止（均由 tmux 启动，无 systemd 单元），需要时重新部署：
-
-```bash
-ansible-playbook site.yml
-```
-
-- `/etc/hosts` 里的集群主机名映射、swap、SELinux、yum 源等系统级变更由 base 角色写入，不在清理范围内。
