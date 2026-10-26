@@ -1,0 +1,72 @@
+- name: 部署 MetalLB
+  block:
+    - name: 下载 MetalLB 清单文件
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/metallb/metallb/v{{ metallb_version }}/config/manifests/metallb-native.yaml
+        dest: /cluster/k8s/metallb.yaml
+      environment:
+        https_proxy: "http://10.0.0.1:7897"
+
+    - name: 应用 MetalLB 清单
+      ansible.builtin.command:
+        cmd: >-
+          /cluster/k8s/client/bin/kubectl
+          --kubeconfig=/cluster/k8s/admin.kubeconfig
+          apply -f /cluster/k8s/metallb.yaml
+      register: metallb_apply_result
+      changed_when: "'unchanged' not in metallb_apply_result.stdout"
+
+    - name: 等待 metallb-controller 就绪
+      ansible.builtin.command: >-
+        /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
+        rollout status deployment/controller -n metallb-system --timeout=60s
+      register: metallb_controller_ready
+      until: metallb_controller_ready.rc == 0
+      retries: 30
+      delay: 10
+      changed_when: false
+
+    - name: 等待 metallb-speaker 就绪
+      ansible.builtin.command: >-
+        /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
+        rollout status daemonset/speaker -n metallb-system --timeout=60s
+      register: metallb_speaker_ready
+      until: metallb_speaker_ready.rc == 0
+      retries: 30
+      delay: 10
+      changed_when: false
+
+# 清单只装 CRD 与组件，地址池与通告需要另建自定义资源
+# 采用 L2 模式：由选中节点应答 VIP 的 ARP，无需 BGP 路由器
+- name: 配置 MetalLB 地址池
+  block:
+    - name: 生成地址池与 L2 通告清单
+      ansible.builtin.copy:
+        dest: /cluster/k8s/metallb-config.yaml
+        content: |
+          apiVersion: metallb.io/v1beta1
+          kind: IPAddressPool
+          metadata:
+            name: default-pool
+            namespace: metallb-system
+          spec:
+            addresses:
+              - {{ metallb_address_pool }}
+          ---
+          apiVersion: metallb.io/v1beta1
+          kind: L2Advertisement
+          metadata:
+            name: default
+            namespace: metallb-system
+          spec:
+            ipAddressPools:
+              - default-pool
+
+    - name: 应用地址池与 L2 通告
+      ansible.builtin.command:
+        cmd: >-
+          /cluster/k8s/client/bin/kubectl
+          --kubeconfig=/cluster/k8s/admin.kubeconfig
+          apply -f /cluster/k8s/metallb-config.yaml
+      register: metallb_config_result
+      changed_when: "'unchanged' not in metallb_config_result.stdout"

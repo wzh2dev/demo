@@ -18,6 +18,8 @@
 
 - ansible.builtin.import_playbook: playbooks/10_metrics_server.yml
 
-- ansible.builtin.import_playbook: playbooks/11_ingress.yml
+- ansible.builtin.import_playbook: playbooks/11_metallb.yml
 
-- ansible.builtin.import_playbook: playbooks/12_dashboard.yml
+- ansible.builtin.import_playbook: playbooks/12_ingress.yml
+
+- ansible.builtin.import_playbook: playbooks/13_dashboard.yml

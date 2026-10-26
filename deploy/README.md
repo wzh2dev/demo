@@ -86,6 +86,14 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/metrics-server/metrics-server:v0.7.2'
 ```
 
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull quay.io/metallb/controller:v0.14.9'
+```
+
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull quay.io/metallb/speaker:v0.14.9'
+```
+
 ## 手动签发 kubelet serving 证书
 
 ### 1. 查看待审批的 serving CSR
@@ -136,6 +144,36 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 ```bash
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig logs -n kube-system -l k8s-app=kube-dns --tail=50
 ```
+
+## 验证 MetalLB 与 ingress-nginx
+
+### 1. 查看 MetalLB 组件状态
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n metallb-system -o wide
+```
+
+### 2. 查看地址池与 L2 通告
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get ipaddresspool,l2advertisement -n metallb-system
+```
+
+### 3. 查看 ingress-nginx-controller 分配到的 VIP
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get svc ingress-nginx-controller -n ingress-nginx
+```
+
+EXTERNAL-IP 由 `<pending>` 变为 `metallb_address_pool` 中的 IP 即为成功。
+
+### 4. 从宿主机验证 VIP 可达
+
+```bash
+curl -I http://<上一步查到的 EXTERNAL-IP>
+```
+
+返回 `404` 属正常：请求已到达 ingress-nginx，只是还没有匹配的 Ingress 规则。
 
 ## 访问 Kubernetes Dashboard
 
