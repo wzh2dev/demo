@@ -26,6 +26,14 @@
         - sa.key
         - sa.pub
 
+    - name: 分发 front-proxy 客户端证书及私钥
+      ansible.builtin.copy:
+        src: /cluster/pki/front-proxy/front-proxy-client.{{ item }}
+        dest: /cluster/pki/front-proxy/
+      loop:
+        - crt
+        - key
+
 - name: 部署 kube-apiserver
   block:
     - name: 检查 kube-apiserver 的 tmux 会话是否存在
@@ -52,6 +60,13 @@
         --kubelet-client-certificate=/cluster/pki/k8s/apiserver-kubelet-client.crt
         --kubelet-client-key=/cluster/pki/k8s/apiserver-kubelet-client.key
         --kubelet-preferred-address-types=InternalIP,Hostname,ExternalIP
+        --requestheader-client-ca-file=/cluster/pki/front-proxy/front-proxy-ca.crt
+        --requestheader-allowed-names=front-proxy-client
+        --requestheader-username-headers=X-Remote-User
+        --requestheader-group-headers=X-Remote-Group
+        --requestheader-extra-headers-prefix=X-Remote-Extra-
+        --proxy-client-cert-file=/cluster/pki/front-proxy/front-proxy-client.crt
+        --proxy-client-key-file=/cluster/pki/front-proxy/front-proxy-client.key
         --service-account-key-file=/cluster/pki/k8s/sa.pub
         --service-account-signing-key-file=/cluster/pki/k8s/sa.key
         --service-account-issuer=https://kubernetes.default.svc.wuzhenhua.com

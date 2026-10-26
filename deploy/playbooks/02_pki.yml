@@ -12,6 +12,9 @@
     - name: 初始化并校验 k8s 中间 CA
       ansible.builtin.import_tasks: ../tasks/pki/k8s_ca.yml
 
+    - name: 初始化并校验 front-proxy 中间 CA
+      ansible.builtin.import_tasks: ../tasks/pki/front_proxy_ca.yml
+
     - name: 签发并校验 etcd 相关证书
       ansible.builtin.import_tasks: ../tasks/pki/etcd_certificates.yml
 
@@ -33,6 +36,9 @@
     - name: 签发并校验 admin 客户端证书
       ansible.builtin.import_tasks: ../tasks/pki/admin_certificates.yml
 
+    - name: 签发并校验 front-proxy 客户端证书
+      ansible.builtin.import_tasks: ../tasks/pki/front_proxy_certificates.yml
+
 - name: 分发公共 CA 证书
   hosts: nodes
   become: true
@@ -46,6 +52,7 @@
         - /cluster/pki/root
         - /cluster/pki/etcd
         - /cluster/pki/k8s
+        - /cluster/pki/front-proxy
   tasks:
     - name: 分发 CA 证书
       ansible.builtin.import_tasks: ../tasks/pki/distribute_ca.yml

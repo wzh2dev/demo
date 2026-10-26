@@ -1,0 +1,69 @@
+- name: 签发并校验 front-proxy 客户端证书
+  block:
+    - name: 生成 front-proxy 客户端证书私钥
+      ansible.builtin.command: openssl genrsa -out /cluster/pki/front-proxy/front-proxy-client.key 4096
+      args:
+        creates: /cluster/pki/front-proxy/front-proxy-client.key
+
+    - name: 写入 front-proxy 客户端证书签名请求配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/front-proxy/front-proxy-client.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = Wuzhenhua
+          OU = IT
+          CN = front-proxy-client
+
+    - name: 生成 front-proxy 客户端证书签名请求
+      ansible.builtin.command: >
+        openssl req -new
+        -config /cluster/pki/front-proxy/front-proxy-client.cnf
+        -key /cluster/pki/front-proxy/front-proxy-client.key
+        -out /cluster/pki/front-proxy/front-proxy-client.csr
+        -sha256
+      args:
+        creates: /cluster/pki/front-proxy/front-proxy-client.csr
+
+    - name: 写入 front-proxy 客户端证书扩展配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/front-proxy/front-proxy-client.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = clientAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
+
+    # 该 CA 只签这一张证书，直接用 x509 -req，无需 openssl ca 的证书数据库
+    - name: 使用 front-proxy 中间 CA 签发客户端证书
+      ansible.builtin.command: >
+        openssl x509 -req
+        -in /cluster/pki/front-proxy/front-proxy-client.csr
+        -CA /cluster/pki/front-proxy/front-proxy-ca.crt
+        -CAkey /cluster/pki/front-proxy/front-proxy-ca.key
+        -passin pass:root
+        -CAcreateserial
+        -extfile /cluster/pki/front-proxy/front-proxy-client.ext
+        -extensions v3_req
+        -out /cluster/pki/front-proxy/front-proxy-client.crt
+        -days 1825
+        -sha256
+      args:
+        creates: /cluster/pki/front-proxy/front-proxy-client.crt
+
+    - name: 校验 front-proxy 客户端证书
+      ansible.builtin.command: >
+        openssl verify
+        -purpose sslclient
+        -CAfile /cluster/pki/root/root.crt
+        -untrusted /cluster/pki/front-proxy/front-proxy-ca.crt
+        /cluster/pki/front-proxy/front-proxy-client.crt
+      changed_when: false
