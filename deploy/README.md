@@ -137,56 +137,6 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig logs -n kube-system -l k8s-app=kube-dns --tail=50
 ```
 
-## 验证 metrics-server
-
-### 1. 查看 node / pod 指标
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig top nodes
-```
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig top pods -A
-```
-
-### 2. 直接读取聚合 API
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get --raw /apis/metrics.k8s.io/v1beta1/nodes
-```
-
-### 3. 单独重新部署 metrics-server
-
-```bash
-ansible-playbook playbooks/10_metrics_server.yml
-```
-
-## 访问 ingress-nginx
-
-### 1. 查看 controller pod 与 Service
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n ingress-nginx -o wide
-```
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get svc -n ingress-nginx
-```
-
-### 2. 在 Windows 宿主机浏览器访问
-
-```text
-http://10.0.0.101:30080
-```
-
-controller 以 NodePort 30080/30443 暴露在任意节点 IP 上，尚未创建 Ingress 规则时返回 404 属正常，说明 controller 已在监听。
-
-### 3. 单独重新部署
-
-```bash
-ansible-playbook playbooks/11_ingress.yml
-```
-
 ## 访问 Kubernetes Dashboard
 
 ### 1. 在 client 机上启动 kubectl proxy
@@ -215,12 +165,6 @@ http://10.0.0.99:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 
 ```bash
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n kubernetes-dashboard -o wide
-```
-
-### 5. 单独重新部署
-
-```bash
-ansible-playbook playbooks/12_dashboard.yml
 ```
 
 ## k8s 学习
