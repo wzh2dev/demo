@@ -106,7 +106,7 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 - 需要强制重新走一遍签发流程时（例如证书丢失或想验证首次部署路径），先删掉 kubelet 本地的 serving 证书并重启 kubelet：
 
 ```bash
-ansible kubelet -b -m shell -a "rm -f /data/kubelet/pki/kubelet.crt /data/kubelet/pki/kubelet.key; tmux kill-session -t kubelet"
+ansible kubelet -b -m shell -a "rm -f /var/lib/kubelet/pki/kubelet.crt /var/lib/kubelet/pki/kubelet.key; tmux kill-session -t kubelet"
 ```
 
 ## 验证 CoreDNS
@@ -211,19 +211,19 @@ ansible apiserver -b -m file -a 'path=/etc/keepalived/keepalived.conf state=abse
 ### 2. 清理 containerd 中旧集群的容器与沙箱
 
 ```bash
-ansible nodes -b -m shell -a '/cluster/crictl/crictl ps -a -q | xargs -r /cluster/crictl/crictl rm -f; /cluster/crictl/crictl pods -q | xargs -r /cluster/crictl/crictl rmp -f; true'
+ansible nodes -b -m shell -a '/cluster/crictl/crictl ps -a -q | xargs -r /cluster/crictl/crictl rm -f; /cluster/crictl/crictl pods -q | xargs -r /cluster/crictl/crictl rmp -f'
 ```
 
 ### 3. 停止所有 tmux 会话
 
 ```bash
-ansible nodes -b -m shell -a 'tmux kill-server 2>/dev/null; true'
+ansible nodes -b -m shell -a 'tmux kill-server'
 ```
 
 ### 4. 删除节点上的 k8s 二进制、证书、数据与配置
 
 ```bash
-ansible nodes -b -m shell -a 'rm -rf /cluster/k8s/kubelet.kubeconfig /cluster/helm /cluster/pki /data/etcd /data/kubelet /var/lib/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
+ansible nodes -b -m shell -a 'rm -rf /cluster/k8s/kubelet.kubeconfig /cluster/helm /cluster/pki /data/etcd /var/lib/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
 ```
 
 ### 5. 删除控制机上的 kubectl、证书签发源与 helm
@@ -241,5 +241,5 @@ ansible nodes -b -m reboot
 ### 7. 验证
 
 ```bash
-ansible nodes -b -m shell -a 'tmux ls || true; ls -d /cluster/* /data/*; systemctl is-enabled keepalived 2>&1; true'
+ansible nodes -b -m shell -a 'tmux ls; ls -d /cluster/* /data/*; systemctl is-enabled keepalived'
 ```

@@ -61,8 +61,6 @@
         --config=/cluster/k8s/kubelet-config.yaml
         --bootstrap-kubeconfig=/cluster/k8s/kubelet-bootstrap.kubeconfig
         --kubeconfig=/cluster/k8s/kubelet.kubeconfig
-        --root-dir=/data/kubelet
-        --cert-dir=/data/kubelet/pki
         --hostname-override={{ inventory_hostname }}
         --node-ip={{ ansible_host }}
         --v=2"
