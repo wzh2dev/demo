@@ -3,17 +3,20 @@
 ## 快捷命令
 
 ### 同步 PKI 产物到客户机（在 Windows 宿主机执行）
+
 ```bash
 vagrant rsync client
 ```
 
 ### 重新配置客户机（在 Windows 宿主机执行）
+
 ```bash
 vagrant provision client
 ```
 
 ### 拉取 PKI 产物到宿主机（在 Windows 宿主机执行）
-```cmd
+
+```bash
 vagrant ssh client -c "sudo cat /cluster/pki/k8s/k8s.crt" > k8s.crt
 vagrant ssh client -c "sudo cat /cluster/pki/k8s/admin-client.crt" > admin-client.crt
 vagrant ssh client -c "sudo cat /cluster/pki/k8s/admin-client.key" > admin-client.key
@@ -71,6 +74,18 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull docker.io/kubernetesui/metrics-scraper:v1.0.8'
 ```
 
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/ingress-nginx/controller:v1.11.8@sha256:695d79381ee6af00c7f5c9fd434f50851d7d32838ad5b2c507e416cf2084fc79'
+```
+
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.0@sha256:c9f76a75fd00e975416ea1b73300efd413116de0de8570346ed90766c5b5cefb'
+```
+
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/metrics-server/metrics-server:v0.7.2'
+```
+
 ## 手动签发 kubelet serving 证书
 
 ### 1. 查看待审批的 serving CSR
@@ -122,6 +137,62 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig logs -n kube-system -l k8s-app=kube-dns --tail=50
 ```
 
+## 验证 metrics-server
+
+### 1. 查看 node / pod 指标
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig top nodes
+```
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig top pods -A
+```
+
+### 2. 直接读取聚合 API
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get --raw /apis/metrics.k8s.io/v1beta1/nodes
+```
+
+### 3. 单独重新部署 metrics-server
+
+```bash
+ansible-playbook playbooks/10_metrics_server.yml
+```
+
+注意事项：
+
+- **前置条件：kubelet serving CSR 必须已批准**（见「手动签发 kubelet serving 证书」）。本集群 kubelet 使用 `serverTLSBootstrap`，serving 证书由 CSR 签发；未批准时 kubelet 用的是自签名证书，metrics-server 校验失败 → 采集不到指标（playbook 会在「等待 metrics API 返回指标」处超时）。
+- CA 以 `kubectl create configmap k8s-ca --from-file=/cluster/pki/k8s/k8s.crt` 渲染出清单后 apply（幂等 create-or-update，CA 变更会自动更新）；清单把它挂进容器并加 `--kubelet-certificate-authority`，校验口径与 kube-apiserver 一致。运行中的 pod 挂载文件由 kubelet 自动同步（约 1 分钟）；若需立即生效，`kubectl rollout restart deployment/metrics-server -n kube-system`。
+- 本集群 kubectl 客户端为 v1.27.x，而 metrics-server `0.8.x` 起要求 k8s 1.31+，因此版本锁定在 `0.7.x`。
+
+## 访问 ingress-nginx
+
+### 1. 查看 controller pod 与 Service
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n ingress-nginx -o wide
+```
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get svc -n ingress-nginx
+```
+
+### 2. 在 Windows 宿主机浏览器访问
+
+```text
+http://10.0.0.101:30080
+```
+
+controller 以 NodePort 30080/30443 暴露在任意节点 IP 上，尚未创建 Ingress 规则时返回 404 属正常，说明 controller 已在监听。
+
+### 3. 单独重新部署
+
+```bash
+ansible-playbook playbooks/11_ingress.yml
+```
+
 ## 访问 Kubernetes Dashboard
 
 ### 1. 在 client 机上启动 kubectl proxy
@@ -155,7 +226,7 @@ http://10.0.0.99:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 ### 5. 单独重新部署
 
 ```bash
-ansible-playbook playbooks/10_dashboard.yml
+ansible-playbook playbooks/12_dashboard.yml
 ```
 
 ## k8s 学习
@@ -214,7 +285,7 @@ ansible nodes -b -m shell -a 'tmux kill-server 2>/dev/null; true'
 ### 4. 删除节点上的 k8s 二进制、证书、数据与配置
 
 ```bash
-ansible nodes -b -m shell -a 'rm -rf /cluster/k8s /cluster/helm /cluster/pki /data/etcd /data/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
+ansible nodes -b -m shell -a 'rm -rf /cluster/k8s/kubelet.kubeconfig /cluster/helm /cluster/pki /data/etcd /data/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
 ```
 
 ### 5. 删除控制机上的 kubectl、证书签发源与 helm

@@ -1,0 +1,6 @@
+- name: 部署 ingress-nginx
+  hosts: localhost
+  become: true
+  tags: [ingress]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/ingress.yml

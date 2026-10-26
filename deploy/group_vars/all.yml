@@ -11,6 +11,8 @@ calico_version: "3.27.5"
 coredns_version: "1.10.1"
 helm_version: "3.15.4"
 dashboard_version: "2.7.0"
+ingress_nginx_version: "1.11.8"
+metrics_server_version: "0.7.2"
 
 pod_cidr: "192.168.2.0/24"
 pod_cidr_mask_size: "26"

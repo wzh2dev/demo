@@ -1,8 +1,5 @@
 - name: 部署 Kubernetes Dashboard
   block:
-    # 清单取自官方 v2.7.0 aio/deploy/recommended.yaml；
-    # 节点无 registry mirror、镜像按 README「拉取镜像」手动预拉，
-    # 故仅将 dashboard 容器的 imagePullPolicy 由 Always 改为 IfNotPresent
     - name: 生成 Kubernetes Dashboard 清单文件
       ansible.builtin.copy:
         dest: /cluster/k8s/dashboard.yaml
@@ -207,6 +204,10 @@
                     args:
                       - --auto-generate-certificates
                       - --namespace=kubernetes-dashboard
+                      # Uncomment the following line to manually specify Kubernetes API server Host
+                      # If not specified, Dashboard will attempt to auto discover the API server and connect
+                      # to it. Uncomment only if the default does not work.
+                      # - --apiserver-host=http://my-address:port
                     volumeMounts:
                       - name: kubernetes-dashboard-certs
                         mountPath: /certs
@@ -292,8 +293,8 @@
                       initialDelaySeconds: 30
                       timeoutSeconds: 30
                     volumeMounts:
-                      - mountPath: /tmp
-                        name: tmp-volume
+                    - mountPath: /tmp
+                      name: tmp-volume
                     securityContext:
                       allowPrivilegeEscalation: false
                       readOnlyRootFilesystem: true

@@ -16,4 +16,8 @@
 
 - ansible.builtin.import_playbook: playbooks/09_helm.yml
 
-- ansible.builtin.import_playbook: playbooks/10_dashboard.yml
+- ansible.builtin.import_playbook: playbooks/10_metrics_server.yml
+
+- ansible.builtin.import_playbook: playbooks/11_ingress.yml
+
+- ansible.builtin.import_playbook: playbooks/12_dashboard.yml

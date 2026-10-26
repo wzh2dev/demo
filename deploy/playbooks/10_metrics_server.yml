@@ -1,0 +1,6 @@
+- name: 部署 metrics-server
+  hosts: localhost
+  become: true
+  tags: [metrics_server]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/metrics_server.yml
