@@ -247,8 +247,6 @@
       delay: 10
       changed_when: false
 
-    # pod 就绪不代表指标可用（聚合 API 注册、kubelet 抓取都可能失败），
-    # 以「返回体中含 usage 字段」作为真正的验收标准。
     - name: 等待 metrics API 返回指标
       ansible.builtin.command: >-
         /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
