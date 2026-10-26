@@ -261,6 +261,6 @@
     - name: 展示 metrics API 返回的 node 指标
       ansible.builtin.debug:
         msg: "{{ item.metadata.name }}  cpu={{ item.usage.cpu }}  memory={{ item.usage.memory }}"
-      loop: "{{ (metrics_api_ready.stdout | from_json).items }}"
+      loop: "{{ (metrics_api_ready.stdout | from_json)['items'] }}"
       loop_control:
         label: "{{ item.metadata.name }}"
