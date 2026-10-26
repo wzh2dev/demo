@@ -1,13 +1,8 @@
 - name: 部署 ingress-nginx
   block:
-    # 清单取自官方 provider/baremetal 静态清单；节点无 registry mirror，
-    # 镜像按 README「拉取镜像」手动预拉，清单中 controller 与 admission job
-    # 均已声明 imagePullPolicy: IfNotPresent，无需改动。
-    # 唯一偏差：官方清单未指定 nodePort（由集群随机分配），
-    # 此处固定为 30080/30443 以便 README 记录固定访问地址。
     - name: 下载 ingress-nginx 清单文件
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v{{ ingress_nginx_version }}/deploy/static/provider/baremetal/deploy.yaml
+        url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v{{ ingress_nginx_version }}/deploy/static/provider/cloud/deploy.yaml
         dest: /cluster/k8s/ingress-nginx.yaml
       environment:
         https_proxy: "http://10.0.0.1:7897"
@@ -20,21 +15,6 @@
           apply -f /cluster/k8s/ingress-nginx.yaml
       register: ingress_nginx_apply_result
       changed_when: "'unchanged' not in ingress_nginx_apply_result.stdout"
-
-    - name: 查询 controller Service 当前 http NodePort
-      ansible.builtin.command: >-
-        /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
-        get service ingress-nginx-controller -n ingress-nginx
-        -o jsonpath='{.spec.ports[?(@.name=="http")].nodePort}'
-      register: ingress_nginx_http_nodeport
-      changed_when: false
-
-    - name: 固定 controller NodePort 为 30080/30443
-      ansible.builtin.command: >-
-        /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
-        patch service ingress-nginx-controller -n ingress-nginx --type=merge
-        -p '{"spec":{"ports":[{"appProtocol":"http","name":"http","port":80,"protocol":"TCP","targetPort":"http","nodePort":30080},{"appProtocol":"https","name":"https","port":443,"protocol":"TCP","targetPort":"https","nodePort":30443}]}}'
-      when: ingress_nginx_http_nodeport.stdout | trim != '30080'
 
     - name: 等待 admission job 完成
       ansible.builtin.command: >-
