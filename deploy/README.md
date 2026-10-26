@@ -223,7 +223,7 @@ ansible nodes -b -m shell -a 'tmux kill-server 2>/dev/null; true'
 ### 4. 删除节点上的 k8s 二进制、证书、数据与配置
 
 ```bash
-ansible nodes -b -m shell -a 'rm -rf /cluster/k8s/kubelet.kubeconfig /cluster/helm /cluster/pki /data/etcd /data/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
+ansible nodes -b -m shell -a 'rm -rf /cluster/k8s/kubelet.kubeconfig /cluster/helm /cluster/pki /data/etcd /data/kubelet /var/lib/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
 ```
 
 ### 5. 删除控制机上的 kubectl、证书签发源与 helm
