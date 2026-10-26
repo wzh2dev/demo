@@ -97,5 +97,6 @@
     }
   ],
   "ansible.ansibleNavigator.path": "/cluster/uv/uvx ansible-navigator",
-  "ansible.validation.lint.enabled": false
+  "ansible.playbook.arguments": "/cluster/uv/uvx ansible-playbook",
+  "ansible.validation.lint.path": "/cluster/uv/uvx ansible-lint"
 }
