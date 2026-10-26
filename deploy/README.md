@@ -161,12 +161,6 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 ansible-playbook playbooks/10_metrics_server.yml
 ```
 
-注意事项：
-
-- **前置条件：kubelet serving CSR 必须已批准**（见「手动签发 kubelet serving 证书」）。本集群 kubelet 使用 `serverTLSBootstrap`，serving 证书由 CSR 签发；未批准时 kubelet 用的是自签名证书，metrics-server 校验失败 → 采集不到指标（playbook 会在「等待 metrics API 返回指标」处超时）。
-- CA 以 `kubectl create configmap k8s-ca --from-file=/cluster/pki/k8s/k8s.crt` 渲染出清单后 apply（幂等 create-or-update，CA 变更会自动更新）；清单把它挂进容器并加 `--kubelet-certificate-authority`，校验口径与 kube-apiserver 一致。运行中的 pod 挂载文件由 kubelet 自动同步（约 1 分钟）；若需立即生效，`kubectl rollout restart deployment/metrics-server -n kube-system`。
-- 本集群 kubectl 客户端为 v1.27.x，而 metrics-server `0.8.x` 起要求 k8s 1.31+，因此版本锁定在 `0.7.x`。
-
 ## 访问 ingress-nginx
 
 ### 1. 查看 controller pod 与 Service

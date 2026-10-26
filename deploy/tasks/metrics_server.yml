@@ -228,6 +228,7 @@
               namespace: kube-system
             version: v1beta1
             versionPriority: 100
+
     - name: 应用 metrics-server 清单
       ansible.builtin.command:
         cmd: >-
