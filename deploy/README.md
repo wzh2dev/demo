@@ -129,16 +129,6 @@ ansible kubelet -b -m shell -a "rm -f /var/lib/kubelet/pki/kubelet.crt /var/lib/
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get svc kube-dns -n kube-system
 ```
 
-### 2. 集群内验证域名解析（需先预拉 busybox 镜像）
-
-```bash
-ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull docker.io/library/busybox:1.36'
-```
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig run dns-test --rm -it --restart=Never --image=docker.io/library/busybox:1.36 -- nslookup kubernetes.default.svc.wuzhenhua.com
-```
-
 ### 3. 查看 coredns 日志（排查解析失败）
 
 ```bash
