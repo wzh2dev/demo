@@ -84,19 +84,3 @@
       retries: 20
       delay: 3
       changed_when: false
-
-- name: 预拉 sandbox 镜像
-  block:
-    - name: 查询 sandbox 镜像是否已存在
-      ansible.builtin.command: >
-        /cluster/containerd/bin/ctr --namespace k8s.io
-        images ls -q name==registry.k8s.io/pause:3.8
-      register: sandbox_image
-      changed_when: false
-
-    - name: 拉取 sandbox 镜像
-      ansible.builtin.command: >
-        /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/pause:3.8
-      when: sandbox_image.stdout | trim == ''
-      environment:
-        HTTPS_PROXY: "http://10.0.0.1:7897"
