@@ -4,3 +4,10 @@
   tags: [zot]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/zot.yml
+
+- name: 安装 skopeo 并预置镜像到 zot
+  hosts: localhost
+  become: true
+  tags: [mirror]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/skopeo.yml

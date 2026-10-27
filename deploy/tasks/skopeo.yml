@@ -1,0 +1,32 @@
+- name: 安装 skopeo
+  ansible.builtin.yum:
+    name: skopeo
+    state: present
+
+- name: 下载镜像并推送到 zot
+  ansible.builtin.command: >
+    skopeo copy
+    docker://{{ item }}
+    docker://10.0.0.104:8080/{{ item }}
+    --dest-tls-verify=false
+  environment:
+    HTTPS_PROXY: "http://10.0.0.1:7897"
+    NO_PROXY: "10.0.0.104"
+  loop:
+    - registry.k8s.io/pause:3.8
+    - registry.k8s.io/coredns/coredns:1.10.1
+    - registry.k8s.io/metrics-server/metrics-server:0.7.2
+    - registry.k8s.io/ingress-nginx/controller:1.11.8
+    - registry.k8s.io/ingress-nginx/kube-webhook-certgen:1.6.0
+    - docker.io/calico/pod2daemon-flexvol:3.27.5
+    - docker.io/calico/cni:3.27.5
+    - docker.io/calico/node:3.27.5
+    - docker.io/calico/typha:3.27.5
+    - docker.io/calico/csi:3.27.5
+    - docker.io/calico/node-driver-registrar:3.27.5
+    - docker.io/calico/kube-controllers:3.27.5
+    - quay.io/metallb/controller:0.16.0
+    - quay.io/metallb/speaker:0.16.0
+    - docker.io/kubernetesui/dashboard:2.7.0
+    - docker.io/kubernetesui/metrics-scraper:1.0.8
+  changed_when: false
