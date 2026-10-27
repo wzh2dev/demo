@@ -8,7 +8,8 @@
 
 - name: 安装 etcd
   block:
-    - name: 下载 etcd
+    - name: 下载 etcd 压缩包
+      tags: [download]
       ansible.builtin.get_url:
         url: https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-{{ arch }}.tar.gz
         dest: /tmp/etcd.tar.gz

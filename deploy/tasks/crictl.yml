@@ -6,6 +6,7 @@
 - name: 安装 crictl
   block:
     - name: 下载 crictl 压缩包
+      tags: [download]
       ansible.builtin.get_url:
         url: https://github.com/kubernetes-sigs/cri-tools/releases/download/v{{ crictl_version }}/crictl-v{{ crictl_version }}-linux-{{ arch }}.tar.gz
         dest: /tmp/crictl.tar.gz

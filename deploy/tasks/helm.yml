@@ -6,6 +6,7 @@
 - name: 安装 helm
   block:
     - name: 下载 helm 压缩包
+      tags: [download]
       ansible.builtin.get_url:
         url: https://get.helm.sh/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz
         dest: /tmp/helm.tar.gz

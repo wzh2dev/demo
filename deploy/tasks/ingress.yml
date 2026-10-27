@@ -1,6 +1,7 @@
 - name: 部署 ingress-nginx
   block:
     - name: 下载 ingress-nginx 清单文件
+      tags: [download]
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v{{ ingress_nginx_version }}/deploy/static/provider/cloud/deploy.yaml
         dest: /cluster/k8s/ingress-nginx.yaml
