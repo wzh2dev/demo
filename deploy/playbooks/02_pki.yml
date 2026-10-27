@@ -15,6 +15,9 @@
     - name: 初始化并校验 front-proxy 中间 CA
       ansible.builtin.import_tasks: ../tasks/pki/front_proxy_ca.yml
 
+    - name: 签发并校验 zot server 证书
+      ansible.builtin.import_tasks: ../tasks/pki/zot_certificates.yml
+
     - name: 签发并校验 etcd 相关证书
       ansible.builtin.import_tasks: ../tasks/pki/etcd_certificates.yml
 
@@ -38,9 +41,6 @@
 
     - name: 签发并校验 front-proxy 客户端证书
       ansible.builtin.import_tasks: ../tasks/pki/front_proxy_certificates.yml
-
-    - name: 签发并校验 zot server 证书
-      ansible.builtin.import_tasks: ../tasks/pki/zot_certificates.yml
 
 - name: 分发公共 CA 证书
   hosts: nodes
