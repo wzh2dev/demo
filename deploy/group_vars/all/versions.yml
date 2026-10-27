@@ -2,8 +2,6 @@
 # - ingress-nginx / metrics-server：取"官方支持矩阵仍包含 1.27"的最后一个补丁版
 # - MetalLB：取最新版，接受 1.27 上的 best-effort
 # 升级 k8s 时以上三处的版本都要重算
-ansible_user: "vagrant"
-ansible_password: "vagrant"
 arch: "amd64"
 
 k8s_version: "1.27.16"
@@ -18,18 +16,3 @@ dashboard_version: "2.7.0"
 ingress_nginx_version: "1.11.8"
 metrics_server_version: "0.7.2"
 metallb_version: "0.16.0"
-
-pod_cidr: "192.168.2.0/24"
-pod_cidr_mask_size: "26"
-service_cluster_ip_range: "192.168.3.0/24"
-kubernetes_service_ip: "192.168.3.1"
-cluster_dns: "192.168.3.10"
-etcd_servers: "https://node1:2379,https://node2:2379,https://node3:2379"
-api_server: "https://{{ keepalived_vip }}:6443"
-
-keepalived_vip: "10.0.0.100"
-keepalived_priority:
-  node1: "100"
-  node2: "90"
-
-metallb_address_pool: "10.0.0.110-10.0.0.120"
