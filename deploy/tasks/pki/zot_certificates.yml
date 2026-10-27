@@ -24,7 +24,7 @@
           ST = Jiangsu
           L  = Nanjing
           O  = Wuzhenhua
-          OU = K8S
+          OU = ZOT
           CN = zot-{{ item }}
       loop: "{{ groups['registry'] }}"
 
