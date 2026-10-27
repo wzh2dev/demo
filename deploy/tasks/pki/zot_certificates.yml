@@ -1,0 +1,88 @@
+- name: 创建 zot 证书工作目录
+  ansible.builtin.file:
+    path: /cluster/pki/zot
+    state: directory
+
+- name: 签发并校验 zot server 证书
+  block:
+    - name: 生成各 registry 成员的 server 证书私钥
+      ansible.builtin.command: openssl genrsa -out /cluster/pki/zot/zot-{{ item }}.key 4096
+      args:
+        creates: /cluster/pki/zot/zot-{{ item }}.key
+      loop: "{{ groups['registry'] }}"
+
+    - name: 生成各 registry 成员的 server 证书签名请求配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/zot/zot-{{ item }}.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = Wuzhenhua
+          OU = K8S
+          CN = zot-{{ item }}
+      loop: "{{ groups['registry'] }}"
+
+    - name: 生成各 registry 成员的 server 证书签名请求
+      ansible.builtin.command: >
+        openssl req -new
+        -config /cluster/pki/zot/zot-{{ item }}.cnf
+        -key /cluster/pki/zot/zot-{{ item }}.key
+        -out /cluster/pki/zot/zot-{{ item }}.csr
+        -sha256
+      args:
+        creates: /cluster/pki/zot/zot-{{ item }}.csr
+      loop: "{{ groups['registry'] }}"
+
+    - name: 生成各 registry 成员的 server 证书扩展配置
+      ansible.builtin.copy:
+        dest: /cluster/pki/zot/zot-{{ item }}.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = serverAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
+          subjectAltName         = @alt_names
+
+          [ alt_names ]
+          DNS.1 = {{ item }}
+          DNS.2 = {{ item }}.wuzhenhua.com
+          DNS.3 = hub.wuzhenhua.com
+          DNS.4 = wuzhenhua.com
+          IP.1  = 127.0.0.1
+          IP.2  = {{ hostvars[item].ansible_host }}
+      loop: "{{ groups['registry'] }}"
+
+    - name: 使用根 CA 签发各 registry 成员的 server 证书
+      ansible.builtin.command: >
+        openssl ca
+        -config /cluster/pki/root/root_ca.cnf
+        -extfile /cluster/pki/zot/zot-{{ item }}.ext
+        -extensions v3_req
+        -cert /cluster/pki/root/root.crt
+        -keyfile /cluster/pki/root/root.key
+        -passin pass:root
+        -in /cluster/pki/zot/zot-{{ item }}.csr
+        -out /cluster/pki/zot/zot-{{ item }}.crt
+        -days 365
+        -md sha256
+        -batch
+        -notext
+      args:
+        creates: /cluster/pki/zot/zot-{{ item }}.crt
+      loop: "{{ groups['registry'] }}"
+
+    - name: 校验各 registry 成员的 server 证书
+      ansible.builtin.command: >
+        openssl verify
+        -CAfile /cluster/pki/root/root.crt
+        /cluster/pki/zot/zot-{{ item }}.crt
+      changed_when: false
+      loop: "{{ groups['registry'] }}"

@@ -5,10 +5,20 @@
   loop:
     - /cluster/zot
     - /data/zot
+    - /cluster/pki/zot
+
+- name: 分发 zot server 证书
+  ansible.builtin.copy:
+    src: /cluster/pki/zot/zot-{{ inventory_hostname }}.{{ item }}
+    dest: /cluster/pki/zot/
+  loop:
+    - crt
+    - key
 
 - name: 安装 zot
   block:
-    - name: 下载 zot 二进制
+    - name: 下载 zot 二进制压缩包
+      tags: [download]
       ansible.builtin.get_url:
         url: https://github.com/project-zot/zot/releases/latest/download/zot-linux-{{ arch }}
         dest: /tmp/zot-linux-{{ arch }}
@@ -32,6 +42,19 @@
             "distSpecVersion": "1.0.1",
             "storage": {
               "rootDirectory": "/data/zot"
+            },
+            "http": {
+              "address": "0.0.0.0",
+              "tls": {
+                "cert": "/cluster/pki/zot/zot-{{ inventory_hostname }}.crt",
+                "key": "/cluster/pki/zot/zot-{{ inventory_hostname }}.key"
+              }
+            },
+            "extensions": {
+              "search": {},
+              "ui": {
+                "enable": true
+              }
             }
           }
 
@@ -52,10 +75,10 @@
       when: zot_tmux_session.rc != 0
 
     - name: 等待 zot registry 接口就绪
-      ansible.builtin.uri:
-        url: http://127.0.0.1:5000/v2/
-        status_code: 200
+      ansible.builtin.command: >
+        curl -skf https://127.0.0.1:8080/v2/
       register: zot_health
-      until: zot_health.status == 200
+      until: zot_health.rc == 0
       retries: 20
       delay: 3
+      changed_when: false
