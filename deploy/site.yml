@@ -2,26 +2,26 @@
 
 - ansible.builtin.import_playbook: playbooks/02_pki.yml
 
-- ansible.builtin.import_playbook: playbooks/03_containerd.yml
+- ansible.builtin.import_playbook: playbooks/03_zot.yml
 
-- ansible.builtin.import_playbook: playbooks/04_etcd.yml
+- ansible.builtin.import_playbook: playbooks/04_containerd.yml
 
-- ansible.builtin.import_playbook: playbooks/05_keepalived.yml
+- ansible.builtin.import_playbook: playbooks/05_etcd.yml
 
-- ansible.builtin.import_playbook: playbooks/06_k8s.yml
+- ansible.builtin.import_playbook: playbooks/06_keepalived.yml
 
-- ansible.builtin.import_playbook: playbooks/07_calico.yml
+- ansible.builtin.import_playbook: playbooks/07_k8s.yml
 
-- ansible.builtin.import_playbook: playbooks/08_coredns.yml
+- ansible.builtin.import_playbook: playbooks/08_calico.yml
 
-- ansible.builtin.import_playbook: playbooks/09_metrics_server.yml
+- ansible.builtin.import_playbook: playbooks/09_coredns.yml
 
-- ansible.builtin.import_playbook: playbooks/10_metallb.yml
+- ansible.builtin.import_playbook: playbooks/10_metrics_server.yml
 
-- ansible.builtin.import_playbook: playbooks/11_ingress.yml
+- ansible.builtin.import_playbook: playbooks/11_metallb.yml
 
-- ansible.builtin.import_playbook: playbooks/12_dashboard.yml
+- ansible.builtin.import_playbook: playbooks/12_ingress.yml
 
-- ansible.builtin.import_playbook: playbooks/13_helm.yml
+- ansible.builtin.import_playbook: playbooks/13_dashboard.yml
 
-- ansible.builtin.import_playbook: playbooks/14_zot.yml
+- ansible.builtin.import_playbook: playbooks/14_helm.yml
