@@ -72,3 +72,4 @@
 | prism            | npx @stoplight/prism-cli                                                             |
 | browser-use      | /custer/uv/uvx browser-use                                                           |
 | markdownlint-cli | npx markdownlint-cli                                                                 |
+| ansible          | /cluster/uv/uvx --from ansible-core ansible --version                                |
