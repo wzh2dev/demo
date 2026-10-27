@@ -356,11 +356,10 @@
           spec:
             ingressClassName: nginx
             tls:
-              # 不指定 secretName 时使用 ingress-nginx 的默认自签名证书
               - hosts:
-                  - {{ dashboard_ingress_host }}
+                  - dashboard.wuzhenhua.com
             rules:
-              - host: {{ dashboard_ingress_host }}
+              - host: dashboard.wuzhenhua.com
                 http:
                   paths:
                     - path: /
