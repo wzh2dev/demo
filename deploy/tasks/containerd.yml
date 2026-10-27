@@ -43,6 +43,18 @@
                       BinaryName = "/cluster/runc/runc"
                       SystemdCgroup = true
 
+              [plugins."io.containerd.grpc.v1.cri".registry]
+                [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+                  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
+                    endpoint = ["https://hub.wuzhenhua.com:8080"]
+                  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+                    endpoint = ["https://hub.wuzhenhua.com:8080"]
+                  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."quay.io"]
+                    endpoint = ["https://hub.wuzhenhua.com:8080"]
+                [plugins."io.containerd.grpc.v1.cri".registry.configs]
+                  [plugins."io.containerd.grpc.v1.cri".registry.configs."hub.wuzhenhua.com:8080".tls]
+                    ca_file = "/cluster/pki/root/root.crt"
+
 - name: 安装 runc
   block:
     - name: 下载 runc
