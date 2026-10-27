@@ -72,6 +72,9 @@
   "[sql]": {
     "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc"
   },
+  "[ansible]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
   "go.goroot": "/cluster/go",
   "gitai.enableCheckpointLogging": true,
   "npm.exclude": ["**/.agents/**"],
@@ -96,7 +99,7 @@
       "password": "root"
     }
   ],
+  "ansible.ansible.path": "/cluster/ansible/bin/ansible",
   "ansible.ansibleNavigator.path": "/cluster/uv/uvx ansible-navigator",
-  "ansible.playbook.arguments": "/cluster/uv/uvx ansible-playbook",
   "ansible.validation.lint.path": "/cluster/uv/uvx ansible-lint"
 }
