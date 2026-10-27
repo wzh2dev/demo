@@ -1,0 +1,61 @@
+- name: 创建组件安装和数据目录
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /cluster/zot
+    - /data/zot
+
+- name: 安装 zot
+  block:
+    - name: 下载 zot 二进制
+      ansible.builtin.get_url:
+        url: https://github.com/project-zot/zot/releases/latest/download/zot-linux-{{ arch }}
+        dest: /tmp/zot-linux-{{ arch }}
+      delegate_to: localhost
+      run_once: true
+      become: false
+      environment:
+        https_proxy: "http://10.0.0.1:7897"
+
+    - name: 分发 zot 并赋予执行权限
+      ansible.builtin.copy:
+        src: /tmp/zot-linux-{{ arch }}
+        dest: /cluster/zot/zot
+        mode: "0755"
+
+    - name: 生成 zot 配置文件
+      ansible.builtin.copy:
+        dest: /cluster/zot/config.json
+        content: |
+          {
+            "distSpecVersion": "1.0.1",
+            "storage": {
+              "rootDirectory": "/data/zot"
+            }
+          }
+
+- name: 启动并验证 zot
+  block:
+    - name: 检查 zot tmux 会话是否存在
+      ansible.builtin.command: tmux has-session -t zot
+      register: zot_tmux_session
+      changed_when: false
+      failed_when: false
+
+    - name: 使用 tmux 后台启动 zot
+      ansible.builtin.command: >
+        tmux new-session
+        -d
+        -s zot
+        "/cluster/zot/zot serve /cluster/zot/config.json"
+      when: zot_tmux_session.rc != 0
+
+    - name: 等待 zot registry 接口就绪
+      ansible.builtin.uri:
+        url: http://127.0.0.1:5000/v2/
+        status_code: 200
+      register: zot_health
+      until: zot_health.status == 200
+      retries: 20
+      delay: 3

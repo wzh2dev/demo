@@ -23,3 +23,5 @@
 - ansible.builtin.import_playbook: playbooks/12_dashboard.yml
 
 - ansible.builtin.import_playbook: playbooks/13_helm.yml
+
+- ansible.builtin.import_playbook: playbooks/14_zot.yml

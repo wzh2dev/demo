@@ -19,7 +19,8 @@ Vagrant.configure("2") do |config|
   nodes = {
     "node1" => "10.0.0.101",
     "node2" => "10.0.0.102",
-    "node3" => "10.0.0.103"
+    "node3" => "10.0.0.103",
+    "node4" => "10.0.0.104"
   }
 
   nodes.each do |name, ip|

@@ -1,0 +1,6 @@
+- name: 安装 zot 镜像仓库
+  hosts: registry
+  become: true
+  tags: [zot]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/zot.yml
