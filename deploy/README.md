@@ -181,10 +181,10 @@ curl -I http://<上一步查到的 EXTERNAL-IP>
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig proxy --address=0.0.0.0 --port=8001 --accept-hosts='.*'
 ```
 
-### 2. 获取 admin-user 登录 token
+### 2. 获取 admin 登录 token
 
 ```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig create token admin-user -n kubernetes-dashboard
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig create token admin -n kubernetes-dashboard
 ```
 
 默认有效期 1 小时，可用 `--duration=24h` 延长（上限受 kube-apiserver 配置约束）。
@@ -202,6 +202,24 @@ http://10.0.0.99:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 ```bash
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n kubernetes-dashboard -o wide
 ```
+
+### 5. 通过 ingress-nginx 访问（可选，与上面的 kubectl proxy 二选一）
+
+Ingress 规则随 `13_dashboard.yml` 一起创建，域名由 `dashboard_ingress_host` 控制（默认 `dashboard.local`）。
+
+在 Windows 宿主机 `hosts` 文件中加入映射，IP 取 ingress-nginx 的 EXTERNAL-IP：
+
+```text
+10.0.0.110 dashboard.local
+```
+
+浏览器访问：
+
+```text
+https://dashboard.local
+```
+
+使用上面拿到的 token 登录。证书是 ingress-nginx 的默认自签名证书，浏览器告警后继续访问即可。
 
 ## k8s 学习
 

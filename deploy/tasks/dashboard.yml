@@ -340,29 +340,69 @@
       delay: 10
       changed_when: false
 
+- name: 通过 ingress-nginx 暴露 Dashboard
+  block:
+    - name: 生成 Dashboard Ingress 清单
+      ansible.builtin.copy:
+        dest: /cluster/k8s/dashboard-ingress.yaml
+        content: |
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: kubernetes-dashboard
+            namespace: kubernetes-dashboard
+            annotations:
+              nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+          spec:
+            ingressClassName: nginx
+            tls:
+              # 不指定 secretName 时使用 ingress-nginx 的默认自签名证书
+              - hosts:
+                  - {{ dashboard_ingress_host }}
+            rules:
+              - host: {{ dashboard_ingress_host }}
+                http:
+                  paths:
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: kubernetes-dashboard
+                          port:
+                            number: 443
+
+    - name: 应用 Dashboard Ingress
+      ansible.builtin.command:
+        cmd: >-
+          /cluster/k8s/client/bin/kubectl
+          --kubeconfig=/cluster/k8s/admin.kubeconfig
+          apply -f /cluster/k8s/dashboard-ingress.yaml
+      register: dashboard_ingress_result
+      changed_when: "'unchanged' not in dashboard_ingress_result.stdout"
+
 - name: 创建 Dashboard 管理用户
   block:
-    - name: 生成 admin-user 清单
+    - name: 生成 admin 清单
       ansible.builtin.copy:
-        dest: /cluster/k8s/dashboard-admin-user.yaml
+        dest: /cluster/k8s/dashboard-admin.yaml
         content: |
           apiVersion: v1
           kind: ServiceAccount
           metadata:
-            name: admin-user
+            name: admin
             namespace: kubernetes-dashboard
           ---
           apiVersion: rbac.authorization.k8s.io/v1
           kind: ClusterRoleBinding
           metadata:
-            name: admin-user
+            name: dashboard-admin
           roleRef:
             apiGroup: rbac.authorization.k8s.io
             kind: ClusterRole
             name: cluster-admin
           subjects:
             - kind: ServiceAccount
-              name: admin-user
+              name: admin
               namespace: kubernetes-dashboard
 
     - name: 创建 Dashboard 管理用户
@@ -370,14 +410,14 @@
         cmd: >-
           /cluster/k8s/client/bin/kubectl
           --kubeconfig=/cluster/k8s/admin.kubeconfig
-          apply -f /cluster/k8s/dashboard-admin-user.yaml
-      register: dashboard_admin_user_result
-      changed_when: "'unchanged' not in dashboard_admin_user_result.stdout"
+          apply -f /cluster/k8s/dashboard-admin.yaml
+      register: dashboard_admin_result
+      changed_when: "'unchanged' not in dashboard_admin_result.stdout"
 
-    - name: 获取 admin-user 登录 token
+    - name: 获取 admin 登录 token
       ansible.builtin.command: >-
         /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
-        create token admin-user -n kubernetes-dashboard
+        create token admin -n kubernetes-dashboard
       register: dashboard_admin_token
       changed_when: false
 
