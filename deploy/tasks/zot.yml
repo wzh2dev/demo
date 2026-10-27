@@ -51,7 +51,9 @@
               }
             },
             "extensions": {
-              "search": {},
+              "search": {
+                "enable": true
+              },
               "ui": {
                 "enable": true
               }
