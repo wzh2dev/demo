@@ -1,3 +1,7 @@
+# 版本选择原则（k8s 1.27.16）：
+# - ingress-nginx / metrics-server：取"官方支持矩阵仍包含 1.27"的最后一个补丁版
+# - MetalLB：取最新版，接受 1.27 上的 best-effort
+# 升级 k8s 时以上三处的版本都要重算
 ansible_user: "vagrant"
 ansible_password: "vagrant"
 arch: "amd64"
