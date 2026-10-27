@@ -67,22 +67,6 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 ```
 
 ```bash
-ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull docker.io/kubernetesui/dashboard:v2.7.0'
-```
-
-```bash
-ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull docker.io/kubernetesui/metrics-scraper:v1.0.8'
-```
-
-```bash
-ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/ingress-nginx/controller:v1.11.8@sha256:695d79381ee6af00c7f5c9fd434f50851d7d32838ad5b2c507e416cf2084fc79'
-```
-
-```bash
-ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.0@sha256:c9f76a75fd00e975416ea1b73300efd413116de0de8570346ed90766c5b5cefb'
-```
-
-```bash
 ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/metrics-server/metrics-server:v0.7.2'
 ```
 
@@ -92,6 +76,30 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 
 ```bash
 ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull quay.io/metallb/speaker:v0.16.0'
+```
+
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/ingress-nginx/controller:v1.11.8@sha256:695d79381ee6af00c7f5c9fd434f50851d7d32838ad5b2c507e416cf2084fc79'
+```
+
+```bash
+ansible nodes -b -m shell -a '/cluster/containerd/bin/ctr --namespace k8s.io images tag registry.k8s.io/ingress-nginx/controller:v1.11.8@sha256:695d79381ee6af00c7f5c9fd434f50851d7d32838ad5b2c507e416cf2084fc79 registry.k8s.io/ingress-nginx/controller@sha256:695d79381ee6af00c7f5c9fd434f50851d7d32838ad5b2c507e416cf2084fc79'
+```
+
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.0@sha256:c9f76a75fd00e975416ea1b73300efd413116de0de8570346ed90766c5b5cefb'
+```
+
+```bash
+ansible nodes -b -m shell -a '/cluster/containerd/bin/ctr --namespace k8s.io images tag registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.0@sha256:c9f76a75fd00e975416ea1b73300efd413116de0de8570346ed90766c5b5cefb registry.k8s.io/ingress-nginx/kube-webhook-certgen@sha256:c9f76a75fd00e975416ea1b73300efd413116de0de8570346ed90766c5b5cefb'
+```
+
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull docker.io/kubernetesui/dashboard:v2.7.0'
+```
+
+```bash
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull docker.io/kubernetesui/metrics-scraper:v1.0.8'
 ```
 
 ## 手动签发 kubelet serving 证书

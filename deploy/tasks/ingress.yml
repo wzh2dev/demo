@@ -16,18 +16,6 @@
       register: ingress_nginx_apply_result
       changed_when: "'unchanged' not in ingress_nginx_apply_result.stdout"
 
-    - name: 等待 admission job 完成
-      ansible.builtin.command: >-
-        /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
-        wait --for=condition=complete
-        job/ingress-nginx-admission-create job/ingress-nginx-admission-patch
-        -n ingress-nginx --timeout=60s
-      register: ingress_nginx_admission_ready
-      until: ingress_nginx_admission_ready.rc == 0
-      retries: 30
-      delay: 10
-      changed_when: false
-
     - name: 等待 ingress-nginx-controller 就绪
       ansible.builtin.command: >-
         /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig
