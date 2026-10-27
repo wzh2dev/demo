@@ -36,8 +36,6 @@
       delay: 10
       changed_when: false
 
-# 清单只装 CRD 与组件，地址池与通告需要另建自定义资源
-# 采用 L2 模式：由选中节点应答 VIP 的 ARP，无需 BGP 路由器
 - name: 配置 MetalLB 地址池
   block:
     - name: 生成地址池与 L2 通告清单
@@ -58,9 +56,6 @@
           metadata:
             name: default
             namespace: metallb-system
-          spec:
-            ipAddressPools:
-              - default-pool
 
     - name: 应用地址池与 L2 通告
       ansible.builtin.command:

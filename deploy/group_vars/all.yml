@@ -13,7 +13,7 @@ helm_version: "3.15.4"
 dashboard_version: "2.7.0"
 ingress_nginx_version: "1.11.8"
 metrics_server_version: "0.7.2"
-metallb_version: "0.14.9"
+metallb_version: "0.16.0"
 
 pod_cidr: "192.168.2.0/24"
 pod_cidr_mask_size: "26"
@@ -28,6 +28,4 @@ keepalived_priority:
   node1: "100"
   node2: "90"
 
-# MetalLB L2 模式对外分配 LoadBalancer VIP 的地址段
-# 需与节点网段（10.0.0.0/24）同网段，且不能与 client(99)/VIP(100)/节点(101-103) 重叠
 metallb_address_pool: "10.0.0.110-10.0.0.120"

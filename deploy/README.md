@@ -87,11 +87,11 @@ ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/cont
 ```
 
 ```bash
-ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull quay.io/metallb/controller:v0.14.9'
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull quay.io/metallb/controller:v0.16.0'
 ```
 
 ```bash
-ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull quay.io/metallb/speaker:v0.14.9'
+ansible nodes -b -m shell -a 'env HTTPS_PROXY=http://10.0.0.1:7897 /cluster/containerd/bin/ctr --namespace k8s.io images pull quay.io/metallb/speaker:v0.16.0'
 ```
 
 ## 手动签发 kubelet serving 证书
