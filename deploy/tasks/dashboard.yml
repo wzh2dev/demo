@@ -197,7 +197,7 @@
                 containers:
                   - name: kubernetes-dashboard
                     image: kubernetesui/dashboard:v{{ dashboard_version }}
-                    imagePullPolicy: IfNotPresent
+                    imagePullPolicy: Always
                     ports:
                       - containerPort: 8443
                         protocol: TCP
