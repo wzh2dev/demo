@@ -8,6 +8,12 @@
       environment:
         https_proxy: "http://10.0.0.1:7897"
 
+    - name: 移除 ingress-nginx 清单中的镜像 digest 锁定
+      ansible.builtin.replace:
+        path: /cluster/k8s/ingress-nginx.yaml
+        regexp: '(:v[\d.]+)@sha256:[a-f0-9]{64}'
+        replace: '\1'
+
     - name: 应用 ingress-nginx 清单
       ansible.builtin.command:
         cmd: >-

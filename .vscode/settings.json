@@ -73,7 +73,7 @@
     "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc"
   },
   "[ansible]": {
-    "editor.defaultFormatter": "redhat.vscode-yaml"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
