@@ -178,22 +178,22 @@ ansible apiserver -b -m shell -a 'systemctl disable --now keepalived'
 ansible apiserver -b -m file -a 'path=/etc/keepalived/keepalived.conf state=absent'
 ```
 
-### 2. 停止所有 tmux 会话
-
-```bash
-ansible nodes -b -m shell -a 'tmux kill-server'
-```
-
-### 3. 清理 containerd 中的容器、沙箱与全部镜像
+### 2. 清理 containerd 中的容器、沙箱与全部镜像
 
 ```bash
 ansible nodes -b -m shell -a '/cluster/crictl/crictl ps -a -q | xargs -r /cluster/crictl/crictl rm -f; /cluster/crictl/crictl pods -q | xargs -r /cluster/crictl/crictl rmp -f; /cluster/crictl/crictl images -q | xargs -r /cluster/crictl/crictl rmi'
 ```
 
+### 3. 停止所有 tmux 会话
+
+```bash
+ansible nodes -b -m shell -a 'tmux kill-server'
+```
+
 ### 4. 删除节点上的 k8s 二进制、证书、数据与配置
 
 ```bash
-ansible nodes -b -m shell -a 'rm -rf /cluster/k8s/kubelet.kubeconfig /cluster/helm /cluster/pki /data/etcd /var/lib/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
+ansible nodes -b -m shell -a 'rm -rf /cluster/k8s/kubelet.kubeconfig /cluster/helm /cluster/pki /data/containerd /data/etcd /var/lib/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
 ```
 
 ### 5. 删除控制机上的 kubectl、证书签发源与 helm
@@ -211,5 +211,7 @@ ansible nodes -b -m reboot
 ### 7. 验证
 
 ```bash
-ansible nodes -b -m shell -a 'tmux ls; ls -d /cluster/* /data/*; systemctl is-enabled keepalived; /cluster/crictl/crictl images'
+ansible nodes -b -m shell -a 'ls -d /cluster/* /data/*; du -sh /data/containerd'
+ansible nodes -b -m shell -a 'tmux ls'
+ansible apiserver -b -m shell -a 'systemctl is-enabled keepalived'
 ```
