@@ -3,9 +3,6 @@
     name: skopeo
     state: present
 
-# containerd 走 mirror 时会去掉镜像的 registry 主机名，
-# 例如 registry.k8s.io/pause 会请求 <mirror>/v2/pause，
-# 所以 zot 中的仓库路径不能带 registry.k8s.io、docker.io、quay.io 前缀。
 - name: 下载镜像并推送到 zot
   tags: [mirror]
   ansible.builtin.command: >
