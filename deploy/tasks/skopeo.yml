@@ -3,32 +3,53 @@
     name: skopeo
     state: present
 
+- name: 定义待同步镜像清单
+  tags: [mirror]
+  ansible.builtin.set_fact:
+    zot_mirrors:
+      - { src: "registry.k8s.io/pause:3.8", dest: "pause:3.8" }
+      - { src: "registry.k8s.io/coredns/coredns:v1.10.1", dest: "coredns/coredns:v1.10.1" }
+      - { src: "registry.k8s.io/metrics-server/metrics-server:v0.7.2", dest: "metrics-server/metrics-server:v0.7.2" }
+      - { src: "registry.k8s.io/ingress-nginx/controller:v1.11.8", dest: "ingress-nginx/controller:v1.11.8" }
+      - { src: "registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.0", dest: "ingress-nginx/kube-webhook-certgen:v1.6.0" }
+      - { src: "quay.io/tigera/operator:v1.32.12", dest: "tigera/operator:v1.32.12" }
+      - { src: "quay.io/metallb/controller:v0.16.0", dest: "metallb/controller:v0.16.0" }
+      - { src: "quay.io/metallb/speaker:v0.16.0", dest: "metallb/speaker:v0.16.0" }
+      - { src: "docker.io/calico/pod2daemon-flexvol:v3.27.5", dest: "calico/pod2daemon-flexvol:v3.27.5" }
+      - { src: "docker.io/calico/cni:v3.27.5", dest: "calico/cni:v3.27.5" }
+      - { src: "docker.io/calico/node:v3.27.5", dest: "calico/node:v3.27.5" }
+      - { src: "docker.io/calico/typha:v3.27.5", dest: "calico/typha:v3.27.5" }
+      - { src: "docker.io/calico/csi:v3.27.5", dest: "calico/csi:v3.27.5" }
+      - { src: "docker.io/calico/node-driver-registrar:v3.27.5", dest: "calico/node-driver-registrar:v3.27.5" }
+      - { src: "docker.io/calico/kube-controllers:v3.27.5", dest: "calico/kube-controllers:v3.27.5" }
+      - { src: "docker.io/kubernetesui/dashboard:v2.7.0", dest: "kubernetesui/dashboard:v2.7.0" }
+      - { src: "docker.io/kubernetesui/metrics-scraper:v1.0.8", dest: "kubernetesui/metrics-scraper:v1.0.8" }
+
+- name: 检查 zot 中镜像是否已存在
+  tags: [mirror]
+  ansible.builtin.command: >
+    skopeo inspect
+    --tls-verify=false
+    docker://10.0.0.104:8080/{{ item.dest }}
+  loop: "{{ zot_mirrors }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  register: zot_mirror_check
+  changed_when: false
+  failed_when: false
+
 - name: 下载镜像并推送到 zot
   tags: [mirror]
   ansible.builtin.command: >
     skopeo copy
-    docker://{{ item.src }}
-    docker://10.0.0.104:8080/{{ item.dest }}
+    docker://{{ item.item.src }}
+    docker://10.0.0.104:8080/{{ item.item.dest }}
     --dest-tls-verify=false
+  loop: "{{ zot_mirror_check.results }}"
+  loop_control:
+    label: "{{ item.item.dest }}"
+  when: item.rc != 0
+  changed_when: false
   environment:
     HTTPS_PROXY: "http://10.0.0.1:7897"
     NO_PROXY: "10.0.0.104"
-  loop:
-    - { src: "registry.k8s.io/pause:3.8", dest: "pause:3.8" }
-    - { src: "registry.k8s.io/coredns/coredns:v1.10.1", dest: "coredns/coredns:v1.10.1" }
-    - { src: "registry.k8s.io/metrics-server/metrics-server:v0.7.2", dest: "metrics-server/metrics-server:v0.7.2" }
-    - { src: "registry.k8s.io/ingress-nginx/controller:v1.11.8", dest: "ingress-nginx/controller:v1.11.8" }
-    - { src: "registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.0", dest: "ingress-nginx/kube-webhook-certgen:v1.6.0" }
-    - { src: "quay.io/tigera/operator:v1.32.12", dest: "tigera/operator:v1.32.12" }
-    - { src: "quay.io/metallb/controller:v0.16.0", dest: "metallb/controller:v0.16.0" }
-    - { src: "quay.io/metallb/speaker:v0.16.0", dest: "metallb/speaker:v0.16.0" }
-    - { src: "docker.io/calico/pod2daemon-flexvol:v3.27.5", dest: "calico/pod2daemon-flexvol:v3.27.5" }
-    - { src: "docker.io/calico/cni:v3.27.5", dest: "calico/cni:v3.27.5" }
-    - { src: "docker.io/calico/node:v3.27.5", dest: "calico/node:v3.27.5" }
-    - { src: "docker.io/calico/typha:v3.27.5", dest: "calico/typha:v3.27.5" }
-    - { src: "docker.io/calico/csi:v3.27.5", dest: "calico/csi:v3.27.5" }
-    - { src: "docker.io/calico/node-driver-registrar:v3.27.5", dest: "calico/node-driver-registrar:v3.27.5" }
-    - { src: "docker.io/calico/kube-controllers:v3.27.5", dest: "calico/kube-controllers:v3.27.5" }
-    - { src: "docker.io/kubernetesui/dashboard:v2.7.0", dest: "kubernetesui/dashboard:v2.7.0" }
-    - { src: "docker.io/kubernetesui/metrics-scraper:v1.0.8", dest: "kubernetesui/metrics-scraper:v1.0.8" }
-  changed_when: false
