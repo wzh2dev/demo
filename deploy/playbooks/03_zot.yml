@@ -8,6 +8,6 @@
 - name: 安装 skopeo 并预置镜像到 zot
   hosts: localhost
   become: true
-  tags: [mirror]
+  tags: [skopeo]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/skopeo.yml

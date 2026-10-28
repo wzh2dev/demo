@@ -4,6 +4,7 @@
     state: present
 
 - name: 下载镜像并推送到 zot
+  tags: [mirror]
   ansible.builtin.command: >
     skopeo copy
     docker://{{ item }}
