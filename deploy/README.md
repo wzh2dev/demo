@@ -211,7 +211,7 @@ ansible nodes -b -m reboot
 ### 7. 验证
 
 ```bash
-ansible nodes -b -m shell -a 'ls -d /cluster/* /data/*; du -sh /data/containerd'
+ansible nodes -b -m shell -a 'ls -d /cluster/* /data'
 ansible nodes -b -m shell -a 'tmux ls'
 ansible apiserver -b -m shell -a 'systemctl is-enabled keepalived'
 ```
