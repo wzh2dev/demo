@@ -75,6 +75,9 @@
   "[ansible]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
   },
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  },
   "go.goroot": "/cluster/go",
   "gitai.enableCheckpointLogging": true,
   "npm.exclude": ["**/.agents/**"],
@@ -101,5 +104,6 @@
   ],
   "ansible.ansible.path": "/cluster/ansible/bin/ansible",
   "ansible.ansibleNavigator.path": "/cluster/uv/uvx ansible-navigator",
-  "ansible.validation.lint.path": "/cluster/uv/uvx ansible-lint"
+  "ansible.validation.lint.path": "/cluster/uv/uvx ansible-lint",
+  "markdown.validate.enabled": false
 }
