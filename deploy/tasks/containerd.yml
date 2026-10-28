@@ -5,7 +5,9 @@
   loop:
     - /cluster/containerd
     - /cluster/runc
-    - /etc/containerd
+    - /cluster/containerd/certs.d/registry.k8s.io
+    - /cluster/containerd/certs.d/docker.io
+    - /cluster/containerd/certs.d/quay.io
 
 - name: 安装 containerd
   block:
@@ -28,7 +30,7 @@
 
     - name: 生成 containerd 配置文件
       ansible.builtin.copy:
-        dest: /etc/containerd/config.toml
+        dest: /cluster/containerd/config.toml
         content: |
           version = 2
           root = "/data/containerd"
@@ -44,16 +46,19 @@
                       SystemdCgroup = true
 
               [plugins."io.containerd.grpc.v1.cri".registry]
-                [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
-                  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
-                    endpoint = ["https://hub.wuzhenhua.com:8080"]
-                  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-                    endpoint = ["https://hub.wuzhenhua.com:8080"]
-                  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."quay.io"]
-                    endpoint = ["https://hub.wuzhenhua.com:8080"]
-                [plugins."io.containerd.grpc.v1.cri".registry.configs]
-                  [plugins."io.containerd.grpc.v1.cri".registry.configs."hub.wuzhenhua.com:8080".tls]
-                    ca_file = "/cluster/pki/root/root.crt"
+                config_path = "/cluster/containerd/certs.d"
+
+    - name: 生成 registry hosts 配置
+      ansible.builtin.copy:
+        dest: "/cluster/containerd/certs.d/{{ item }}/hosts.toml"
+        content: |
+          [host."https://hub.wuzhenhua.com:8080"]
+            capabilities = ["pull", "resolve"]
+            ca = "/cluster/pki/root/root.crt"
+      loop:
+        - registry.k8s.io
+        - docker.io
+        - quay.io
 
 - name: 安装 runc
   block:
@@ -87,7 +92,7 @@
         tmux new-session
         -d
         -s containerd
-        "/cluster/containerd/bin/containerd --config /etc/containerd/config.toml"
+        "/cluster/containerd/bin/containerd --config /cluster/containerd/config.toml"
       when: containerd_tmux_session.rc != 0
 
     - name: 等待 containerd 接口就绪
