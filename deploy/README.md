@@ -141,15 +141,19 @@ curl -I http://<上一步查到的 EXTERNAL-IP>
 
 Weave Scope 是纯可视化组件，部署在 `weave` 命名空间，与 CNI 无关，不影响 Calico。
 
-### 1. 在 client 机上把 Service 转发到宿主机
+### 1. 通过 ingress-nginx 访问
+
+playbook 会创建 Ingress `weave-scope`，域名固定为 `scope.wuzhenhua.com`。先在客户端 hosts 中把该域名指向 ingress-nginx-controller 的 EXTERNAL-IP：
 
 ```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig port-forward -n weave svc/weave-scope-app 4040:80 --address=0.0.0.0
+echo "<ingress-nginx EXTERNAL-IP> scope.wuzhenhua.com" | sudo tee -a /etc/hosts
 ```
 
-浏览器访问 `http://<client 机 IP>:4040`。
+浏览器访问 `http://scope.wuzhenhua.com`。
 
-### 2. 查看 agent 状态
+注意：Scope 没有任何认证，能打开页面的人可以查看全部拓扑、Pod 日志，甚至删除 Pod。不要暴露到公网。
+
+### 3. 查看 agent 状态
 
 ```bash
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n weave -o wide

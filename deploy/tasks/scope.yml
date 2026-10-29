@@ -357,3 +357,44 @@
       retries: 30
       delay: 10
       changed_when: false
+
+- name: 通过 ingress-nginx 暴露 Scope
+  block:
+    - name: 生成 Scope Ingress 清单
+      ansible.builtin.copy:
+        dest: /cluster/k8s/weave-scope-ingress.yaml
+        content: |
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: weave-scope
+            namespace: weave
+            annotations:
+              # Scope 前端通过 websocket 长连接推送拓扑，默认 60s 会被 nginx 断开
+              nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+              nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+          spec:
+            ingressClassName: nginx
+            tls:
+              - hosts:
+                  - scope.wuzhenhua.com
+            rules:
+              - host: scope.wuzhenhua.com
+                http:
+                  paths:
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: weave-scope-app
+                          port:
+                            number: 80
+
+    - name: 应用 Scope Ingress
+      ansible.builtin.command:
+        cmd: >-
+          /cluster/k8s/client/bin/kubectl
+          --kubeconfig=/cluster/k8s/admin.kubeconfig
+          apply -f /cluster/k8s/weave-scope-ingress.yaml
+      register: scope_ingress_result
+      changed_when: "'unchanged' not in scope_ingress_result.stdout"
