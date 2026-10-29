@@ -75,51 +75,11 @@ ansible kubelet -b -m shell -a "rm -f /var/lib/kubelet/pki/kubelet.crt /var/lib/
 
 ## 验证 CoreDNS
 
-### 1. 查看 coredns pod 与 kube-dns Service
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n kube-system -l k8s-app=kube-dns -o wide
-```
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get svc kube-dns -n kube-system
-```
-
-### 3. 查看 coredns 日志（排查解析失败）
+### 1. 查看 coredns 日志（排查解析失败）
 
 ```bash
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig logs -n kube-system -l k8s-app=kube-dns --tail=50
 ```
-
-## 验证 MetalLB 与 ingress-nginx
-
-### 1. 查看 MetalLB 组件状态
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n metallb-system -o wide
-```
-
-### 2. 查看地址池与 L2 通告
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get ipaddresspool,l2advertisement -n metallb-system
-```
-
-### 3. 查看 ingress-nginx-controller 分配到的 VIP
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get svc ingress-nginx-controller -n ingress-nginx
-```
-
-EXTERNAL-IP 由 `<pending>` 变为 `metallb_address_pool` 中的 IP 即为成功。
-
-### 4. 从宿主机验证 VIP 可达
-
-```bash
-curl -I http://<上一步查到的 EXTERNAL-IP>
-```
-
-返回 `404` 属正常：请求已到达 ingress-nginx，只是还没有匹配的 Ingress 规则。
 
 ## 访问 Kubernetes Dashboard
 
@@ -136,30 +96,6 @@ curl -I http://<上一步查到的 EXTERNAL-IP>
 ```
 
 默认有效期 1 小时，可用 `--duration=24h` 延长（上限受 kube-apiserver 配置约束）。
-
-## 访问 Weave Scope
-
-Weave Scope 是纯可视化组件，部署在 `weave` 命名空间，与 CNI 无关，不影响 Calico。
-
-### 1. 通过 ingress-nginx 访问
-
-playbook 会创建 Ingress `weave-scope`，域名固定为 `scope.wuzhenhua.com`。先在客户端 hosts 中把该域名指向 ingress-nginx-controller 的 EXTERNAL-IP：
-
-```bash
-echo "<ingress-nginx EXTERNAL-IP> scope.wuzhenhua.com" | sudo tee -a /etc/hosts
-```
-
-浏览器访问 `http://scope.wuzhenhua.com`。
-
-注意：Scope 没有任何认证，能打开页面的人可以查看全部拓扑、Pod 日志，甚至删除 Pod。不要暴露到公网。
-
-### 3. 查看 agent 状态
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n weave -o wide
-```
-
-注意：agent 默认挂载 `/var/run/docker.sock`，本集群容器运行时是 containerd，所以 Scope 中 Docker 视图为空，Kubernetes 视图正常。
 
 ## k8s 学习
 
