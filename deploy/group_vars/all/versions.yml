@@ -1,7 +1,9 @@
 # 版本选择原则（k8s 1.27.16）：
 # - ingress-nginx / metrics-server：取"官方支持矩阵仍包含 1.27"的最后一个补丁版
 # - MetalLB：取最新版，接受 1.27 上的 best-effort
-# 升级 k8s 时以上三处的版本都要重算
+# - Weave Net：2.8.1 是主线最后一个版本，1.27 上 best-effort
+# - Weave Scope：1.13.2 是最后版本（项目已归档），仅用于集群可视化
+# 升级 k8s 时以上五处的版本都要重算
 arch: "amd64"
 
 k8s_version: "1.27.16"
@@ -16,3 +18,4 @@ dashboard_version: "2.7.0"
 ingress_nginx_version: "1.11.8"
 metrics_server_version: "0.7.2"
 metallb_version: "0.16.0"
+scope_version: "1.13.2"

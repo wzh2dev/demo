@@ -1,0 +1,6 @@
+- name: 部署 Weave Scope
+  hosts: localhost
+  become: true
+  tags: [scope]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/scope.yml

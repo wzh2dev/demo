@@ -137,6 +137,26 @@ curl -I http://<上一步查到的 EXTERNAL-IP>
 
 默认有效期 1 小时，可用 `--duration=24h` 延长（上限受 kube-apiserver 配置约束）。
 
+## 访问 Weave Scope
+
+Weave Scope 是纯可视化组件，部署在 `weave` 命名空间，与 CNI 无关，不影响 Calico。
+
+### 1. 在 client 机上把 Service 转发到宿主机
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig port-forward -n weave svc/weave-scope-app 4040:80 --address=0.0.0.0
+```
+
+浏览器访问 `http://<client 机 IP>:4040`。
+
+### 2. 查看 agent 状态
+
+```bash
+/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig get pod -n weave -o wide
+```
+
+注意：agent 默认挂载 `/var/run/docker.sock`，本集群容器运行时是 containerd，所以 Scope 中 Docker 视图为空，Kubernetes 视图正常。
+
 ## k8s 学习
 
 ### 4. 查看 calico-system 命名空间下的 calico-node pod 详情
