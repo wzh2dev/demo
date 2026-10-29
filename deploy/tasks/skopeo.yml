@@ -9,8 +9,7 @@
     zot_mirrors:
       - { src: "registry.k8s.io/pause:3.8", dest: "pause:3.8" }
       - { src: "registry.k8s.io/coredns/coredns:{{ coredns_version }}", dest: "coredns/coredns:{{ coredns_version }}" }
-      - src: registry.k8s.io/metrics-server/metrics-server:{{ metrics_server_version }}
-        dest: metrics-server/metrics-server:{{ metrics_server_version }}
+      - { src: "registry.k8s.io/metrics-server/metrics-server:{{ metrics_server_version }}", dest: "metrics-server/metrics-server:{{ metrics_server_version }}" }
       - { src: "registry.k8s.io/ingress-nginx/controller:{{ ingress_nginx_version }}", dest: "ingress-nginx/controller:{{ ingress_nginx_version }}" }
       - { src: "registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.0", dest: "ingress-nginx/kube-webhook-certgen:v1.6.0" }
       - { src: "quay.io/tigera/operator:v1.32.12", dest: "tigera/operator:v1.32.12" }
