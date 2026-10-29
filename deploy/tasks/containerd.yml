@@ -14,7 +14,7 @@
     - name: 下载 containerd 压缩包
       tags: [download]
       ansible.builtin.get_url:
-        url: https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-{{ arch }}.tar.gz
+        url: https://github.com/containerd/containerd/releases/download/{{ containerd_version }}/containerd-{{ containerd_version[1:] }}-linux-{{ arch }}.tar.gz
         dest: /tmp/containerd.tar.gz
       delegate_to: localhost
       run_once: true
@@ -65,7 +65,7 @@
     - name: 下载 runc
       tags: [download]
       ansible.builtin.get_url:
-        url: https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.{{ arch }}
+        url: https://github.com/opencontainers/runc/releases/download/{{ runc_version }}/runc.{{ arch }}
         dest: /tmp/runc.{{ arch }}
       delegate_to: localhost
       run_once: true

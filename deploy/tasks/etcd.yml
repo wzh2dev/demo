@@ -11,7 +11,7 @@
     - name: 下载 etcd 压缩包
       tags: [download]
       ansible.builtin.get_url:
-        url: https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-{{ arch }}.tar.gz
+        url: https://github.com/etcd-io/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-{{ arch }}.tar.gz
         dest: /tmp/etcd.tar.gz
       delegate_to: localhost
       run_once: true

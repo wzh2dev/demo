@@ -160,7 +160,7 @@
                   - --kubelet-use-node-status-port
                   - --kubelet-certificate-authority=/etc/kubernetes/pki/k8s.crt
                   - --metric-resolution=15s
-                  image: registry.k8s.io/metrics-server/metrics-server:v{{ metrics_server_version }}
+                  image: registry.k8s.io/metrics-server/metrics-server:{{ metrics_server_version }}
                   imagePullPolicy: IfNotPresent
                   livenessProbe:
                     failureThreshold: 3

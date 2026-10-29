@@ -15,7 +15,7 @@
     - name: 下载 Kubernetes 客户端安装包
       tags: [download]
       ansible.builtin.get_url:
-        url: https://dl.k8s.io/v{{ k8s_version }}/kubernetes-client-linux-{{ arch }}.tar.gz
+        url: https://dl.k8s.io/{{ k8s_version }}/kubernetes-client-linux-{{ arch }}.tar.gz
         dest: /tmp/kubernetes-client-{{ k8s_version }}-{{ arch }}.tar.gz
       delegate_to: localhost
       run_once: true
@@ -36,7 +36,7 @@
     - name: 下载 Kubernetes 节点安装包
       tags: [download]
       ansible.builtin.get_url:
-        url: https://dl.k8s.io/v{{ k8s_version }}/kubernetes-node-linux-{{ arch }}.tar.gz
+        url: https://dl.k8s.io/{{ k8s_version }}/kubernetes-node-linux-{{ arch }}.tar.gz
         dest: /tmp/kubernetes-node-{{ k8s_version }}-{{ arch }}.tar.gz
       delegate_to: localhost
       run_once: true
@@ -55,7 +55,7 @@
     - name: 下载 Kubernetes 服务端安装包
       tags: [download]
       ansible.builtin.get_url:
-        url: https://dl.k8s.io/v{{ k8s_version }}/kubernetes-server-linux-{{ arch }}.tar.gz
+        url: https://dl.k8s.io/{{ k8s_version }}/kubernetes-server-linux-{{ arch }}.tar.gz
         dest: /tmp/kubernetes-server-{{ k8s_version }}-{{ arch }}.tar.gz
       delegate_to: localhost
       run_once: true

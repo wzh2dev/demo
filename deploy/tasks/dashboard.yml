@@ -196,7 +196,7 @@
                     type: RuntimeDefault
                 containers:
                   - name: kubernetes-dashboard
-                    image: kubernetesui/dashboard:v{{ dashboard_version }}
+                    image: kubernetesui/dashboard:{{ dashboard_version }}
                     imagePullPolicy: Always
                     ports:
                       - containerPort: 8443

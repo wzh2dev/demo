@@ -126,7 +126,7 @@
               kubernetes.io/os: linux
             containers:
               - name: coredns
-                image: registry.k8s.io/coredns/coredns:v{{ coredns_version }}
+                image: registry.k8s.io/coredns/coredns:{{ coredns_version }}
                 imagePullPolicy: IfNotPresent
                 resources:
                   limits:

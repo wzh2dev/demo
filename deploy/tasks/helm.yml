@@ -8,7 +8,7 @@
     - name: 下载 helm 压缩包
       tags: [download]
       ansible.builtin.get_url:
-        url: https://get.helm.sh/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz
+        url: https://get.helm.sh/helm-{{ helm_version }}-linux-{{ arch }}.tar.gz
         dest: /tmp/helm.tar.gz
       environment:
         https_proxy: "http://10.0.0.1:7897"

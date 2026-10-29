@@ -3,7 +3,7 @@
     - name: 下载 MetalLB 清单文件
       tags: [download]
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/metallb/metallb/v{{ metallb_version }}/config/manifests/metallb-native.yaml
+        url: https://raw.githubusercontent.com/metallb/metallb/{{ metallb_version }}/config/manifests/metallb-native.yaml
         dest: /cluster/k8s/metallb.yaml
       environment:
         https_proxy: "http://10.0.0.1:7897"
