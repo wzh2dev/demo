@@ -200,7 +200,7 @@
                           - '--probe.kubernetes.role=host'
                           - '--probe.docker.bridge=docker0'
                           - '--probe.docker=true'
-                          - 'weave-scope-app.weave.svc.cluster.local.:80'
+                          - 'weave-scope-app.weave.svc.{{ cluster_domain }}.:80'
                         env:
                           - name: SCOPE_HOSTNAME
                             valueFrom:
@@ -273,7 +273,7 @@
                           - '--mode=probe'
                           - '--probe-only'
                           - '--probe.kubernetes.role=cluster'
-                          - 'weave-scope-app.weave.svc.cluster.local.:80'
+                          - 'weave-scope-app.weave.svc.{{ cluster_domain }}.:80'
                         command:
                           - /home/weave/scope
                         image: 'docker.io/weaveworks/scope:{{ scope_version }}'
@@ -370,7 +370,6 @@
             name: weave-scope
             namespace: weave
             annotations:
-              # Scope 前端通过 websocket 长连接推送拓扑，默认 60s 会被 nginx 断开
               nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
               nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
           spec:

@@ -39,7 +39,7 @@
               clientCAFile: /cluster/pki/k8s/k8s.crt
           authorization:
             mode: Webhook
-          clusterDomain: wuzhenhua.com
+          clusterDomain: {{ cluster_domain }}
           clusterDNS:
             - {{ cluster_dns }}
 

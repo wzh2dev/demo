@@ -3,6 +3,7 @@ pod_cidr_mask_size: "26"
 service_cluster_ip_range: "192.168.3.0/24"
 kubernetes_service_ip: "192.168.3.1"
 cluster_dns: "192.168.3.10"
+cluster_domain: "wuzhenhua.com"
 etcd_servers: "https://node1:2379,https://node2:2379,https://node3:2379"
 api_server: "https://{{ keepalived_vip }}:6443"
 
