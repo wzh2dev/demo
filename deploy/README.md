@@ -175,3 +175,13 @@ ansible nodes -b -m shell -a 'ls -d /cluster/* /data'
 ansible nodes -b -m shell -a 'tmux ls'
 ansible apiserver -b -m shell -a 'systemctl is-enabled keepalived'
 ```
+
+```bash
+helm upgrade higress higress.io/higress \
+  -n higress-system \
+  --reuse-values \
+  --set higress-core.gateway.resources.requests.cpu=500m \
+  --set higress-core.gateway.resources.requests.memory=512Mi \
+  --set higress-core.gateway.resources.limits.cpu=1000m \
+  --set higress-core.gateway.resources.limits.memory=1Gi
+```
