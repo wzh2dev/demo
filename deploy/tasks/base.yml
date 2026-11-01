@@ -106,7 +106,9 @@
         update_cache: true
         cache_valid_time: 3600
 
-- name: 安装 tmux
+- name: 安装基础软件包
   ansible.builtin.package:
-    name: tmux
+    name:
+      - iptables
+      - tmux
     state: present
