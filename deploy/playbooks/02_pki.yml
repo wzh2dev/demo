@@ -36,9 +36,6 @@
     - name: 签发并校验 kube-proxy 客户端证书
       ansible.builtin.import_tasks: ../tasks/pki/kube_proxy_certificates.yml
 
-    - name: 签发并校验 apiserver 健康检查客户端证书
-      ansible.builtin.import_tasks: ../tasks/pki/apiserver_healthz_certificates.yml
-
     - name: 签发并校验 admin 客户端证书
       ansible.builtin.import_tasks: ../tasks/pki/admin_certificates.yml
 
