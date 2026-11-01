@@ -21,7 +21,7 @@
         replace: '#\1'
 
 - name: 关闭 SELinux
-  when: ansible_facts.selinux is defined
+  when: ansible_os_family == 'RedHat'
   block:
     - name: 临时关闭 SELinux
       ansible.builtin.command: setenforce 0
