@@ -12,7 +12,7 @@
       }
 
       vrrp_script check_apiserver {
-          script "/bin/bash -c 'curl -sfk https://127.0.0.1:6443/healthz -o /dev/null'"
+          script "/bin/bash -c 'curl -sfk --cert /cluster/pki/k8s/apiserver-healthz-client.crt --key /cluster/pki/k8s/apiserver-healthz-client.key https://127.0.0.1:6443/healthz -o /dev/null'"
           interval 2
           fall 3
           rise 2
