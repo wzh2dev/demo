@@ -52,7 +52,7 @@
       ansible.builtin.copy:
         dest: "/cluster/containerd/certs.d/{{ item }}/hosts.toml"
         content: |
-          [host."https://hub.wuzhenhua.com:8080"]
+          [host."https://pn41.wuzhenhua.com:8080"]
             capabilities = ["pull", "resolve"]
             ca = "/cluster/pki/root/root.crt"
       loop:
