@@ -38,6 +38,9 @@
             name: default
           spec:
             calicoNetwork:
+              nodeAddressAutodetectionV4:
+                firstFound: false
+                kubernetes: NodeInternalIP
               ipPools:
                 - blockSize: {{ pod_cidr_mask_size }}
                   cidr: {{ pod_cidr }}
