@@ -12,6 +12,7 @@
     - name: 关闭当前启用的 swap
       ansible.builtin.command: swapoff -a
       when: ansible_swaptotal_mb | int > 0
+      changed_when: ansible_swaptotal_mb | int > 0
 
     - name: 注释 fstab 中启用的 swap 条目
       ansible.builtin.replace:
@@ -20,6 +21,7 @@
         replace: '#\1'
 
 - name: 关闭 SELinux
+  when: ansible_facts.selinux is defined
   block:
     - name: 临时关闭 SELinux
       ansible.builtin.command: setenforce 0
@@ -50,7 +52,7 @@
         path: /etc/ssh/sshd_config
         regexp: '^[ \t#]*PermitRootLogin'
         line: "PermitRootLogin yes"
-        validate: sshd -t -f %s
+        validate: /usr/sbin/sshd -t -f %s
       notify: 重载 SSH 服务
 
     - name: 允许密码认证
@@ -58,13 +60,14 @@
         path: /etc/ssh/sshd_config
         regexp: '^[ \t#]*PasswordAuthentication'
         line: "PasswordAuthentication yes"
-        validate: sshd -t -f %s
+        validate: /usr/sbin/sshd -t -f %s
       notify: 重载 SSH 服务
 
     - name: 应用 SSH 配置变更
       ansible.builtin.meta: flush_handlers
 
 - name: 配置阿里云 yum 源
+  when: ansible_os_family == 'RedHat'
   block:
     - name: 删除原有 CentOS 源文件
       ansible.builtin.file:
@@ -89,7 +92,21 @@
       when: aliyun_base_repo is changed
       changed_when: false
 
+- name: 配置阿里云 apt 源
+  when: ansible_os_family == 'Debian'
+  block:
+    - name: 替换为阿里云 apt 源
+      ansible.builtin.replace:
+        path: /etc/apt/sources.list
+        regexp: 'http://(archive|security)\.ubuntu\.com/ubuntu/?'
+        replace: "https://mirrors.aliyun.com/ubuntu/"
+
+    - name: 更新 apt 缓存
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
 - name: 安装 tmux
-  ansible.builtin.yum:
+  ansible.builtin.package:
     name: tmux
     state: present
