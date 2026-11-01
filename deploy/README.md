@@ -83,13 +83,7 @@ ansible kubelet -b -m shell -a "rm -f /var/lib/kubelet/pki/kubelet.crt /var/lib/
 
 ## 访问 Kubernetes Dashboard
 
-### 1. 在 client 机上启动 kubectl proxy
-
-```bash
-/cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig proxy --address=0.0.0.0 --port=8001 --accept-hosts='.*'
-```
-
-### 2. 获取 admin 登录 token
+### 1. 获取 admin 登录 token
 
 ```bash
 /cluster/k8s/client/bin/kubectl --kubeconfig=/cluster/k8s/admin.kubeconfig create token admin -n kubernetes-dashboard

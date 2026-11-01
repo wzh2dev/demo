@@ -422,4 +422,4 @@
 
     - name: 输出 Dashboard 登录 token
       ansible.builtin.debug:
-        msg: "登录 token（有效期 1 小时）：{{ dashboard_admin_token.stdout | trim }}，访问方式见 README「访问 Kubernetes Dashboard」"
+        msg: "登录 token（有效期 1 小时）：{{ dashboard_admin_token.stdout | trim }}"
