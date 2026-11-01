@@ -7,9 +7,9 @@ cluster_domain: "wuzhenhua.com"
 etcd_servers: "https://node1:2379,https://node2:2379,https://node3:2379"
 api_server: "https://{{ keepalived_vip }}:6443"
 
-keepalived_vip: "10.0.0.100"
+keepalived_vip: "10.0.0.3"
 keepalived_priority:
   node1: "100"
   node2: "90"
 
-metallb_address_pool: "10.0.0.110-10.0.0.120"
+metallb_address_pool: "10.0.0.4-10.0.0.100"
