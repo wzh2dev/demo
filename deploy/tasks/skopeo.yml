@@ -1,5 +1,5 @@
 - name: 安装 skopeo
-  ansible.builtin.yum:
+  ansible.builtin.package:
     name: skopeo
     state: present
 
@@ -31,7 +31,7 @@
   ansible.builtin.command: >
     skopeo inspect
     --tls-verify=false
-    docker://10.0.0.104:8080/{{ item.dest }}
+    docker://127.0.0.1:8080/{{ item.dest }}
   loop: "{{ zot_mirrors }}"
   loop_control:
     label: "{{ item.dest }}"
@@ -43,8 +43,9 @@
   tags: [mirror]
   ansible.builtin.command: >
     skopeo copy
+    --all
     docker://{{ item.item.src }}
-    docker://10.0.0.104:8080/{{ item.item.dest }}
+    docker://127.0.0.1:8080/{{ item.item.dest }}
     --dest-tls-verify=false
   loop: "{{ zot_mirror_check.results }}"
   loop_control:
@@ -53,4 +54,4 @@
   changed_when: false
   environment:
     HTTPS_PROXY: "http://10.0.0.1:7897"
-    NO_PROXY: "10.0.0.104"
+    NO_PROXY: "127.0.0.1"
