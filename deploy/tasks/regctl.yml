@@ -1,0 +1,47 @@
+- name: 创建 regctl 安装目录
+  tags: [download]
+  ansible.builtin.file:
+    path: /cluster/regctl
+    state: directory
+
+- name: 下载 regctl 到控制机
+  tags: [download]
+  ansible.builtin.get_url:
+    url: https://github.com/regclient/regclient/releases/latest/download/regctl-linux-{{ arch }}
+    dest: /tmp/regctl.{{ arch }}
+  delegate_to: localhost
+  run_once: true
+  become: false
+  environment:
+    https_proxy: "http://10.0.0.1:7897"
+
+- name: 分发 regctl 并赋予执行权限
+  ansible.builtin.copy:
+    src: /tmp/regctl.{{ arch }}
+    dest: /cluster/regctl/regctl
+    mode: "0755"
+
+- name: 定义含 attestation 清单的镜像
+  tags: [mirror]
+  ansible.builtin.set_fact:
+    regctl_mirrors:
+      - { src: "quay.io/metallb/controller:{{ metallb_version }}", dest: "metallb/controller:{{ metallb_version }}" }
+      - { src: "quay.io/metallb/speaker:{{ metallb_version }}", dest: "metallb/speaker:{{ metallb_version }}" }
+      - { src: "registry.k8s.io/ingress-nginx/controller:{{ ingress_nginx_version }}", dest: "ingress-nginx/controller:{{ ingress_nginx_version }}" }
+      - { src: "registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.0", dest: "ingress-nginx/kube-webhook-certgen:v1.6.0" }
+
+- name: 使用 regctl 同步含 attestation 的镜像到 zot
+  tags: [mirror]
+  ansible.builtin.command: >
+    /cluster/regctl/regctl
+    --host "reg=127.0.0.1:8080,tls=insecure"
+    image copy
+    {{ item.src }}
+    127.0.0.1:8080/{{ item.dest }}
+  loop: "{{ regctl_mirrors }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  changed_when: false
+  environment:
+    HTTPS_PROXY: "http://10.0.0.1:7897"
+    NO_PROXY: "127.0.0.1"

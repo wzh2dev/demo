@@ -11,3 +11,10 @@
   tags: [skopeo]
   tasks:
     - ansible.builtin.import_tasks: ../tasks/skopeo.yml
+
+- name: 安装 regctl 并预置镜像到 zot
+  hosts: registry
+  become: true
+  tags: [regctl]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/regctl.yml
