@@ -9,16 +9,16 @@
 
 本机工具不依赖系统 PATH。调用下列工具时，**MUST** 使用表中给出的可执行文件路径，**MUST NOT** 根据安装目录自行猜测命令位置。
 
-| 工具                  | 环境根目录                 | 可执行文件或调用方式                    |
-| :-------------------- | :------------------------- | :---------------------------------------|
-| JDK                   | /cluster/jdk/Contents/Home | /cluster/jdk/Contents/Home/bin/java     |
-| Go                    | /cluster/go                | /cluster/go/bin/go                      |
-| Android cmdline-tools | /cluster/cmdline-tools     | /cluster/cmdline-tools/bin/sdkmanager   |
-| Android SDK           | /cluster/android-sdk       | /cluster/android-sdk/platform-tools/adb |
-| Gradle                | /cluster/gradle            | /cluster/gradle/bin/gradle              |
-| Maven                 | /cluster/maven             | /cluster/maven/bin/mvn                  |
-| uv                    | /cluster/uv                | /cluster/uv/uv                          |
-| Pandoc                | /cluster/pandoc            | /cluster/pandoc/bin/pandoc              |
+| 工具                  | 环境根目录                 | 可执行文件或调用方式                     |
+| :-------------------- | :------------------------- | :--------------------------------------- |
+| JDK                   | /cluster/jdk/Contents/Home | /cluster/jdk/Contents/Home/bin/java      |
+| Go                    | /cluster/go                | /cluster/go/bin/go                       |
+| Android cmdline-tools | /cluster/cmdline-tools     | /cluster/cmdline-tools/bin/sdkmanager    |
+| Android SDK           | /cluster/android-sdk       | /cluster/android-sdk/platform-tools/adb  |
+| Gradle                | /cluster/gradle            | /cluster/gradle/bin/gradle               |
+| Maven                 | /cluster/maven             | /cluster/maven/bin/mvn                   |
+| uv                    | /cluster/uv                | /cluster/uv/uv                           |
+| Pandoc                | /cluster/pandoc            | /cluster/pandoc/bin/pandoc               |
 
 > 调用规则:
 >
