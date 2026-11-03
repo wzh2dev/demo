@@ -1,11 +1,9 @@
 - name: 部署 Tigera Operator
   block:
-    - name: 下载 Tigera Operator 清单文件
-      ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/tigera-operator.yaml
+    - name: 分发 Tigera Operator 清单文件
+      ansible.builtin.copy:
+        src: ../files/tigera-operator.yaml
         dest: /cluster/k8s/tigera-operator.yaml
-      environment:
-        https_proxy: "http://10.0.0.1:7897"
 
     - name: 部署 Tigera Operator
       ansible.builtin.command:
