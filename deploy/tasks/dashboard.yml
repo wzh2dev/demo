@@ -37,8 +37,8 @@
 - name: 通过 ingress-nginx 暴露 Dashboard
   block:
     - name: 生成 Dashboard Ingress 清单
-      ansible.builtin.template:
-        src: ../templates/dashboard/dashboard-ingress.yaml.j2
+      ansible.builtin.copy:
+        src: ../files/dashboard-ingress.yaml
         dest: /cluster/k8s/dashboard-ingress.yaml
 
     - name: 应用 Dashboard Ingress
