@@ -35,32 +35,10 @@
         mode: "0755"
 
     - name: 生成 zot 配置文件
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/zot/config.json.j2
         dest: /cluster/zot/config.json
-        content: |
-          {
-            "distSpecVersion": "1.0.1",
-            "storage": {
-              "rootDirectory": "/data/zot"
-            },
-            "http": {
-              "address": "0.0.0.0",
-              "readTimeout": "30m",
-              "writeTimeout": "30m",
-              "tls": {
-                "cert": "/cluster/pki/zot/zot-{{ inventory_hostname }}.crt",
-                "key": "/cluster/pki/zot/zot-{{ inventory_hostname }}.key"
-              }
-            },
-            "extensions": {
-              "search": {
-                "enable": true
-              },
-              "ui": {
-                "enable": true
-              }
-            }
-          }
+        mode: "0644"
 
 - name: 启动并验证 zot
   block:

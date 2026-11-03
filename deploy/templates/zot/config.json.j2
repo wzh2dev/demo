@@ -1,0 +1,23 @@
+{
+  "distSpecVersion": "1.0.1",
+  "storage": {
+    "rootDirectory": "/data/zot"
+  },
+  "http": {
+    "address": "0.0.0.0",
+    "readTimeout": "30m",
+    "writeTimeout": "30m",
+    "tls": {
+      "cert": "/cluster/pki/zot/zot-{{ inventory_hostname }}.crt",
+      "key": "/cluster/pki/zot/zot-{{ inventory_hostname }}.key"
+    }
+  },
+  "extensions": {
+    "search": {
+      "enable": true
+    },
+    "ui": {
+      "enable": true
+    }
+  }
+}

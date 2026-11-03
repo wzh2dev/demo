@@ -29,32 +29,16 @@
         creates: /cluster/containerd/bin/containerd
 
     - name: 生成 containerd 配置文件
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/containerd/config.toml.j2
         dest: /cluster/containerd/config.toml
-        content: |
-          version = 2
-          root = "/data/containerd"
-
-          [plugins]
-            [plugins."io.containerd.grpc.v1.cri"]
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                    runtime_type = "io.containerd.runc.v2"
-                    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-                      BinaryName = "/cluster/runc/runc"
-                      SystemdCgroup = true
-
-              [plugins."io.containerd.grpc.v1.cri".registry]
-                config_path = "/cluster/containerd/certs.d"
+        mode: "0644"
 
     - name: 生成 registry hosts 配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/containerd/hosts.toml.j2
         dest: "/cluster/containerd/certs.d/{{ item }}/hosts.toml"
-        content: |
-          [host."https://pn41.wuzhenhua.com:8080"]
-            capabilities = ["pull", "resolve"]
-            ca = "/cluster/pki/root/root.crt"
+        mode: "0644"
       loop:
         - registry.k8s.io
         - docker.io
