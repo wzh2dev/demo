@@ -376,9 +376,9 @@
             ingressClassName: nginx
             tls:
               - hosts:
-                  - scope.wuzhenhua.com
+                  - scope.{{ cluster_domain }}
             rules:
-              - host: scope.wuzhenhua.com
+              - host: scope.{{ cluster_domain }}
                 http:
                   paths:
                     - path: /

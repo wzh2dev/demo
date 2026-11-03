@@ -357,9 +357,9 @@
             ingressClassName: nginx
             tls:
               - hosts:
-                  - dashboard.wuzhenhua.com
+                  - dashboard.{{ cluster_domain }}
             rules:
-              - host: dashboard.wuzhenhua.com
+              - host: dashboard.{{ cluster_domain }}
                 http:
                   paths:
                     - path: /
