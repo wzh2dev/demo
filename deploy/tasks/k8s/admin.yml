@@ -1,24 +1,6 @@
 - name: 生成 admin kubeconfig
   block:
     - name: 生成 admin kubeconfig
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/k8s/admin.kubeconfig.j2
         dest: /cluster/k8s/admin.kubeconfig
-        content: |
-          apiVersion: v1
-          kind: Config
-          clusters:
-            - name: local
-              cluster:
-                server: {{ api_server }}
-                certificate-authority: /cluster/pki/k8s/k8s.crt
-          users:
-            - name: admin
-              user:
-                client-certificate: /cluster/pki/k8s/admin-client.crt
-                client-key: /cluster/pki/k8s/admin-client.key
-          contexts:
-            - name: admin@local
-              context:
-                cluster: local
-                user: admin
-          current-context: admin@local

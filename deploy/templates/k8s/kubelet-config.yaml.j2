@@ -1,0 +1,16 @@
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+containerRuntimeEndpoint: unix:///run/containerd/containerd.sock
+cgroupDriver: systemd
+rotateCertificates: true
+serverTLSBootstrap: true
+authentication:
+  anonymous:
+    enabled: false
+  x509:
+    clientCAFile: /cluster/pki/k8s/k8s.crt
+authorization:
+  mode: Webhook
+clusterDomain: {{ cluster_domain }}
+clusterDNS:
+  - {{ cluster_dns }}

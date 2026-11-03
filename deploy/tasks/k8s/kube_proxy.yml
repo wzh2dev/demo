@@ -11,39 +11,14 @@
 - name: 部署 kube-proxy
   block:
     - name: 生成 kube-proxy kubeconfig
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/k8s/kube-proxy.kubeconfig.j2
         dest: /cluster/k8s/kube-proxy.kubeconfig
-        content: |
-          apiVersion: v1
-          kind: Config
-          clusters:
-            - name: local
-              cluster:
-                server: {{ api_server }}
-                certificate-authority: /cluster/pki/k8s/k8s.crt
-          users:
-            - name: kube-proxy
-              user:
-                client-certificate: /cluster/pki/k8s/kube-proxy-client.crt
-                client-key: /cluster/pki/k8s/kube-proxy-client.key
-          contexts:
-            - name: kube-proxy@local
-              context:
-                cluster: local
-                user: kube-proxy
-          current-context: kube-proxy@local
 
     - name: 生成 kube-proxy 配置文件
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/k8s/kube-proxy-config.yaml.j2
         dest: /cluster/k8s/kube-proxy-config.yaml
-        content: |
-          apiVersion: kubeproxy.config.k8s.io/v1alpha1
-          kind: KubeProxyConfiguration
-          hostnameOverride: {{ inventory_hostname }}
-          clusterCIDR: {{ pod_cidr }}
-          mode: iptables
-          clientConnection:
-            kubeconfig: /cluster/k8s/kube-proxy.kubeconfig
 
     - name: 检查 kube-proxy 的 tmux 会话是否存在
       ansible.builtin.command: tmux has-session -t kube-proxy

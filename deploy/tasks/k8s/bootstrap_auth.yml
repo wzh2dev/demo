@@ -1,20 +1,9 @@
 - name: 准备 kubelet TLS Bootstrap 集群资源
   block:
     - name: 生成 bootstrap token Secret 清单文件
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/k8s/bootstrap-token-secret.yaml.j2
         dest: /cluster/k8s/bootstrap-token-secret.yaml
-        content: |
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: bootstrap-token-abcdef
-            namespace: kube-system
-          type: bootstrap.kubernetes.io/token
-          stringData:
-            token-id: "abcdef"
-            token-secret: "0123456789abcdef"
-            usage-bootstrap-authentication: "true"
-            usage-bootstrap-signing: "false"
 
     - name: 创建 bootstrap token Secret
       ansible.builtin.command:
@@ -38,50 +27,9 @@
         var: bootstrap_token_list.stdout_lines
 
     - name: 生成 bootstrap 授权及 CSR 自动审批清单文件
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/k8s/bootstrap-rbac.yaml.j2
         dest: /cluster/k8s/bootstrap-rbac.yaml
-        content: |
-          # 1. 允许 bootstrap 组提交首次 CSR
-          apiVersion: rbac.authorization.k8s.io/v1
-          kind: ClusterRoleBinding
-          metadata:
-            name: create-csrs-for-bootstrapping
-          roleRef:
-            apiGroup: rbac.authorization.k8s.io
-            kind: ClusterRole
-            name: system:node-bootstrapper
-          subjects:
-            - kind: Group
-              apiGroup: rbac.authorization.k8s.io
-              name: system:bootstrappers
-          ---
-          # 2. 自动批准首次 node client 证书
-          apiVersion: rbac.authorization.k8s.io/v1
-          kind: ClusterRoleBinding
-          metadata:
-            name: auto-approve-csrs-for-group
-          roleRef:
-            apiGroup: rbac.authorization.k8s.io
-            kind: ClusterRole
-            name: system:certificates.k8s.io:certificatesigningrequests:nodeclient
-          subjects:
-            - kind: Group
-              apiGroup: rbac.authorization.k8s.io
-              name: system:bootstrappers
-          ---
-          # 3. 自动批准客户端证书轮换
-          apiVersion: rbac.authorization.k8s.io/v1
-          kind: ClusterRoleBinding
-          metadata:
-            name: auto-approve-renewals-for-nodes
-          roleRef:
-            apiGroup: rbac.authorization.k8s.io
-            kind: ClusterRole
-            name: system:certificates.k8s.io:certificatesigningrequests:selfnodeclient
-          subjects:
-            - kind: Group
-              apiGroup: rbac.authorization.k8s.io
-              name: system:nodes
 
     - name: 创建 bootstrap 授权及 CSR 自动审批绑定
       ansible.builtin.command:

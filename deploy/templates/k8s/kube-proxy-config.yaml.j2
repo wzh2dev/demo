@@ -1,0 +1,7 @@
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+hostnameOverride: {{ inventory_hostname }}
+clusterCIDR: {{ pod_cidr }}
+mode: iptables
+clientConnection:
+  kubeconfig: /cluster/k8s/kube-proxy.kubeconfig
