@@ -6,20 +6,9 @@
         creates: /cluster/pki/front-proxy/front-proxy-client.key
 
     - name: 写入 front-proxy 客户端证书签名请求配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/front-proxy-client.cnf.j2
         dest: /cluster/pki/front-proxy/front-proxy-client.cnf
-        content: |
-          [ req ]
-          prompt             = no
-          distinguished_name = req_distinguished_name
-
-          [ req_distinguished_name ]
-          C  = CN
-          ST = Jiangsu
-          L  = Nanjing
-          O  = Wuzhenhua
-          OU = IT
-          CN = front-proxy-client
 
     - name: 生成 front-proxy 客户端证书签名请求
       ansible.builtin.command: >
@@ -32,15 +21,9 @@
         creates: /cluster/pki/front-proxy/front-proxy-client.csr
 
     - name: 写入 front-proxy 客户端证书扩展配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/front-proxy-client.ext.j2
         dest: /cluster/pki/front-proxy/front-proxy-client.ext
-        content: |
-          [ v3_req ]
-          basicConstraints       = critical, CA:FALSE
-          keyUsage               = critical, digitalSignature, keyEncipherment
-          extendedKeyUsage       = clientAuth
-          subjectKeyIdentifier   = hash
-          authorityKeyIdentifier = keyid,issuer
 
     # 该 CA 只签这一张证书，直接用 x509 -req，无需 openssl ca 的证书数据库
     - name: 使用 front-proxy 中间 CA 签发客户端证书

@@ -1,0 +1,24 @@
+[ ca ]
+default_ca = ca_default
+
+[ ca_default ]
+dir             = /cluster/pki/etcd
+crl_dir         = $dir/crl
+new_certs_dir   = $dir/newcerts
+database        = $dir/index.txt
+serial          = $dir/serial
+crlnumber       = $dir/crlnumber
+
+policy          = policy_strict
+
+unique_subject  = yes
+copy_extensions = none
+
+[ policy_strict ]
+countryName            = match
+stateOrProvinceName    = match
+localityName           = match
+organizationName       = match
+organizationalUnitName = match
+commonName             = supplied
+emailAddress           = optional

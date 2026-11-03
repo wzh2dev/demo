@@ -6,20 +6,9 @@
         creates: /cluster/pki/k8s/kube-proxy-client.key
 
     - name: 写入 kube-proxy 客户端证书签名请求配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/kube-proxy-client.cnf.j2
         dest: /cluster/pki/k8s/kube-proxy-client.cnf
-        content: |
-          [ req ]
-          prompt             = no
-          distinguished_name = req_distinguished_name
-
-          [ req_distinguished_name ]
-          C  = CN
-          ST = Jiangsu
-          L  = Nanjing
-          O  = Wuzhenhua
-          OU = K8S
-          CN = system:kube-proxy
 
     - name: 生成 kube-proxy 客户端证书签名请求
       ansible.builtin.command: >
@@ -32,15 +21,9 @@
         creates: /cluster/pki/k8s/kube-proxy-client.csr
 
     - name: 写入 kube-proxy 客户端证书扩展配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/kube-proxy-client.ext.j2
         dest: /cluster/pki/k8s/kube-proxy-client.ext
-        content: |
-          [ v3_req ]
-          basicConstraints       = critical, CA:FALSE
-          keyUsage               = critical, digitalSignature, keyEncipherment
-          extendedKeyUsage       = clientAuth
-          subjectKeyIdentifier   = hash
-          authorityKeyIdentifier = keyid,issuer
 
     - name: 使用 k8s 中间 CA 签发 kube-proxy 客户端证书
       ansible.builtin.command: >

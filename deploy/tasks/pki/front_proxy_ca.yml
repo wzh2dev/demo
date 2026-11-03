@@ -9,20 +9,9 @@
     creates: /cluster/pki/front-proxy/front-proxy-ca.key
 
 - name: 写入 front-proxy 中间 CA 证书签名请求配置
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: ../templates/pki/front-proxy-ca.cnf.j2
     dest: /cluster/pki/front-proxy/front-proxy-ca.cnf
-    content: |
-      [ req ]
-      prompt             = no
-      distinguished_name = req_distinguished_name
-
-      [ req_distinguished_name ]
-      C  = CN
-      ST = Jiangsu
-      L  = Nanjing
-      O  = Wuzhenhua
-      OU = IT
-      CN = Front Proxy CA
 
 - name: 生成 front-proxy 中间 CA 证书签名请求
   ansible.builtin.command: >
@@ -36,14 +25,9 @@
     creates: /cluster/pki/front-proxy/front-proxy-ca.csr
 
 - name: 写入 front-proxy 中间 CA 证书扩展配置
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: ../templates/pki/front-proxy-ca.ext.j2
     dest: /cluster/pki/front-proxy/front-proxy-ca.ext
-    content: |
-      [ v3_ca ]
-      basicConstraints       = critical, CA:true, pathlen:0
-      keyUsage               = critical, keyCertSign, cRLSign
-      subjectKeyIdentifier   = hash
-      authorityKeyIdentifier = keyid:always
 
 - name: 使用根 CA 签发 front-proxy 中间 CA 证书
   ansible.builtin.command: >

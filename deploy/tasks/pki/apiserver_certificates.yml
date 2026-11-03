@@ -7,20 +7,9 @@
       loop: "{{ groups['apiserver'] }}"
 
     - name: 生成各 kube-apiserver 成员的 server 证书签名请求配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/apiserver.cnf.j2
         dest: /cluster/pki/k8s/apiserver-{{ item }}.cnf
-        content: |
-          [ req ]
-          prompt             = no
-          distinguished_name = req_distinguished_name
-
-          [ req_distinguished_name ]
-          C  = CN
-          ST = Jiangsu
-          L  = Nanjing
-          O  = Wuzhenhua
-          OU = K8S
-          CN = kube-apiserver-{{ item }}
       loop: "{{ groups['apiserver'] }}"
 
     - name: 生成各 kube-apiserver 成员的 server 证书签名请求
@@ -35,31 +24,9 @@
       loop: "{{ groups['apiserver'] }}"
 
     - name: 生成各 kube-apiserver 成员的 server 证书扩展配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/apiserver.ext.j2
         dest: /cluster/pki/k8s/apiserver-{{ item }}.ext
-        content: |
-          [ v3_req ]
-          basicConstraints       = critical, CA:FALSE
-          keyUsage               = critical, digitalSignature, keyEncipherment
-          extendedKeyUsage       = serverAuth
-          subjectKeyIdentifier   = hash
-          authorityKeyIdentifier = keyid,issuer
-          subjectAltName         = @alt_names
-
-          [ alt_names ]
-          DNS.1 = localhost
-          DNS.2 = wuzhenhua.com
-          DNS.3 = xueyingying.com
-          DNS.4 = {{ item }}
-          DNS.5 = {{ item }}.wuzhenhua.com
-          DNS.6 = kubernetes
-          DNS.7 = kubernetes.default
-          DNS.8 = kubernetes.default.svc
-          DNS.9 = kubernetes.default.svc.wuzhenhua.com
-          IP.1  = 127.0.0.1
-          IP.2  = {{ hostvars[item].ansible_host }}
-          IP.3  = {{ kubernetes_service_ip }}
-          IP.4  = {{ keepalived_vip }}
       loop: "{{ groups['apiserver'] }}"
 
     - name: 使用 k8s 中间 CA 签发各 kube-apiserver 成员的 server 证书
@@ -97,20 +64,9 @@
         creates: /cluster/pki/k8s/apiserver-kubelet-client.key
 
     - name: 写入 kube-apiserver 访问 kubelet 的客户端证书签名请求配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/apiserver-kubelet-client.cnf.j2
         dest: /cluster/pki/k8s/apiserver-kubelet-client.cnf
-        content: |
-          [ req ]
-          prompt             = no
-          distinguished_name = req_distinguished_name
-
-          [ req_distinguished_name ]
-          C  = CN
-          ST = Jiangsu
-          L  = Nanjing
-          O  = system:masters
-          OU = K8S
-          CN = kube-apiserver-kubelet-client
 
     - name: 生成 kube-apiserver 访问 kubelet 的客户端证书签名请求
       ansible.builtin.command: >
@@ -123,15 +79,9 @@
         creates: /cluster/pki/k8s/apiserver-kubelet-client.csr
 
     - name: 写入 kube-apiserver 访问 kubelet 的客户端证书扩展配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/apiserver-kubelet-client.ext.j2
         dest: /cluster/pki/k8s/apiserver-kubelet-client.ext
-        content: |
-          [ v3_req ]
-          basicConstraints       = critical, CA:FALSE
-          keyUsage               = critical, digitalSignature, keyEncipherment
-          extendedKeyUsage       = clientAuth
-          subjectKeyIdentifier   = hash
-          authorityKeyIdentifier = keyid,issuer
 
     - name: 使用 k8s 中间 CA 签发 kube-apiserver 访问 kubelet 的客户端证书
       ansible.builtin.command: >
@@ -167,20 +117,9 @@
         creates: /cluster/pki/k8s/apiserver-healthz-client.key
 
     - name: 写入 apiserver 健康检查客户端证书签名请求配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/apiserver-healthz-client.cnf.j2
         dest: /cluster/pki/k8s/apiserver-healthz-client.cnf
-        content: |
-          [ req ]
-          prompt             = no
-          distinguished_name = req_distinguished_name
-
-          [ req_distinguished_name ]
-          C  = CN
-          ST = Jiangsu
-          L  = Nanjing
-          O  = Wuzhenhua
-          OU = K8S
-          CN = apiserver-healthz
 
     - name: 生成 apiserver 健康检查客户端证书签名请求
       ansible.builtin.command: >
@@ -193,15 +132,9 @@
         creates: /cluster/pki/k8s/apiserver-healthz-client.csr
 
     - name: 写入 apiserver 健康检查客户端证书扩展配置
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: ../templates/pki/apiserver-healthz-client.ext.j2
         dest: /cluster/pki/k8s/apiserver-healthz-client.ext
-        content: |
-          [ v3_req ]
-          basicConstraints       = critical, CA:FALSE
-          keyUsage               = critical, digitalSignature, keyEncipherment
-          extendedKeyUsage       = clientAuth
-          subjectKeyIdentifier   = hash
-          authorityKeyIdentifier = keyid,issuer
 
     - name: 使用 k8s 中间 CA 签发 apiserver 健康检查客户端证书
       ansible.builtin.command: >

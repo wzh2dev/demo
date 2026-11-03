@@ -9,26 +9,9 @@
     creates: /cluster/pki/k8s/k8s.key
 
 - name: 写入 k8s 中间 CA 证书签名请求配置
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: ../templates/pki/k8s.cnf.j2
     dest: /cluster/pki/k8s/k8s.cnf
-    content: |
-      [ req ]
-      prompt             = no
-      distinguished_name = req_distinguished_name
-
-      [ req_distinguished_name ]
-      C  = CN
-      ST = Jiangsu
-      L  = Nanjing
-      O  = Wuzhenhua
-      OU = K8S
-      CN = K8S CA
-
-      [ v3_ca ]
-      basicConstraints       = critical, CA:true, pathlen:0
-      keyUsage               = critical, keyCertSign, cRLSign
-      subjectKeyIdentifier   = hash
-      authorityKeyIdentifier = keyid:always
 
 - name: 生成 k8s 中间 CA 证书签名请求
   ansible.builtin.command: >
@@ -41,14 +24,9 @@
     creates: /cluster/pki/k8s/k8s.csr
 
 - name: 写入 k8s 中间 CA 证书扩展配置
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: ../templates/pki/k8s.ext.j2
     dest: /cluster/pki/k8s/k8s.ext
-    content: |
-      [ v3_ca ]
-      basicConstraints       = critical, CA:true, pathlen:0
-      keyUsage               = critical, keyCertSign, cRLSign
-      subjectKeyIdentifier   = hash
-      authorityKeyIdentifier = keyid:always
 
 - name: 使用根 CA 签发 k8s 中间 CA 证书
   ansible.builtin.command: >
@@ -97,30 +75,6 @@
     - /cluster/pki/k8s/crlnumber
 
 - name: 写入 k8s 中间 CA 签发配置
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: ../templates/pki/k8s_ca.cnf.j2
     dest: /cluster/pki/k8s/k8s_ca.cnf
-    content: |
-      [ ca ]
-      default_ca = ca_default
-
-      [ ca_default ]
-      dir             = /cluster/pki/k8s
-      crl_dir         = $dir/crl
-      new_certs_dir   = $dir/newcerts
-      database        = $dir/index.txt
-      serial          = $dir/serial
-      crlnumber       = $dir/crlnumber
-
-      policy          = policy_strict
-
-      unique_subject  = yes
-      copy_extensions = none
-
-      [ policy_strict ]
-      countryName            = match
-      stateOrProvinceName    = match
-      localityName           = match
-      organizationName       = supplied
-      organizationalUnitName = match
-      commonName             = supplied
-      emailAddress           = optional
