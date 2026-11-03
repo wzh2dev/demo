@@ -7,7 +7,6 @@
   ansible.builtin.template:
     src: ../templates/keepalived/keepalived.conf.j2
     dest: /etc/keepalived/keepalived.conf
-    mode: "0644"
   notify: 重启 keepalived
 
 - name: 启动并设置开机自启
