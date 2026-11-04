@@ -83,13 +83,19 @@
         enabled: true
       register: aliyun_base_repo
 
+    - name: 下载阿里云 EPEL 7 repo 文件
+      ansible.builtin.get_url:
+        url: https://mirrors.aliyun.com/repo/epel-7.repo
+        dest: /etc/yum.repos.d/epel.repo
+      register: aliyun_epel_repo
+
     - name: 清理 yum 缓存
       ansible.builtin.command: yum clean all
-      when: aliyun_base_repo is changed
+      when: aliyun_base_repo is changed or aliyun_epel_repo is changed
 
     - name: 重建 yum 缓存
       ansible.builtin.command: yum makecache
-      when: aliyun_base_repo is changed
+      when: aliyun_base_repo is changed or aliyun_epel_repo is changed
       changed_when: false
 
 - name: 配置阿里云 apt 源
