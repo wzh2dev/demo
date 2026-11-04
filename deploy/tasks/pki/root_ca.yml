@@ -9,9 +9,26 @@
     creates: /cluster/pki/root/root.key
 
 - name: 写入根 CA 自签名证书配置
-  ansible.builtin.template:
-    src: ../templates/pki/root.cnf.j2
+  ansible.builtin.copy:
     dest: /cluster/pki/root/root.cnf
+    content: |
+      [ req ]
+      prompt             = no
+      distinguished_name = req_distinguished_name
+
+      [ req_distinguished_name ]
+      C  = CN
+      ST = Jiangsu
+      L  = Nanjing
+      O  = Wuzhenhua
+      OU = IT
+      CN = Root CA
+
+      [ v3_ca ]
+      basicConstraints       = critical, CA:true, pathlen:1
+      keyUsage               = critical, keyCertSign, cRLSign
+      subjectKeyIdentifier   = hash
+      authorityKeyIdentifier = keyid:always
 
 - name: 生成根 CA 自签名证书
   ansible.builtin.command: >
@@ -55,6 +72,30 @@
     - /cluster/pki/root/crlnumber
 
 - name: 写入根 CA 签发配置
-  ansible.builtin.template:
-    src: ../templates/pki/root_ca.cnf.j2
+  ansible.builtin.copy:
     dest: /cluster/pki/root/root_ca.cnf
+    content: |
+      [ ca ]
+      default_ca = ca_default
+
+      [ ca_default ]
+      dir             = /cluster/pki/root
+      crl_dir         = $dir/crl
+      new_certs_dir   = $dir/newcerts
+      database        = $dir/index.txt
+      serial          = $dir/serial
+      crlnumber       = $dir/crlnumber
+
+      policy          = policy_strict
+
+      unique_subject  = yes
+      copy_extensions = none
+
+      [ policy_strict ]
+      countryName            = match
+      stateOrProvinceName    = match
+      localityName           = match
+      organizationName       = match
+      organizationalUnitName = supplied
+      commonName             = supplied
+      emailAddress           = optional

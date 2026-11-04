@@ -9,9 +9,20 @@
     creates: /cluster/pki/etcd/etcd.key
 
 - name: 写入 etcd 中间 CA 证书签名请求配置
-  ansible.builtin.template:
-    src: ../templates/pki/etcd.cnf.j2
+  ansible.builtin.copy:
     dest: /cluster/pki/etcd/etcd.cnf
+    content: |
+      [ req ]
+      prompt             = no
+      distinguished_name = req_distinguished_name
+
+      [ req_distinguished_name ]
+      C  = CN
+      ST = Jiangsu
+      L  = Nanjing
+      O  = Wuzhenhua
+      OU = ETCD
+      CN = ETCD CA
 
 - name: 生成 etcd 中间 CA 证书签名请求
   ansible.builtin.command: >
@@ -25,9 +36,14 @@
     creates: /cluster/pki/etcd/etcd.csr
 
 - name: 写入 etcd 中间 CA 证书扩展配置
-  ansible.builtin.template:
-    src: ../templates/pki/etcd.ext.j2
+  ansible.builtin.copy:
     dest: /cluster/pki/etcd/etcd.ext
+    content: |
+      [ v3_ca ]
+      basicConstraints       = critical, CA:true, pathlen:0
+      keyUsage               = critical, keyCertSign, cRLSign
+      subjectKeyIdentifier   = hash
+      authorityKeyIdentifier = keyid:always
 
 - name: 使用根 CA 签发 etcd 中间 CA 证书
   ansible.builtin.command: >
@@ -76,6 +92,30 @@
     - /cluster/pki/etcd/crlnumber
 
 - name: 写入 etcd 中间 CA 签发配置
-  ansible.builtin.template:
-    src: ../templates/pki/etcd_ca.cnf.j2
+  ansible.builtin.copy:
     dest: /cluster/pki/etcd/etcd_ca.cnf
+    content: |
+      [ ca ]
+      default_ca = ca_default
+
+      [ ca_default ]
+      dir             = /cluster/pki/etcd
+      crl_dir         = $dir/crl
+      new_certs_dir   = $dir/newcerts
+      database        = $dir/index.txt
+      serial          = $dir/serial
+      crlnumber       = $dir/crlnumber
+
+      policy          = policy_strict
+
+      unique_subject  = yes
+      copy_extensions = none
+
+      [ policy_strict ]
+      countryName            = match
+      stateOrProvinceName    = match
+      localityName           = match
+      organizationName       = match
+      organizationalUnitName = match
+      commonName             = supplied
+      emailAddress           = optional

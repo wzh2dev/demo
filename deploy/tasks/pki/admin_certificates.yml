@@ -6,9 +6,20 @@
         creates: /cluster/pki/k8s/admin-client.key
 
     - name: 写入 admin 客户端证书签名请求配置
-      ansible.builtin.template:
-        src: ../templates/pki/admin-client.cnf.j2
+      ansible.builtin.copy:
         dest: /cluster/pki/k8s/admin-client.cnf
+        content: |
+          [ req ]
+          prompt             = no
+          distinguished_name = req_distinguished_name
+
+          [ req_distinguished_name ]
+          C  = CN
+          ST = Jiangsu
+          L  = Nanjing
+          O  = system:masters
+          OU = K8S
+          CN = admin
 
     - name: 生成 admin 客户端证书签名请求
       ansible.builtin.command: >
@@ -21,9 +32,15 @@
         creates: /cluster/pki/k8s/admin-client.csr
 
     - name: 写入 admin 客户端证书扩展配置
-      ansible.builtin.template:
-        src: ../templates/pki/admin-client.ext.j2
+      ansible.builtin.copy:
         dest: /cluster/pki/k8s/admin-client.ext
+        content: |
+          [ v3_req ]
+          basicConstraints       = critical, CA:FALSE
+          keyUsage               = critical, digitalSignature, keyEncipherment
+          extendedKeyUsage       = clientAuth
+          subjectKeyIdentifier   = hash
+          authorityKeyIdentifier = keyid,issuer
 
     - name: 使用 k8s 中间 CA 签发 admin 客户端证书
       ansible.builtin.command: >
