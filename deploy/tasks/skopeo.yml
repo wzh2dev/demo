@@ -41,6 +41,7 @@
     skopeo copy
     --all
     --dest-tls-verify=false
+    --format oci
     docker://{{ item.item.src }}
     docker://127.0.0.1:8080/{{ item.item.dest }}
   loop: "{{ zot_mirror_check.results }}"
