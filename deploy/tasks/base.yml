@@ -4,7 +4,7 @@
     marker: "# {mark} ANSIBLE MANAGED CLUSTER HOSTS"
     block: |
       {% for host in groups['nodes'] %}
-      {{ hostvars[host].ansible_host }} {{ host }}.{{ cluster_domain }} {{ host }}
+      {{ hostvars[host].ansible_host }} {{ host }}.wuzhenhua.com {{ host }}
       {% endfor %}
 
 - name: 关闭 swap
