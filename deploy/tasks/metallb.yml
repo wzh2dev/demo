@@ -1,9 +1,12 @@
 - name: 部署 MetalLB
   block:
-    - name: 分发 MetalLB 清单文件
-      ansible.builtin.copy:
-        src: ../files/metallb.yaml
+    - name: 下载 MetalLB 清单文件
+      tags: [download]
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/metallb/metallb/{{ metallb_version }}/config/manifests/metallb-native.yaml
         dest: /cluster/k8s/metallb.yaml
+      environment:
+        https_proxy: "http://10.0.0.1:7897"
 
     - name: 应用 MetalLB 清单
       ansible.builtin.command:

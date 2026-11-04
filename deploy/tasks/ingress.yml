@@ -1,9 +1,12 @@
 - name: 部署 ingress-nginx
   block:
-    - name: 分发 ingress-nginx 清单文件
-      ansible.builtin.copy:
-        src: ../files/ingress-nginx.yaml
+    - name: 下载 ingress-nginx 清单文件
+      tags: [download]
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-{{ ingress_nginx_version }}/deploy/static/provider/cloud/deploy.yaml
         dest: /cluster/k8s/ingress-nginx.yaml
+      environment:
+        https_proxy: "http://10.0.0.1:7897"
 
     - name: 应用 ingress-nginx 清单
       ansible.builtin.command:
