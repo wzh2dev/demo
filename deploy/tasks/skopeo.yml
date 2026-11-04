@@ -40,10 +40,9 @@
   ansible.builtin.command: >
     skopeo copy
     --all
-    --retry-times 3
+    --dest-tls-verify=false
     docker://{{ item.item.src }}
     docker://127.0.0.1:8080/{{ item.item.dest }}
-    --dest-tls-verify=false
   loop: "{{ zot_mirror_check.results }}"
   loop_control:
     label: "{{ item.item.dest }}"
