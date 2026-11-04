@@ -53,6 +53,7 @@
       ansible.builtin.template:
         src: ../templates/etcd/etcd.config.yml.j2
         dest: /cluster/etcd/etcd.config.yml
+        mode: "0644"
 
 - name: 启动并验证 etcd
   block:

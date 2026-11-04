@@ -32,11 +32,13 @@
       ansible.builtin.template:
         src: ../templates/containerd/config.toml.j2
         dest: /cluster/containerd/config.toml
+        mode: "0644"
 
     - name: 生成 registry hosts 配置
       ansible.builtin.template:
         src: ../templates/containerd/hosts.toml.j2
         dest: "/cluster/containerd/certs.d/{{ item }}/hosts.toml"
+        mode: "0644"
       loop:
         - registry.k8s.io
         - docker.io
