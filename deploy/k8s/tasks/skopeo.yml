@@ -21,6 +21,7 @@
       - { src: "docker.io/kubernetesui/dashboard:{{ dashboard_version }}", dest: "kubernetesui/dashboard:{{ dashboard_version }}" }
       - { src: "docker.io/kubernetesui/metrics-scraper:v1.0.8", dest: "kubernetesui/metrics-scraper:v1.0.8" }
       - { src: "docker.io/weaveworks/scope:{{ scope_version }}", dest: "weaveworks/scope:{{ scope_version }}" }
+      - { src: "docker.io/library/mysql:5.7", dest: "library/mysql:5.7" }
 
 - name: 检查 zot 中镜像是否已存在
   tags: [mirror]
