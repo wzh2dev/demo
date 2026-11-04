@@ -50,7 +50,6 @@ Vagrant.configure("2") do |config|
 
     client.vm.provision "shell", inline: <<-'SHELL'
       curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
-      curl -o /etc/yum.repos.d/epel.repo https://mirrors.aliyun.com/repo/epel-7.repo
       yum clean all && yum makecache
     SHELL
 
