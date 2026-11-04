@@ -69,18 +69,18 @@
 - name: 配置阿里云 yum 源
   when: ansible_os_family == 'RedHat'
   block:
-    - name: 删除原有 CentOS 源文件
-      ansible.builtin.file:
-        path: /etc/yum.repos.d/CentOS-Base.repo
-        state: absent
+    - name: 获取阿里云 CentOS 7 repo 文件
+      ansible.builtin.uri:
+        url: https://mirrors.aliyun.com/repo/Centos-7.repo
+        return_content: true
+      register: aliyun_base_repo_content
+      check_mode: false
+      changed_when: false
 
-    - name: 配置阿里云 base 源
-      ansible.builtin.yum_repository:
-        name: base
-        description: CentOS-7 - Base - Aliyun
-        baseurl: https://mirrors.aliyun.com/centos-vault/7.9.2009/os/$basearch/
-        gpgcheck: false
-        enabled: true
+    - name: 写入 CentOS-Base 源并关闭签名校验
+      ansible.builtin.copy:
+        dest: /etc/yum.repos.d/CentOS-Base.repo
+        content: '{{ aliyun_base_repo_content.content | replace("gpgcheck=1", "gpgcheck=0") | regex_replace("(?m)^.*mirrors\.(cloud\.)?aliyuncs\.com.*\n", "") }}'
       register: aliyun_base_repo
 
     - name: 下载阿里云 EPEL 7 repo 文件
