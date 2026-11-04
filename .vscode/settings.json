@@ -105,5 +105,5 @@
   "ansible.ansible.path": "/cluster/ansible/bin/ansible",
   "ansible.ansibleNavigator.path": "/cluster/uv/uvx ansible-navigator",
   "ansible.validation.lint.path": "/cluster/uv/uvx ansible-lint",
-  "markdown.validate.enabled": false
+  "ansible.validation.lint.enabled": false
 }
