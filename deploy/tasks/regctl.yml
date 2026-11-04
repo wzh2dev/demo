@@ -19,7 +19,6 @@
   ansible.builtin.copy:
     src: /tmp/regctl.{{ arch }}
     dest: /cluster/regctl/regctl
-    mode: "0755"
 
 - name: 定义含 attestation 清单的镜像
   tags: [mirror]
