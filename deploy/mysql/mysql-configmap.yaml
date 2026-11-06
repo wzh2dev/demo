@@ -7,7 +7,6 @@ metadata:
     app.kubernetes.io/name: mysql
 data:
   primary.cnf: |
-    # 单实例部署；开启 binlog 必须显式指定 server-id
     [mysqld]
     server-id=1
     log-bin

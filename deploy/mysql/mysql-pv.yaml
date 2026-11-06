@@ -1,5 +1,3 @@
-# 集群无动态存储插件（无 StorageClass / 无 PV），这里为单实例 MySQL 提供静态 PV。
-# 使用节点本地目录，副本固定调度到 node1（见 mysql-statefulset.yaml 的 nodeSelector）。
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -11,9 +9,8 @@ spec:
   capacity:
     storage: 10Gi
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  # 不设置 storageClassName：与 StatefulSet 生成的 PVC（未指定 storageClass）按容量/访问模式绑定
   hostPath:
     path: /data/mysql
     type: DirectoryOrCreate
