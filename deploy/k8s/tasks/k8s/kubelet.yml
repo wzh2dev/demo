@@ -2,25 +2,8 @@
   block:
     - name: 生成 kubelet bootstrap kubeconfig
       ansible.builtin.copy:
+        src: "{{ inventory_dir }}/files/kubelet-bootstrap.kubeconfig"
         dest: /cluster/k8s/kubelet-bootstrap.kubeconfig
-        content: |
-          apiVersion: v1
-          kind: Config
-          clusters:
-            - name: local
-              cluster:
-                server: {{ api_server }}
-                certificate-authority: /cluster/pki/k8s/k8s.crt
-          users:
-            - name: kubelet-bootstrap
-              user:
-                token: "abcdef.0123456789abcdef"
-          contexts:
-            - name: kubelet-bootstrap@local
-              context:
-                cluster: local
-                user: kubelet-bootstrap
-          current-context: kubelet-bootstrap@local
 
     - name: 生成 kubelet 配置文件
       ansible.builtin.copy:

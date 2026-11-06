@@ -77,7 +77,7 @@
         --proxy-client-key-file=/cluster/pki/front-proxy/front-proxy-client.key
         --service-account-key-file=/cluster/pki/k8s/sa.pub
         --service-account-signing-key-file=/cluster/pki/k8s/sa.key
-        --service-account-issuer=https://kubernetes.default.svc.wuzhenhua.com
+        --service-account-issuer=https://kubernetes.default.svc.{{ cluster_domain }}
         --service-cluster-ip-range={{ service_cluster_ip_range }}
         --enable-bootstrap-token-auth=true
         --authorization-mode=Node,RBAC
