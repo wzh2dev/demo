@@ -1,0 +1,42 @@
+- name: 创建 mgr 数据目录
+  ansible.builtin.file:
+    path: "/var/lib/ceph/mgr/ceph-{{ inventory_hostname }}"
+    state: directory
+    owner: ceph
+    group: ceph
+    mode: "0755"
+
+- name: 检查 mgr 密钥是否存在
+  ansible.builtin.stat:
+    path: "/var/lib/ceph/mgr/ceph-{{ inventory_hostname }}/keyring"
+  register: ceph_mgr_keyring
+
+- name: 创建 mgr 密钥
+  ansible.builtin.command:
+    argv:
+      - ceph
+      - auth
+      - get-or-create
+      - "mgr.{{ inventory_hostname }}"
+      - mon
+      - allow profile mgr
+      - osd
+      - allow *
+      - mds
+      - allow *
+      - -o
+      - "/var/lib/ceph/mgr/ceph-{{ inventory_hostname }}/keyring"
+  when: not ceph_mgr_keyring.stat.exists
+
+- name: 设置 mgr 密钥权限
+  ansible.builtin.file:
+    path: "/var/lib/ceph/mgr/ceph-{{ inventory_hostname }}/keyring"
+    owner: ceph
+    group: ceph
+    mode: "0600"
+
+- name: 启动 mgr
+  ansible.builtin.service:
+    name: "ceph-mgr@{{ inventory_hostname }}"
+    state: started
+    enabled: true

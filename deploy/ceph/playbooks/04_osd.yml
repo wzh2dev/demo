@@ -1,0 +1,7 @@
+- name: 部署 OSD
+  hosts: osds
+  become: true
+  tags: [osd]
+  tasks:
+    - name: 初始化 OSD
+      ansible.builtin.import_tasks: ../tasks/osd.yml

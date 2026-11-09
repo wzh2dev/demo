@@ -1,0 +1,15 @@
+- name: 生成 monitor 密钥与 monmap
+  hosts: mons[0]
+  become: true
+  tags: [mon]
+  tasks:
+    - name: 生成密钥与 monmap
+      ansible.builtin.import_tasks: ../tasks/mon_keys.yml
+
+- name: 部署 monitor
+  hosts: mons
+  become: true
+  tags: [mon]
+  tasks:
+    - name: 初始化 monitor
+      ansible.builtin.import_tasks: ../tasks/mon.yml

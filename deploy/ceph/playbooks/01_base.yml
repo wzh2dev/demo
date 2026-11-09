@@ -1,0 +1,7 @@
+- name: 节点基础配置
+  hosts: ceph
+  become: true
+  tags: [base]
+  tasks:
+    - name: 配置基础系统
+      ansible.builtin.import_tasks: ../tasks/base.yml

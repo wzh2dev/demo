@@ -1,0 +1,5 @@
+# CentOS 7 (el7) 官方只支持到 Nautilus（14.2.22 为最后一个版本），安装跟随源内最新版本
+ceph_release: "nautilus"
+
+# 官方源；国内访问慢时可换成 https://mirrors.aliyun.com/ceph/rpm-{{ ceph_release }}/el7/$basearch
+ceph_repo_baseurl: "https://download.ceph.com/rpm-{{ ceph_release }}/el7/$basearch"

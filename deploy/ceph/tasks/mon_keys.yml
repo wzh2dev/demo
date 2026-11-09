@@ -1,0 +1,114 @@
+- name: 检查 monitor 密钥是否存在
+  ansible.builtin.stat:
+    path: /etc/ceph/ceph.mon.keyring
+  register: ceph_mon_keyring_stat
+
+- name: 生成 monitor 密钥
+  ansible.builtin.command:
+    argv:
+      - ceph-authtool
+      - --create-keyring
+      - /etc/ceph/ceph.mon.keyring
+      - --gen-key
+      - -n
+      - mon.
+      - --cap
+      - mon
+      - allow *
+  when: not ceph_mon_keyring_stat.stat.exists
+
+- name: 检查 admin 密钥是否存在
+  ansible.builtin.stat:
+    path: /etc/ceph/ceph.client.admin.keyring
+  register: ceph_admin_keyring_stat
+
+- name: 生成 admin 客户端密钥
+  ansible.builtin.command:
+    argv:
+      - ceph-authtool
+      - --create-keyring
+      - /etc/ceph/ceph.client.admin.keyring
+      - --gen-key
+      - -n
+      - client.admin
+      - --cap
+      - mon
+      - allow *
+      - --cap
+      - osd
+      - allow *
+      - --cap
+      - mds
+      - allow *
+      - --cap
+      - mgr
+      - allow *
+  when: not ceph_admin_keyring_stat.stat.exists
+
+- name: 创建 bootstrap-osd 密钥目录
+  ansible.builtin.file:
+    path: /var/lib/ceph/bootstrap-osd
+    state: directory
+    owner: ceph
+    group: ceph
+    mode: "0755"
+
+- name: 检查 bootstrap-osd 密钥是否存在
+  ansible.builtin.stat:
+    path: /var/lib/ceph/bootstrap-osd/ceph.keyring
+  register: ceph_bootstrap_osd_keyring_stat
+
+- name: 生成 bootstrap-osd 密钥
+  ansible.builtin.command:
+    argv:
+      - ceph-authtool
+      - --create-keyring
+      - /var/lib/ceph/bootstrap-osd/ceph.keyring
+      - --gen-key
+      - -n
+      - client.bootstrap-osd
+      - --cap
+      - mon
+      - profile bootstrap-osd
+  when: not ceph_bootstrap_osd_keyring_stat.stat.exists
+
+- name: 将 admin 密钥导入 monitor 密钥环
+  ansible.builtin.command:
+    argv:
+      - ceph-authtool
+      - /etc/ceph/ceph.mon.keyring
+      - --import-keyring
+      - /etc/ceph/ceph.client.admin.keyring
+  when: not ceph_mon_keyring_stat.stat.exists or not ceph_admin_keyring_stat.stat.exists
+
+- name: 将 bootstrap-osd 密钥导入 monitor 密钥环
+  ansible.builtin.command:
+    argv:
+      - ceph-authtool
+      - /etc/ceph/ceph.mon.keyring
+      - --import-keyring
+      - /var/lib/ceph/bootstrap-osd/ceph.keyring
+  when: not ceph_mon_keyring_stat.stat.exists or not ceph_bootstrap_osd_keyring_stat.stat.exists
+
+- name: 检查 monmap 是否存在
+  ansible.builtin.stat:
+    path: /etc/ceph/ceph.monmap
+  register: ceph_monmap_stat
+
+- name: 生成包含全部 monitor 的 monmap
+  ansible.builtin.shell:
+    cmd: >
+      monmaptool --create --fsid {{ ceph_fsid }}
+      {% for host in groups['mons'] %}--add {{ host }} {{ hostvars[host].ansible_host }} {% endfor %}
+      /etc/ceph/ceph.monmap
+  when: not ceph_monmap_stat.stat.exists
+
+- name: 读取密钥与 monmap
+  ansible.builtin.slurp:
+    src: "{{ item }}"
+  loop:
+    - /etc/ceph/ceph.mon.keyring
+    - /etc/ceph/ceph.client.admin.keyring
+    - /var/lib/ceph/bootstrap-osd/ceph.keyring
+    - /etc/ceph/ceph.monmap
+  register: ceph_mon_slurp

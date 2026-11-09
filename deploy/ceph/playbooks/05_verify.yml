@@ -1,0 +1,7 @@
+- name: 验证 Ceph 集群
+  hosts: mons[0]
+  become: true
+  tags: [verify]
+  tasks:
+    - name: 检查集群状态
+      ansible.builtin.import_tasks: ../tasks/verify.yml

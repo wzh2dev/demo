@@ -1,0 +1,54 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  config.vm.box_version = "2004.01"
+  config.vm.box_check_update = false
+  config.vm.provider "vmware_desktop" do |v|
+    v.vmx["numvcpus"] = "1"
+    v.vmx["memsize"] = "2048"
+  end
+  config.ssh.insert_key = false
+
+  bridge = "Intel(R) Ethernet Connection I217-LM"
+
+  config.vm.provision "shell", inline: <<-'SHELL'
+    sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+    systemctl restart sshd 2>/dev/null
+  SHELL
+
+  nodes = {
+    "ceph1" => "10.0.0.111",
+    "ceph2" => "10.0.0.112",
+    "ceph3" => "10.0.0.113",
+  }
+
+  nodes.each do |name, ip|
+    config.vm.define name do |node|
+      node.vm.hostname = name
+      node.vm.network "public_network", ip: ip, netmask: "255.255.255.0", bridge: bridge
+      node.vm.disk :disk, name: "data", size: "20GB"
+    end
+  end
+
+  # 控制机放在最后定义，保证 vagrant up 时另外两台已就绪
+  config.vm.define "ceph3" do |ceph3|
+    ceph3.vm.provision "shell", inline: <<-'SHELL'
+      curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+      curl -o /etc/yum.repos.d/epel.repo https://mirrors.aliyun.com/repo/epel-7.repo
+      yum clean all && yum makecache
+    SHELL
+
+    ceph3.vm.provision "shell", inline: <<-'SHELL'
+      yum install ansible sshpass -y
+    SHELL
+
+    ceph3.vm.provision "ansible_local" do |ansible|
+      ansible.install = false
+      ansible.playbook = "site.yml"
+      ansible.inventory_path = "inventory.ini"
+      ansible.limit = "all"
+    end
+  end
+end

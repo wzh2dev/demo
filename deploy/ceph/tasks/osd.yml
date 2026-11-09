@@ -1,0 +1,55 @@
+- name: 查询已存在的 OSD
+  ansible.builtin.command: ceph-volume lvm list --format json
+  register: ceph_volume_list
+  changed_when: false
+  failed_when: false
+
+- name: 初始化已使用数据盘列表
+  ansible.builtin.set_fact:
+    ceph_osd_used_devices: []
+
+- name: 解析已使用的数据盘
+  ansible.builtin.set_fact:
+    ceph_osd_used_devices: >-
+      {{ ceph_volume_list.stdout | from_json | dict2items | map(attribute='value') | flatten | map(attribute='devices') | flatten | list }}
+  when: ceph_volume_list.stdout | trim | length > 0
+
+- name: 检查数据盘设备
+  ansible.builtin.stat:
+    path: "{{ ceph_osd_device }}"
+  register: ceph_osd_device_stat
+  when: ceph_osd_device not in ceph_osd_used_devices
+
+- name: 确认数据盘存在
+  ansible.builtin.assert:
+    that: ceph_osd_device_stat.stat.exists
+    fail_msg: "{{ ceph_osd_device }} 不存在，请确认节点已挂载数据盘"
+  when: ceph_osd_device not in ceph_osd_used_devices
+
+- name: 检查数据盘是否已有文件系统或分区
+  ansible.builtin.command:
+    argv:
+      - blkid
+      - -p
+      - "{{ ceph_osd_device }}"
+  register: ceph_osd_blkid
+  changed_when: false
+  failed_when: false
+  when: ceph_osd_device not in ceph_osd_used_devices
+
+- name: 拒绝在非空数据盘上创建 OSD
+  ansible.builtin.assert:
+    that: ceph_osd_blkid.stdout | trim | length == 0
+    fail_msg: "{{ ceph_osd_device }} 上存在文件系统或分区，请清空后再执行"
+  when: ceph_osd_device not in ceph_osd_used_devices
+
+- name: 创建 bluestore OSD
+  ansible.builtin.command:
+    argv:
+      - ceph-volume
+      - lvm
+      - create
+      - --bluestore
+      - --data
+      - "{{ ceph_osd_device }}"
+  when: ceph_osd_device not in ceph_osd_used_devices

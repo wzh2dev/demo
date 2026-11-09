@@ -1,0 +1,25 @@
+- name: 读取集群健康状态
+  ansible.builtin.command: ceph health
+  register: ceph_health
+  changed_when: false
+
+- name: 检查集群健康状态
+  ansible.builtin.assert:
+    that: "'HEALTH_ERR' not in ceph_health.stdout"
+    fail_msg: "集群处于 {{ ceph_health.stdout }}，请执行 ceph -s 排查"
+
+- name: 读取集群状态
+  ansible.builtin.command: "{{ item }}"
+  loop:
+    - ceph -s
+    - ceph osd tree
+    - ceph df
+  register: ceph_status
+  changed_when: false
+
+- name: 输出集群状态
+  ansible.builtin.debug:
+    msg: "{{ item.stdout_lines }}"
+  loop: "{{ ceph_status.results }}"
+  loop_control:
+    label: "{{ item.item }}"

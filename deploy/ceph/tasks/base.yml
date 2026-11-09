@@ -1,0 +1,79 @@
+- name: 写入集群主机名映射
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} ANSIBLE MANAGED CEPH HOSTS"
+    block: |
+      {% for host in groups['ceph'] %}
+      {{ hostvars[host].ansible_host }} {{ host }}
+      {% endfor %}
+
+- name: 关闭 SELinux
+  when: ansible_os_family == 'RedHat'
+  block:
+    - name: 临时关闭 SELinux
+      ansible.builtin.command: setenforce 0
+      when:
+        - ansible_selinux.status | default('disabled') == 'enabled'
+        - ansible_selinux.mode | default('permissive') == 'enforcing'
+
+    - name: 永久关闭 SELinux
+      ansible.builtin.lineinfile:
+        path: /etc/selinux/config
+        regexp: "^SELINUX="
+        line: SELINUX=disabled
+
+    - name: 重启使 SELinux 配置生效
+      ansible.builtin.reboot:
+        reboot_timeout: 600
+      when: ansible_selinux.status | default('disabled') != 'disabled'
+
+- name: 关闭防火墙
+  ansible.builtin.systemd:
+    name: firewalld
+    state: stopped
+    enabled: false
+  when: ansible_facts.services is defined and 'firewalld.service' in ansible_facts.services
+
+- name: 配置阿里云 CentOS 7 yum 源
+  when: ansible_os_family == 'RedHat'
+  block:
+    - name: 获取阿里云 CentOS 7 repo 文件
+      ansible.builtin.uri:
+        url: https://mirrors.aliyun.com/repo/Centos-7.repo
+        return_content: true
+      register: aliyun_base_repo_content
+      check_mode: false
+      changed_when: false
+
+    - name: 写入 CentOS-Base 源并关闭签名校验
+      ansible.builtin.copy:
+        dest: /etc/yum.repos.d/CentOS-Base.repo
+        content: '{{ aliyun_base_repo_content.content | replace("gpgcheck=1", "gpgcheck=0") | regex_replace("(?m)^.*mirrors\.(cloud\.)?aliyuncs\.com.*\n", "") }}'
+      register: aliyun_base_repo
+
+    - name: 清理 yum 缓存
+      ansible.builtin.command: yum clean all
+      when: aliyun_base_repo is changed
+
+    - name: 重建 yum 缓存
+      ansible.builtin.command: yum makecache
+      when: aliyun_base_repo is changed
+      changed_when: false
+
+- name: 配置 Ceph yum 源
+  ansible.builtin.yum_repository:
+    name: ceph
+    description: Ceph packages for $basearch
+    baseurl: "{{ ceph_repo_baseurl }}"
+    enabled: true
+    gpgcheck: false
+    type: rpm-md
+
+- name: 安装 Ceph 软件包
+  ansible.builtin.yum:
+    name:
+      - ceph-common
+      - ceph-mon
+      - ceph-mgr
+      - ceph-osd
+    state: present

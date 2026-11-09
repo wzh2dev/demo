@@ -1,0 +1,9 @@
+- ansible.builtin.import_playbook: playbooks/01_base.yml
+
+- ansible.builtin.import_playbook: playbooks/02_mon.yml
+
+- ansible.builtin.import_playbook: playbooks/03_mgr.yml
+
+- ansible.builtin.import_playbook: playbooks/04_osd.yml
+
+- ansible.builtin.import_playbook: playbooks/05_verify.yml
