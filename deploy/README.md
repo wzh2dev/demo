@@ -17,9 +17,9 @@ vagrant provision client
 ### 拉取 PKI 产物到宿主机（在 Windows 宿主机执行）
 
 ```bash
-vagrant ssh client -c "sudo cat /cluster/pki/k8s/k8s.crt" > k8s.crt
-vagrant ssh client -c "sudo cat /cluster/pki/k8s/admin-client.crt" > admin-client.crt
-vagrant ssh client -c "sudo cat /cluster/pki/k8s/admin-client.key" > admin-client.key
+vagrant ssh client -c "sudo cat /data/ca/k8s/k8s.crt" > k8s.crt
+vagrant ssh client -c "sudo cat /data/ca/k8s/admin-client.crt" > admin-client.crt
+vagrant ssh client -c "sudo cat /data/ca/k8s/admin-client.key" > admin-client.key
 ```
 
 ### 查询节点镜像
@@ -147,13 +147,13 @@ ansible nodes -b -m shell -a 'tmux kill-server'
 ### 4. 删除节点上的 k8s 二进制、证书、数据与配置
 
 ```bash
-ansible nodes -b -m shell -a 'rm -rf /cluster/k8s/kubelet.kubeconfig /cluster/helm /cluster/pki /data/containerd /data/etcd /var/lib/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
+ansible nodes -b -m shell -a 'rm -rf /cluster/k8s/kubelet.kubeconfig /cluster/helm /data/ca /data/containerd /data/etcd /var/lib/kubelet /etc/cni /etc/crictl.yaml /var/lib/cni /var/lib/calico /var/run/calico /cluster/etcd/etcd.config.yml'
 ```
 
 ### 5. 删除控制机上的 kubectl、证书签发源与 helm
 
 ```bash
-ansible localhost -b -m shell -a 'rm -rf /cluster/pki'
+ansible localhost -b -m shell -a 'rm -rf /data/ca'
 ```
 
 ### 6. 重启节点，清除 containerd-shim、netns、iptables 等内核态残留

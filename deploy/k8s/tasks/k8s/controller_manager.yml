@@ -2,16 +2,16 @@
   block:
     - name: 分发 kube-controller-manager 客户端证书及私钥
       ansible.builtin.copy:
-        src: /cluster/pki/k8s/controller-manager-client.{{ item }}
-        dest: /cluster/pki/k8s/
+        src: /data/ca/k8s/controller-manager-client.{{ item }}
+        dest: /data/ca/k8s/
       loop:
         - crt
         - key
 
     - name: 分发 Kubernetes 中间 CA 私钥
       ansible.builtin.copy:
-        src: /cluster/pki/k8s/k8s.key
-        dest: /cluster/pki/k8s/k8s.key
+        src: /data/ca/k8s/k8s.key
+        dest: /data/ca/k8s/k8s.key
 
 - name: 部署 kube-controller-manager
   block:
@@ -31,10 +31,10 @@
         tmux new-session -d -s controller-manager
         "/cluster/k8s/server/bin/kube-controller-manager
         --kubeconfig=/cluster/k8s/controller-manager.kubeconfig
-        --root-ca-file=/cluster/pki/k8s/k8s.crt
-        --service-account-private-key-file=/cluster/pki/k8s/sa.key
-        --cluster-signing-cert-file=/cluster/pki/k8s/k8s.crt
-        --cluster-signing-key-file=/cluster/pki/k8s/k8s.key
+        --root-ca-file=/data/ca/k8s/k8s.crt
+        --service-account-private-key-file=/data/ca/k8s/sa.key
+        --cluster-signing-cert-file=/data/ca/k8s/k8s.crt
+        --cluster-signing-key-file=/data/ca/k8s/k8s.key
         --leader-elect=true
         --use-service-account-credentials=true
         --controllers=*,-tokencleaner
@@ -45,9 +45,9 @@
   block:
     - name: 等待 kube-controller-manager 选主 Lease 可读取
       ansible.builtin.command: >
-        curl -fsS --cacert /cluster/pki/k8s/k8s.crt
-        --cert /cluster/pki/k8s/controller-manager-client.crt
-        --key /cluster/pki/k8s/controller-manager-client.key
+        curl -fsS --cacert /data/ca/k8s/k8s.crt
+        --cert /data/ca/k8s/controller-manager-client.crt
+        --key /data/ca/k8s/controller-manager-client.key
         {{ api_server }}/apis/coordination.k8s.io/v1/namespaces/kube-system/leases/kube-controller-manager
       register: controller_manager_ready
       until: controller_manager_ready.rc == 0

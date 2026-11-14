@@ -2,8 +2,8 @@
   block:
     - name: 分发 kube-scheduler 客户端证书及私钥
       ansible.builtin.copy:
-        src: /cluster/pki/k8s/scheduler-client.{{ item }}
-        dest: /cluster/pki/k8s/
+        src: /data/ca/k8s/scheduler-client.{{ item }}
+        dest: /data/ca/k8s/
       loop:
         - crt
         - key
@@ -34,9 +34,9 @@
   block:
     - name: 等待 kube-scheduler 选主 Lease 可读取
       ansible.builtin.command: >
-        curl -fsS --cacert /cluster/pki/k8s/k8s.crt
-        --cert /cluster/pki/k8s/scheduler-client.crt
-        --key /cluster/pki/k8s/scheduler-client.key
+        curl -fsS --cacert /data/ca/k8s/k8s.crt
+        --cert /data/ca/k8s/scheduler-client.crt
+        --key /data/ca/k8s/scheduler-client.key
         {{ api_server }}/apis/coordination.k8s.io/v1/namespaces/kube-system/leases/kube-scheduler
       register: scheduler_ready
       until: scheduler_ready.rc == 0

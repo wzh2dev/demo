@@ -1,16 +1,16 @@
 - name: 创建 front-proxy 中间 CA 工作目录
   ansible.builtin.file:
-    path: /cluster/pki/front-proxy
+    path: /data/ca/front-proxy
     state: directory
 
 - name: 生成 front-proxy 中间 CA 私钥
-  ansible.builtin.command: openssl genrsa -aes256 -out /cluster/pki/front-proxy/front-proxy-ca.key -passout pass:root 4096
+  ansible.builtin.command: openssl genrsa -aes256 -out /data/ca/front-proxy/front-proxy-ca.key -passout pass:root 4096
   args:
-    creates: /cluster/pki/front-proxy/front-proxy-ca.key
+    creates: /data/ca/front-proxy/front-proxy-ca.key
 
 - name: 写入 front-proxy 中间 CA 证书签名请求配置
   ansible.builtin.copy:
-    dest: /cluster/pki/front-proxy/front-proxy-ca.cnf
+    dest: /data/ca/front-proxy/front-proxy-ca.cnf
     content: |
       [ req ]
       prompt             = no
@@ -27,17 +27,17 @@
 - name: 生成 front-proxy 中间 CA 证书签名请求
   ansible.builtin.command: >
     openssl req -new
-    -config /cluster/pki/front-proxy/front-proxy-ca.cnf
-    -key /cluster/pki/front-proxy/front-proxy-ca.key
+    -config /data/ca/front-proxy/front-proxy-ca.cnf
+    -key /data/ca/front-proxy/front-proxy-ca.key
     -passin pass:root
-    -out /cluster/pki/front-proxy/front-proxy-ca.csr
+    -out /data/ca/front-proxy/front-proxy-ca.csr
     -sha256
   args:
-    creates: /cluster/pki/front-proxy/front-proxy-ca.csr
+    creates: /data/ca/front-proxy/front-proxy-ca.csr
 
 - name: 写入 front-proxy 中间 CA 证书扩展配置
   ansible.builtin.copy:
-    dest: /cluster/pki/front-proxy/front-proxy-ca.ext
+    dest: /data/ca/front-proxy/front-proxy-ca.ext
     content: |
       [ v3_ca ]
       basicConstraints       = critical, CA:true, pathlen:0
@@ -48,21 +48,21 @@
 - name: 使用根 CA 签发 front-proxy 中间 CA 证书
   ansible.builtin.command: >
     openssl ca
-    -config /cluster/pki/root/root_ca.cnf
-    -extfile /cluster/pki/front-proxy/front-proxy-ca.ext
+    -config /data/ca/root/root_ca.cnf
+    -extfile /data/ca/front-proxy/front-proxy-ca.ext
     -extensions v3_ca
-    -cert /cluster/pki/root/root.crt
-    -keyfile /cluster/pki/root/root.key
+    -cert /data/ca/root/root.crt
+    -keyfile /data/ca/root/root.key
     -passin pass:root
-    -in /cluster/pki/front-proxy/front-proxy-ca.csr
-    -out /cluster/pki/front-proxy/front-proxy-ca.crt
+    -in /data/ca/front-proxy/front-proxy-ca.csr
+    -out /data/ca/front-proxy/front-proxy-ca.crt
     -days 1825
     -md sha256
     -batch
     -notext
   args:
-    creates: /cluster/pki/front-proxy/front-proxy-ca.crt
+    creates: /data/ca/front-proxy/front-proxy-ca.crt
 
 - name: 校验 front-proxy 中间 CA 证书
-  ansible.builtin.command: openssl verify -CAfile /cluster/pki/root/root.crt /cluster/pki/front-proxy/front-proxy-ca.crt
+  ansible.builtin.command: openssl verify -CAfile /data/ca/root/root.crt /data/ca/front-proxy/front-proxy-ca.crt
   changed_when: false

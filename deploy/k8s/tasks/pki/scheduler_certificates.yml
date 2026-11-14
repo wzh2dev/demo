@@ -1,13 +1,13 @@
 - name: 签发并校验 kube-scheduler 客户端证书
   block:
     - name: 生成 kube-scheduler 客户端证书私钥
-      ansible.builtin.command: openssl genrsa -out /cluster/pki/k8s/scheduler-client.key 4096
+      ansible.builtin.command: openssl genrsa -out /data/ca/k8s/scheduler-client.key 4096
       args:
-        creates: /cluster/pki/k8s/scheduler-client.key
+        creates: /data/ca/k8s/scheduler-client.key
 
     - name: 写入 kube-scheduler 客户端证书签名请求配置
       ansible.builtin.copy:
-        dest: /cluster/pki/k8s/scheduler-client.cnf
+        dest: /data/ca/k8s/scheduler-client.cnf
         content: |
           [ req ]
           prompt             = no
@@ -24,16 +24,16 @@
     - name: 生成 kube-scheduler 客户端证书签名请求
       ansible.builtin.command: >
         openssl req -new
-        -config /cluster/pki/k8s/scheduler-client.cnf
-        -key /cluster/pki/k8s/scheduler-client.key
-        -out /cluster/pki/k8s/scheduler-client.csr
+        -config /data/ca/k8s/scheduler-client.cnf
+        -key /data/ca/k8s/scheduler-client.key
+        -out /data/ca/k8s/scheduler-client.csr
         -sha256
       args:
-        creates: /cluster/pki/k8s/scheduler-client.csr
+        creates: /data/ca/k8s/scheduler-client.csr
 
     - name: 写入 kube-scheduler 客户端证书扩展配置
       ansible.builtin.copy:
-        dest: /cluster/pki/k8s/scheduler-client.ext
+        dest: /data/ca/k8s/scheduler-client.ext
         content: |
           [ v3_req ]
           basicConstraints       = critical, CA:FALSE
@@ -45,25 +45,25 @@
     - name: 使用 k8s 中间 CA 签发 kube-scheduler 客户端证书
       ansible.builtin.command: >
         openssl ca
-        -config /cluster/pki/k8s/k8s_ca.cnf
-        -extfile /cluster/pki/k8s/scheduler-client.ext
+        -config /data/ca/k8s/k8s_ca.cnf
+        -extfile /data/ca/k8s/scheduler-client.ext
         -extensions v3_req
-        -cert /cluster/pki/k8s/k8s.crt
-        -keyfile /cluster/pki/k8s/k8s.key
-        -in /cluster/pki/k8s/scheduler-client.csr
-        -out /cluster/pki/k8s/scheduler-client.crt
+        -cert /data/ca/k8s/k8s.crt
+        -keyfile /data/ca/k8s/k8s.key
+        -in /data/ca/k8s/scheduler-client.csr
+        -out /data/ca/k8s/scheduler-client.crt
         -days 365
         -md sha256
         -batch
         -notext
       args:
-        creates: /cluster/pki/k8s/scheduler-client.crt
+        creates: /data/ca/k8s/scheduler-client.crt
 
     - name: 校验 kube-scheduler 客户端证书
       ansible.builtin.command: >
         openssl verify
         -purpose sslclient
-        -CAfile /cluster/pki/root/root.crt
-        -untrusted /cluster/pki/k8s/k8s.crt
-        /cluster/pki/k8s/scheduler-client.crt
+        -CAfile /data/ca/root/root.crt
+        -untrusted /data/ca/k8s/k8s.crt
+        /data/ca/k8s/scheduler-client.crt
       changed_when: false

@@ -54,7 +54,7 @@
         content: |
           [host."https://hub.wuzhenhua.com:8080"]
             capabilities = ["pull", "resolve"]
-            ca = "/cluster/pki/root/root.crt"
+            ca = "/data/ca/root/root.crt"
       loop:
         - registry.k8s.io
         - docker.io

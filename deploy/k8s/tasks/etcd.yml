@@ -31,14 +31,14 @@
   block:
     - name: 分发各成员的 server / peer 证书
       ansible.builtin.copy:
-        src: /cluster/pki/etcd/{{ item.0 }}-{{ inventory_hostname }}.{{ item.1 }}
-        dest: /cluster/pki/etcd/
+        src: /data/ca/etcd/{{ item.0 }}-{{ inventory_hostname }}.{{ item.1 }}
+        dest: /data/ca/etcd/
       loop: "{{ ['server', 'peer'] | product(['crt', 'key']) | list }}"
 
     - name: 分发 etcd client 证书
       ansible.builtin.copy:
-        src: /cluster/pki/etcd/client.{{ item }}
-        dest: /cluster/pki/etcd/
+        src: /data/ca/etcd/client.{{ item }}
+        dest: /data/ca/etcd/
       loop:
         - crt
         - key
@@ -63,14 +63,14 @@
           initial-cluster-token: etcd-cluster
           initial-cluster-state: new
           client-transport-security:
-            cert-file: /cluster/pki/etcd/server-{{ inventory_hostname }}.crt
-            key-file: /cluster/pki/etcd/server-{{ inventory_hostname }}.key
-            trusted-ca-file: /cluster/pki/etcd/etcd.crt
+            cert-file: /data/ca/etcd/server-{{ inventory_hostname }}.crt
+            key-file: /data/ca/etcd/server-{{ inventory_hostname }}.key
+            trusted-ca-file: /data/ca/etcd/etcd.crt
             client-cert-auth: true
           peer-transport-security:
-            cert-file: /cluster/pki/etcd/peer-{{ inventory_hostname }}.crt
-            key-file: /cluster/pki/etcd/peer-{{ inventory_hostname }}.key
-            trusted-ca-file: /cluster/pki/etcd/etcd.crt
+            cert-file: /data/ca/etcd/peer-{{ inventory_hostname }}.crt
+            key-file: /data/ca/etcd/peer-{{ inventory_hostname }}.key
+            trusted-ca-file: /data/ca/etcd/etcd.crt
             client-cert-auth: true
 
 - name: 启动并验证 etcd
@@ -91,9 +91,9 @@
       ansible.builtin.command: >
         /cluster/etcd/etcdctl endpoint health
         --endpoints=https://{{ ansible_host }}:2379
-        --cacert=/cluster/pki/etcd/etcd.crt
-        --cert=/cluster/pki/etcd/client.crt
-        --key=/cluster/pki/etcd/client.key
+        --cacert=/data/ca/etcd/etcd.crt
+        --cert=/data/ca/etcd/client.crt
+        --key=/data/ca/etcd/client.key
       register: etcd_health
       until: etcd_health.rc == 0
       retries: 20
@@ -104,7 +104,7 @@
       ansible.builtin.command: >
         /cluster/etcd/etcdctl member list
         --endpoints=https://{{ ansible_host }}:2379
-        --cacert=/cluster/pki/etcd/etcd.crt
-        --cert=/cluster/pki/etcd/client.crt
-        --key=/cluster/pki/etcd/client.key
+        --cacert=/data/ca/etcd/etcd.crt
+        --cert=/data/ca/etcd/client.crt
+        --key=/data/ca/etcd/client.key
       changed_when: false

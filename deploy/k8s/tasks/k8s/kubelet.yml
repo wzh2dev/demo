@@ -19,7 +19,7 @@
             anonymous:
               enabled: false
             x509:
-              clientCAFile: /cluster/pki/k8s/k8s.crt
+              clientCAFile: /data/ca/k8s/k8s.crt
           authorization:
             mode: Webhook
           clusterDomain: {{ cluster_domain }}

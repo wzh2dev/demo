@@ -1,16 +1,16 @@
 - name: 创建根 CA 工作目录
   ansible.builtin.file:
-    path: /cluster/pki/root
+    path: /data/ca/root
     state: directory
 
 - name: 生成根 CA 私钥
-  ansible.builtin.command: openssl genrsa -aes256 -out /cluster/pki/root/root.key -passout pass:root 4096
+  ansible.builtin.command: openssl genrsa -aes256 -out /data/ca/root/root.key -passout pass:root 4096
   args:
-    creates: /cluster/pki/root/root.key
+    creates: /data/ca/root/root.key
 
 - name: 写入根 CA 自签名证书配置
   ansible.builtin.copy:
-    dest: /cluster/pki/root/root.cnf
+    dest: /data/ca/root/root.cnf
     content: |
       [ req ]
       prompt             = no
@@ -33,18 +33,18 @@
 - name: 生成根 CA 自签名证书
   ansible.builtin.command: >
     openssl req -x509 -new
-    -config /cluster/pki/root/root.cnf
+    -config /data/ca/root/root.cnf
     -extensions v3_ca
-    -key /cluster/pki/root/root.key
+    -key /data/ca/root/root.key
     -passin pass:root
-    -out /cluster/pki/root/root.crt
+    -out /data/ca/root/root.crt
     -days 3650
     -sha256
   args:
-    creates: /cluster/pki/root/root.crt
+    creates: /data/ca/root/root.crt
 
 - name: 校验根 CA 证书
-  ansible.builtin.command: openssl verify -CAfile /cluster/pki/root/root.crt /cluster/pki/root/root.crt
+  ansible.builtin.command: openssl verify -CAfile /data/ca/root/root.crt /data/ca/root/root.crt
   changed_when: false
 
 - name: 创建根 CA 的 newcerts / crl 目录
@@ -52,12 +52,12 @@
     path: "{{ item }}"
     state: directory
   loop:
-    - /cluster/pki/root/newcerts
-    - /cluster/pki/root/crl
+    - /data/ca/root/newcerts
+    - /data/ca/root/crl
 
 - name: 初始化根 CA 的证书数据库 index.txt
   ansible.builtin.file:
-    path: /cluster/pki/root/index.txt
+    path: /data/ca/root/index.txt
     state: touch
     modification_time: preserve
     access_time: preserve
@@ -68,18 +68,18 @@
     dest: "{{ item }}"
     force: false
   loop:
-    - /cluster/pki/root/serial
-    - /cluster/pki/root/crlnumber
+    - /data/ca/root/serial
+    - /data/ca/root/crlnumber
 
 - name: 写入根 CA 签发配置
   ansible.builtin.copy:
-    dest: /cluster/pki/root/root_ca.cnf
+    dest: /data/ca/root/root_ca.cnf
     content: |
       [ ca ]
       default_ca = ca_default
 
       [ ca_default ]
-      dir             = /cluster/pki/root
+      dir             = /data/ca/root
       crl_dir         = $dir/crl
       new_certs_dir   = $dir/newcerts
       database        = $dir/index.txt

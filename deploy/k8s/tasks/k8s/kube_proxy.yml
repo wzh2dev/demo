@@ -2,8 +2,8 @@
   block:
     - name: 分发 kube-proxy 客户端证书及私钥
       ansible.builtin.copy:
-        src: /cluster/pki/k8s/kube-proxy-client.{{ item }}
-        dest: /cluster/pki/k8s/
+        src: /data/ca/k8s/kube-proxy-client.{{ item }}
+        dest: /data/ca/k8s/
       loop:
         - crt
         - key

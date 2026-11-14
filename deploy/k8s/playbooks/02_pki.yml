@@ -52,10 +52,10 @@
         path: "{{ item }}"
         state: directory
       loop:
-        - /cluster/pki/root
-        - /cluster/pki/etcd
-        - /cluster/pki/k8s
-        - /cluster/pki/front-proxy
+        - /data/ca/root
+        - /data/ca/etcd
+        - /data/ca/k8s
+        - /data/ca/front-proxy
   tasks:
     - name: 分发 CA 证书
       ansible.builtin.import_tasks: ../tasks/pki/distribute_ca.yml
