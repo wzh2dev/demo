@@ -26,6 +26,10 @@
     "usernamehw.errorlens",
     "tamasfe.even-better-toml",
     "qwtel.sqlite-viewer",
-    "redhat.vscode-community-server-connector"
+    "redhat.vscode-community-server-connector",
+    "llvm-vs-code-extensions.vscode-clangd",
+    "vadimcn.vscode-lldb",
+    "ms-vscode.makefile-tools",
+    "ms-vscode.cmake-tools"
   ]
 }
